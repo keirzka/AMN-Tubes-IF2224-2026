@@ -4,15 +4,15 @@
 map<string, string> dictionary;
 
 void INIT_DICTIONARY() {
-    dictionary["NOT"] = "notsy";
+    dictionary["not"] = "notsy";
     dictionary["+"] = "plus";
     dictionary["-"] = "minus";
     dictionary["*"] = "times";
     dictionary["div"] = "idiv";
     dictionary["/"] = "rdiv";
-    dictionary["MOD"] = "imod";
-    dictionary["AND"] = "andsy";
-    dictionary["OR"] = "orsy";
+    dictionary["mod"] = "imod";
+    dictionary["and"] = "andsy";
+    dictionary["or"] = "orsy";
     dictionary["=="] = "eql";
     dictionary["<>"] = "neq";
     dictionary[">"] = "gtr";
@@ -29,7 +29,7 @@ void INIT_DICTIONARY() {
     dictionary[":"] = "colon";
     dictionary[":="] = "becomes";
     dictionary["const"] = "constsy";
-    dictionary["type "] = "typesy";
+    dictionary["type"] = "typesy";
     dictionary["var"] = "varsy";
     dictionary["function"] = "functionsy";
     dictionary["procedure"] = "proceduresy";

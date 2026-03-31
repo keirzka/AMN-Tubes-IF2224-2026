@@ -125,4 +125,17 @@ void SAVE_TOKEN_LIST ();
  */
 void READ_ALL_FILE ();
 
+bool IS_LETTER(char c);
+bool IS_DIGIT(char c);
+bool IS_ALNUM(char c);
+bool IS_WHITESPACE(char c);
+
+void SKIP_WHITESPACE();
+void READ_IDENTIFIER_OR_KEYWORD();
+void READ_NUMBER();
+void READ_SPECIAL_TOKEN();
+
+string TO_LOWER(const string& s);
+void ADD_TOKEN(const string& tokenType, const string& lexeme = "");
+
 #endif

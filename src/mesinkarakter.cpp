@@ -14,20 +14,18 @@ void INPUT_FILE ()
         string fileName;
         getline(cin, fileName);
 
-        ifstream fInput ("test/milestone-1/" + fileName);
+        ifstream fInput("test/milestone-1/" + fileName);
 
-        // cout << endl;
         if (!fInput.is_open()) {
             cout << "File dengan nama: " << fileName << " tidak ditemukan!" << endl;
         }
         else {
+            fInput.close();
             fileStream.open("test/milestone-1/" + fileName);
             break;
         }
     }
-
 }
-
 
 void START_FILE()
 {
@@ -39,8 +37,6 @@ void START_FILE()
     }
     else {
         currentChar = firstChar;
-        currentWord = firstChar;
-        currentWordState = CHARACTER_STATE();
     }
 }
 
@@ -55,7 +51,6 @@ void ADV()
     else {
         currentChar = nextChar;
     }
-    
 }
 
 int CHARACTER_STATE () 
@@ -67,7 +62,8 @@ int CHARACTER_STATE ()
     }
     else if (currentChar == ' '
     || currentChar == '\n'
-    || currentChar == '\r') {
+    || currentChar == '\r'
+    || currentChar == '\t') {
         return BLANK_CHARACTER;
     }
     else {
@@ -75,9 +71,146 @@ int CHARACTER_STATE ()
     }
 }
 
+bool IS_LETTER(char c) {
+    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+}
+
+bool IS_DIGIT(char c) {
+    return (c >= '0' && c <= '9');
+}
+
+bool IS_ALNUM(char c) {
+    return IS_LETTER(c) || IS_DIGIT(c);
+}
+
+bool IS_WHITESPACE(char c) {
+    return c == ' ' || c == '\n' || c == '\r' || c == '\t';
+}
+
+string TO_LOWER(const string& s) {
+    string res = s;
+    for (int i = 0; i < (int)res.length(); i++) {
+        if (res[i] >= 'A' && res[i] <= 'Z') {
+            res[i] = res[i] - 'A' + 'a';
+        }
+    }
+    return res;
+}
+
+void ADD_TOKEN(const string& tokenType, const string& lexeme) {
+    if (lexeme == "") {
+        token_list.push_back(tokenType);
+    } else {
+        token_list.push_back(tokenType + " (" + lexeme + ")");
+    }
+}
+
+void SKIP_WHITESPACE() {
+    while (currentChar != '\0' && IS_WHITESPACE(currentChar)) {
+        ADV();
+    }
+}
+
+void READ_IDENTIFIER_OR_KEYWORD() {
+    string lexeme = "";
+    while (currentChar != '\0' && IS_ALNUM(currentChar)) {
+        lexeme += currentChar;
+        ADV();
+    }
+    string lowerLexeme = TO_LOWER(lexeme);
+    if (dictionary.find(lowerLexeme) != dictionary.end()) {
+        token_list.push_back(dictionary[lowerLexeme]);
+    } else {
+        ADD_TOKEN("ident", lexeme);
+    }
+}
+
+void READ_NUMBER() {
+    string lexeme = "";
+    while (currentChar != '\0' && IS_DIGIT(currentChar)) {
+        lexeme += currentChar;
+        ADV();
+    }
+    ADD_TOKEN("intcon", lexeme);
+}
+
+void READ_SPECIAL_TOKEN() {
+    if (currentChar == '=') {
+        ADV();
+        if (currentChar == '=') {
+            ADV();
+            token_list.push_back("eql");
+        } else {
+            cout << "Lexical error: '=' tunggal tidak valid." << endl;
+        }
+    }
+    else if (currentChar == '<') {
+        ADV();
+        if (currentChar == '>') {
+            ADV();
+            token_list.push_back("neq");
+        } else if (currentChar == '=') {
+            ADV();
+            token_list.push_back("leq");
+        } else {
+            token_list.push_back("lss");
+        }
+    }
+    else if (currentChar == '>') {
+        ADV();
+        if (currentChar == '=') {
+            ADV();
+            token_list.push_back("geq");
+        } else {
+            token_list.push_back("gtr");
+        }
+    }
+    else if (currentChar == ':') {
+        ADV();
+        if (currentChar == '=') {
+            ADV();
+            token_list.push_back("becomes");
+        } else {
+            token_list.push_back("colon");
+        }
+    }
+    else if (currentChar == '(') {
+        ADV();
+        token_list.push_back("lparent");
+    }
+    else if (currentChar == ')') {
+        ADV();
+        token_list.push_back("rparent");
+    }
+    else if (currentChar == '[') {
+        ADV();
+        token_list.push_back("lbrack");
+    }
+    else if (currentChar == ']') {
+        ADV();
+        token_list.push_back("rbrack");
+    }
+    else if (currentChar == ',') {
+        ADV();
+        token_list.push_back("comma");
+    }
+    else if (currentChar == ';') {
+        ADV();
+        token_list.push_back("semicolon");
+    }
+    else if (currentChar == '.') {
+        ADV();
+        token_list.push_back("period");
+    }
+    else {
+        cout << "Lexical error: karakter tidak dikenal '" << currentChar << "'" << endl;
+        ADV();
+    }
+}
+
 void PRINT_TOKEN_LIST () 
 {
-    for (int i = 0; i < token_list.size(); i++) {
+    for (int i = 0; i < (int)token_list.size(); i++) {
         cout << token_list[i] << endl;
     }
 }
@@ -87,9 +220,9 @@ void SAVE_TOKEN_LIST ()
     cout << "Masukkan nama file untuk menyimpan hasil : ";
     string fileName;
     getline(cin, fileName);
-    // cout << endl;
-    ofstream outputStream ("test/milestone-1/" + fileName + ".txt");
-    for (int i = 0; i < token_list.size(); i++) {
+
+    ofstream outputStream("test/milestone-1/" + fileName + ".txt");
+    for (int i = 0; i < (int)token_list.size(); i++) {
         outputStream << token_list[i] << endl;
     }
 }
@@ -98,17 +231,18 @@ void READ_ALL_FILE ()
 {
     START_FILE();
 
-    while (!fileStream.eof()) {
-        ADV();
-        if (CHARACTER_STATE() == currentWordState) {
-            currentWord += currentChar;
+    while (currentChar != '\0') {
+        if (IS_WHITESPACE(currentChar)) {
+            SKIP_WHITESPACE();
+        }
+        else if (IS_LETTER(currentChar)) {
+            READ_IDENTIFIER_OR_KEYWORD();
+        }
+        else if (IS_DIGIT(currentChar)) {
+            READ_NUMBER();
         }
         else {
-            if (currentWordState != BLANK_CHARACTER) {
-                token_list.push_back(currentWord);
-            }
-            currentWord = currentChar;
-            currentWordState = CHARACTER_STATE();
+            READ_SPECIAL_TOKEN();
         }
     }
 }
