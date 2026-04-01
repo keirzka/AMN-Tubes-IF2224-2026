@@ -134,6 +134,8 @@ void SKIP_WHITESPACE();
 void READ_IDENTIFIER_OR_KEYWORD();
 void READ_NUMBER();
 void READ_SPECIAL_TOKEN();
+void READ_STRING();
+void SKIP_COMMENT();
 
 string TO_LOWER(const string& s);
 void ADD_TOKEN(const string& tokenType, const string& lexeme = "");

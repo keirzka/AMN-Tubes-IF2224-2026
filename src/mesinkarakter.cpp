@@ -29,28 +29,14 @@ void INPUT_FILE ()
 
 void START_FILE()
 {
-    char firstChar;
-    fileStream.get(firstChar);
-
-    if (fileStream.eof() || fileStream.fail()) {
-        currentChar = '\0';
-    }
-    else {
-        currentChar = firstChar;
-    }
+    fileStream.get(currentChar);
+    if (fileStream.eof() || fileStream.fail()) currentChar = '\0';
 }
 
 void ADV()
 {
-    char nextChar;
-    fileStream.get(nextChar);
-
-    if (fileStream.eof() || fileStream.fail()) {
-        currentChar = '\0';
-    }
-    else {
-        currentChar = nextChar;
-    }
+    fileStream.get(currentChar);
+    if (fileStream.eof() || fileStream.fail()) currentChar = '\0';
 }
 
 int CHARACTER_STATE () 
@@ -127,103 +113,191 @@ void READ_IDENTIFIER_OR_KEYWORD() {
 
 void READ_NUMBER() {
     string lexeme = "";
+
     while (currentChar != '\0' && IS_DIGIT(currentChar)) {
         lexeme += currentChar;
         ADV();
     }
+
+    if (currentChar == '.') {
+        ADV();
+
+        if (IS_DIGIT(currentChar)) {
+            lexeme += '.';
+
+            while (currentChar != '\0' && IS_DIGIT(currentChar)) {
+                lexeme += currentChar;
+                ADV();
+            }
+
+            ADD_TOKEN("realcon", lexeme);
+            return;
+        } 
+        else {
+            ADD_TOKEN("intcon", lexeme);
+            ADD_TOKEN("period", "");
+            return;
+        }
+    }
+
     ADD_TOKEN("intcon", lexeme);
 }
 
+void READ_STRING() {
+    string lexeme = "";
+    ADV(); 
+
+    while (currentChar != '\0') {
+        if (currentChar == '\'') {
+            ADV();
+            if (currentChar == '\'') {
+                lexeme += '\'';
+                ADV();
+            } else {
+                ADD_TOKEN("string", lexeme);
+                return;
+            }
+        }
+        else if (currentChar == '\n') {
+            cout << "Lexical error: string tidak boleh multiline\n";
+            ADD_TOKEN("unknown", lexeme);
+            return;
+        }
+        else {
+            lexeme += currentChar;
+            ADV();
+        }
+    }
+
+    cout << "Lexical error: string tidak ditutup\n";
+    ADD_TOKEN("unknown", lexeme);
+}
+
+void SKIP_COMMENT_CURLY() {
+    ADV(); 
+
+    while (currentChar != '\0') {
+        if (currentChar == '}') {
+            ADV();
+            return;
+        }
+        else if (currentChar == '(') { 
+            return;
+        }
+        ADV();
+    }
+
+    cout << "Lexical error: comment tidak ditutup\n";
+}
+
+void SKIP_COMMENT_PAREN() {
+    ADV(); 
+
+    while (currentChar != '\0') {
+        if (currentChar == '*') {
+            ADV();
+            if (currentChar == ')') {
+                ADV();
+                return;
+            }
+        }
+        else if (currentChar == '{') { 
+            return;
+        }
+        else {
+            ADV();
+        }
+    }
+
+    cout << "Lexical error: comment tidak ditutup\n";
+}
+
 void READ_SPECIAL_TOKEN() {
-    if (currentChar == '=') {
+
+    if (currentChar == '\'') {
+        READ_STRING();
+        return;
+    }
+
+    else if (currentChar == '{') {
+        SKIP_COMMENT_CURLY();
+        return;
+    }
+
+    else if (currentChar == '(') {
+        ADV();
+        if (currentChar == '*') {
+            SKIP_COMMENT_PAREN();
+            return;
+        } else {
+            ADD_TOKEN("lparent", "");
+            return;
+        }
+    }
+
+    else if (currentChar == '=') {
         ADV();
         if (currentChar == '=') {
             ADV();
-            token_list.push_back("eql");
+            ADD_TOKEN("eql", "");
         } else {
-            cout << "Lexical error: '=' tunggal tidak valid." << endl;
+            ADD_TOKEN("unknown", "=");
         }
+        return;
     }
+
     else if (currentChar == '<') {
         ADV();
         if (currentChar == '>') {
             ADV();
-            token_list.push_back("neq");
+            ADD_TOKEN("neq", "");
         } else if (currentChar == '=') {
             ADV();
-            token_list.push_back("leq");
+            ADD_TOKEN("leq", "");
         } else {
-            token_list.push_back("lss");
+            ADD_TOKEN("lss", "");
         }
+        return;
     }
+
     else if (currentChar == '>') {
         ADV();
         if (currentChar == '=') {
             ADV();
-            token_list.push_back("geq");
+            ADD_TOKEN("geq", "");
         } else {
-            token_list.push_back("gtr");
+            ADD_TOKEN("gtr", "");
         }
+        return;
     }
+
     else if (currentChar == ':') {
         ADV();
         if (currentChar == '=') {
             ADV();
-            token_list.push_back("becomes");
+            ADD_TOKEN("becomes", "");
         } else {
-            token_list.push_back("colon");
+            ADD_TOKEN("colon", "");
         }
+        return;
     }
-    else if (currentChar == '(') {
-        ADV();
-        token_list.push_back("lparent");
-    }
-    else if (currentChar == ')') {
-        ADV();
-        token_list.push_back("rparent");
-    }
-    else if (currentChar == '[') {
-        ADV();
-        token_list.push_back("lbrack");
-    }
-    else if (currentChar == ']') {
-        ADV();
-        token_list.push_back("rbrack");
-    }
-    else if (currentChar == ',') {
-        ADV();
-        token_list.push_back("comma");
-    }
-    else if (currentChar == ';') {
-        ADV();
-        token_list.push_back("semicolon");
-    }
-    else if (currentChar == '.') {
-        ADV();
-        token_list.push_back("period");
-    }
+
+    else if (currentChar == '+') { ADV(); ADD_TOKEN("plus", ""); return; }
+    else if (currentChar == '-') { ADV(); ADD_TOKEN("minus", ""); return; }
+    else if (currentChar == '*') { ADV(); ADD_TOKEN("times", ""); return; }
+    else if (currentChar == '/') { ADV(); ADD_TOKEN("rdiv", ""); return; }
+    else if (currentChar == ')') { ADV(); ADD_TOKEN("rparent", ""); return; }
+    else if (currentChar == '[') { ADV(); ADD_TOKEN("lbrack", ""); return; }
+    else if (currentChar == ']') { ADV(); ADD_TOKEN("rbrack", ""); return; }
+    else if (currentChar == ',') { ADV(); ADD_TOKEN("comma", ""); return; }
+    else if (currentChar == ';') { ADV(); ADD_TOKEN("semicolon", ""); return; }
+    else if (currentChar == '.') { ADV(); ADD_TOKEN("period", ""); return; }
+
     else {
-        cout << "Lexical error: karakter tidak dikenal '" << currentChar << "'" << endl;
+        string tmp(1, currentChar);
+        ADD_TOKEN("unknown", tmp);
         ADV();
-    }
-}
-
-void PRINT_TOKEN_LIST () 
-{
-    for (int i = 0; i < (int)token_list.size(); i++) {
-        cout << token_list[i] << endl;
-    }
-}
-
-void SAVE_TOKEN_LIST () 
-{
-    cout << "Masukkan nama file untuk menyimpan hasil : ";
-    string fileName;
-    getline(cin, fileName);
-
-    ofstream outputStream("test/milestone-1/" + fileName + ".txt");
-    for (int i = 0; i < (int)token_list.size(); i++) {
-        outputStream << token_list[i] << endl;
+        return;
     }
 }
 
@@ -244,5 +318,24 @@ void READ_ALL_FILE ()
         else {
             READ_SPECIAL_TOKEN();
         }
+    }
+}
+
+void PRINT_TOKEN_LIST () 
+{
+    for (int i = 0; i < (int)token_list.size(); i++) {
+        cout << token_list[i] << endl;
+    }
+}
+
+void SAVE_TOKEN_LIST () 
+{
+    cout << "Masukkan nama file untuk menyimpan hasil : ";
+    string fileName;
+    getline(cin, fileName);
+
+    ofstream outputStream("test/milestone-1/" + fileName + ".txt");
+    for (int i = 0; i < (int)token_list.size(); i++) {
+        outputStream << token_list[i] << endl;
     }
 }
