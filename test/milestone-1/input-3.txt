@@ -1,0 +1,39 @@
+program DataTest;
+
+type
+  myArray = array[1..10] of integer;
+  myRecord = record
+    c: char;
+    s: string;
+  end;
+
+var
+  a: myArray;
+  r: myRecord;
+
+begin
+  r.c := 'A';
+  r.s := 'HelloWorld';
+
+  { ===== TEST ESCAPE CHARACTER ===== }
+
+  r.s := 'It''s fine';          { escape di tengah }
+  r.s := 'I''m learning';       { escape di tengah }
+  r.s := '''';                  { 1 karakter ' }
+  r.s := 'A''B''C';             { multiple escape }
+  r.s := '123''456';            { angka + escape }
+
+  { ===== EDGE CASE ===== }
+
+  r.s := '';                    { string kosong }
+  r.s := ' ';                   { spasi }
+  r.s := '''Hello''';           { quote di awal & akhir }
+  r.s := 'End with quote''';    { escape di akhir }
+
+  { ===== ERROR CASE ===== }
+
+  r.s := 'Unclosed string;      { tidak ditutup }
+  r.s := 'Line
+break';                         { multiline (error) }
+
+end.
