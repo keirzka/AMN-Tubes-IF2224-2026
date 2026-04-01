@@ -1,9 +1,7 @@
-#include "mesinkarakter.hpp"
+#include "lexer.hpp"
 
 // Variabel Global
 char currentChar;
-string currentWord;
-int currentWordState;
 vector<string> token_list;
 ifstream fileStream; 
 
@@ -143,26 +141,34 @@ void READ_NUMBER() {
     ADD_TOKEN("intcon", lexeme);
 }
 
-void READ_STRING() {
+void READ_STRING_OR_CHAR() {
     string lexeme = "";
     ADV(); 
 
     while (currentChar != '\0') {
         if (currentChar == '\'') {
-            ADV();
-            if (currentChar == '\'') {
+            if (peek() == '\'') { // escape '
+                ADV(); // ke '
                 lexeme += '\'';
+                ADV(); // lanjut setelah escape
+            } 
+            else { // ' sebagai closing
                 ADV();
-            } else {
-                ADD_TOKEN("string", lexeme);
+                if (lexeme.length() == 1) {
+                    ADD_TOKEN("charcon", lexeme);
+                } else {
+                    ADD_TOKEN("string", lexeme);
+                }
                 return;
             }
         }
+
         else if (currentChar == '\n') {
             cout << "Lexical error: string tidak boleh multiline\n";
             ADD_TOKEN("unknown", lexeme);
             return;
         }
+
         else {
             lexeme += currentChar;
             ADV();
@@ -173,6 +179,11 @@ void READ_STRING() {
     ADD_TOKEN("unknown", lexeme);
 }
 
+char peek() {
+    if (fileStream.eof()) return '\0';
+    return fileStream.peek();
+}
+
 void SKIP_COMMENT_CURLY() {
     ADV(); 
 
@@ -181,9 +192,9 @@ void SKIP_COMMENT_CURLY() {
             ADV();
             return;
         }
-        else if (currentChar == '(') { 
-            return;
-        }
+        // else if (currentChar == '(') { 
+        //     return;
+        // }
         ADV();
     }
 
@@ -215,7 +226,7 @@ void SKIP_COMMENT_PAREN() {
 void READ_SPECIAL_TOKEN() {
 
     if (currentChar == '\'') {
-        READ_STRING();
+        READ_STRING_OR_CHAR();
         return;
     }
 
@@ -225,12 +236,14 @@ void READ_SPECIAL_TOKEN() {
     }
 
     else if (currentChar == '(') {
-        ADV();
-        if (currentChar == '*') {
+        if (peek() == '*') { // cek next dulu
+            ADV(); // skip (
+            ADV(); // skip *
             SKIP_COMMENT_PAREN();
             return;
         } else {
             ADD_TOKEN("lparent", "");
+            ADV();
             return;
         }
     }

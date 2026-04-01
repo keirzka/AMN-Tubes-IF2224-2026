@@ -1,4 +1,4 @@
-#include "mesinkarakter.hpp"
+#include "lexer.hpp"
 
 int main () {
     INIT_DICTIONARY();

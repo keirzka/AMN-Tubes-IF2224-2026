@@ -38,8 +38,6 @@ using namespace std;
 
 // Variabel global
 extern char currentChar; // karakter yang dibaca saat ini
-extern string currentWord; // kata yang terbentuk dari karakter-karakter saat ini
-extern int currentWordState; // state kata
 extern vector<string> token_list; // array dinamis berisi semua token (kata)
 extern ifstream fileStream; // stream untuk membaca file
 
@@ -134,7 +132,8 @@ void SKIP_WHITESPACE();
 void READ_IDENTIFIER_OR_KEYWORD();
 void READ_NUMBER();
 void READ_SPECIAL_TOKEN();
-void READ_STRING();
+void READ_STRING_OR_CHAR();
+char peek();
 void SKIP_COMMENT();
 
 string TO_LOWER(const string& s);
