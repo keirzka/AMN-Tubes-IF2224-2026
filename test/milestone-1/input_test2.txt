@@ -1,0 +1,25 @@
+program OpsTest;
+
+var
+  x, y: integer;
+
+begin
+  x := 10;
+  y := 5;
+
+  if x == y then
+    x := x + y;
+  if x <> y then
+    x := x - y;
+  if x > y then
+    x := x * y;
+  if x >= y then
+    x := x div y;
+  if x < y then
+    x := x / y;
+  if x <= y then
+    x := x MOD y;
+
+  if NOT (x == y) AND (x > y) OR (y < x) then
+    x := y;
+end.

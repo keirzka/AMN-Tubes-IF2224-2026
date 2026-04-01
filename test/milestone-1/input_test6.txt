@@ -1,0 +1,8 @@
+program CrazyIdent;
+
+var
+  h4g, identIniSangatPanjang24tetapiTetapValid, X123: integer;
+
+begin
+  X123 := 100;
+end.

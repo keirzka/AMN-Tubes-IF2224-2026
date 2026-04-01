@@ -1,0 +1,18 @@
+program CommentTest;
+
+var
+  x: integer;
+
+begin
+  { ini komentar biasa }
+  x := 5;
+
+  (* ini komentar
+     multi-line *)
+
+  x := x + 10;
+
+  { komentar dengan simbol aneh + - * / := }
+
+  x := 'Not a { comment }';
+end.
