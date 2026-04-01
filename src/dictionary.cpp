@@ -49,5 +49,8 @@ void INIT_DICTIONARY() {
     dictionary["do"] = "dosy";
     dictionary["to"] = "tosy";
     dictionary["downto"] = "downtosy";
-    dictionary["then"] = "thensy";
+    dictionary["int"] = "intcon";
+    dictionary["float"] = "realcon";
+    dictionary["char"] = "charcon";
+    dictionary["string"] = "string";
 }

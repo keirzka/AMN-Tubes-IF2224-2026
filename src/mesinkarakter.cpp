@@ -134,6 +134,19 @@ void READ_NUMBER() {
     ADD_TOKEN("intcon", lexeme);
 }
 
+// void READ_STRING(){
+//     string lexeme = "";
+//     while (currentChar != '\0' && IS_LETTER(currentChar)) {
+//         lexeme += currentChar;
+//         ADV();
+//     }
+//     ADD_TOKEN("string", lexeme);
+// }
+
+// void READ_CHAR(){
+
+// }
+
 void READ_SPECIAL_TOKEN() {
     if (currentChar == '=') {
         ADV();
@@ -201,6 +214,37 @@ void READ_SPECIAL_TOKEN() {
     else if (currentChar == '.') {
         ADV();
         token_list.push_back("period");
+    }
+    else if (currentChar == '+'){
+        ADV();
+        token_list.push_back("plus");
+    }
+    else if (currentChar == '-'){
+        ADV();
+        token_list.push_back("minus");
+    }else if (currentChar == '*'){
+        ADV();
+        token_list.push_back("times");
+    }
+    else if (currentChar == '/'){
+        ADV();
+        token_list.push_back("rdiv");
+    }
+    else if (currentChar == 'div'){
+        ADV();
+        token_list.push_back("idiv");
+    }
+    else if (currentChar == 'MOD'){
+        ADV();
+        token_list.push_back("imod");
+    }
+    else if (currentChar == 'AND'){
+        ADV();
+        token_list.push_back("andsy");
+    }
+    else if (currentChar == 'OR'){
+        ADV();
+        token_list.push_back("orsy");
     }
     else {
         cout << "Lexical error: karakter tidak dikenal '" << currentChar << "'" << endl;
