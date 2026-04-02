@@ -1,0 +1,12 @@
+# object files
+*.o
+*.obj
+
+# executables
+*.exe
+bin/main
+
+# Build directories
+obj/
+bin/
+
