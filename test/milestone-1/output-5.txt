@@ -1,23 +1,25 @@
 programsy
-ident (Test1)
+ident (CommentTest)
 semicolon
 varsy
-ident (a)
-comma
-ident (b)
+ident (x)
 colon
 ident (integer)
 semicolon
 beginsy
-ident (a)
+ident (x)
 becomes
 intcon (5)
 semicolon
-ident (b)
+ident (x)
 becomes
-ident (a)
+ident (x)
 plus
 intcon (10)
+semicolon
+ident (x)
+becomes
+string (Not a { comment })
 semicolon
 endsy
 period

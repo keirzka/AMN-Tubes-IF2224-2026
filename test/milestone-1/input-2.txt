@@ -23,3 +23,4 @@ begin
   if NOT (x == y) AND (x > y) OR (y < x) then
     x := y;
 end.
+

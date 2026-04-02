@@ -1,0 +1,119 @@
+programsy
+ident (DataTest)
+semicolon
+typesy
+ident (myArray)
+unknown (=)
+arraysy
+lbrack
+intcon (1)
+period
+period
+intcon (10)
+rbrack
+ofsy
+ident (integer)
+semicolon
+ident (myRecord)
+unknown (=)
+recordsy
+ident (c)
+colon
+ident (char)
+semicolon
+ident (s)
+colon
+ident (string)
+semicolon
+endsy
+semicolon
+varsy
+ident (a)
+colon
+ident (myArray)
+semicolon
+ident (r)
+colon
+ident (myRecord)
+semicolon
+beginsy
+ident (r)
+period
+ident (c)
+becomes
+charcon (A)
+semicolon
+ident (r)
+period
+ident (s)
+becomes
+string (HelloWorld)
+semicolon
+ident (r)
+period
+ident (s)
+becomes
+string (It's fine)
+semicolon
+ident (r)
+period
+ident (s)
+becomes
+string (I'm learning)
+semicolon
+ident (r)
+period
+ident (s)
+becomes
+charcon (')
+semicolon
+ident (r)
+period
+ident (s)
+becomes
+string (A'B'C)
+semicolon
+ident (r)
+period
+ident (s)
+becomes
+string (123'456)
+semicolon
+ident (r)
+period
+ident (s)
+becomes
+string
+semicolon
+ident (r)
+period
+ident (s)
+becomes
+charcon ( )
+semicolon
+ident (r)
+period
+ident (s)
+becomes
+string ('Hello')
+semicolon
+ident (r)
+period
+ident (s)
+becomes
+string (End with quote')
+semicolon
+ident (r)
+period
+ident (s)
+becomes
+unknown (Unclosed string;      { tidak ditutup })
+ident (r)
+period
+ident (s)
+becomes
+unknown (Line)
+ident (break)
+unknown (;                         { multiline (error) })
+endsy
+period

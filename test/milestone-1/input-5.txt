@@ -16,3 +16,5 @@ begin
 
   x := 'Not a { comment }';
 end.
+
+

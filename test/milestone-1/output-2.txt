@@ -1,119 +1,111 @@
 programsy
-ident (DataTest)
-semicolon
-typesy
-ident (myArray)
-unknown (=)
-arraysy
-lbrack
-intcon (1)
-period
-period
-intcon (10)
-rbrack
-ofsy
-ident (integer)
-semicolon
-ident (myRecord)
-unknown (=)
-recordsy
-ident (c)
-colon
-ident (char)
-semicolon
-ident (s)
-colon
-ident (string)
-semicolon
-endsy
+ident (OpsTest)
 semicolon
 varsy
-ident (a)
+ident (x)
+comma
+ident (y)
 colon
-ident (myArray)
-semicolon
-ident (r)
-colon
-ident (myRecord)
+ident (integer)
 semicolon
 beginsy
-ident (r)
-period
-ident (c)
+ident (x)
 becomes
-charcon (A)
+intcon (10)
 semicolon
-ident (r)
-period
-ident (s)
+ident (y)
 becomes
-string (HelloWorld)
+intcon (5)
 semicolon
-ident (r)
-period
-ident (s)
+ifsy
+ident (x)
+eql
+ident (y)
+thensy
+ident (x)
 becomes
-string (It's fine)
+ident (x)
+plus
+ident (y)
 semicolon
-ident (r)
-period
-ident (s)
+ifsy
+ident (x)
+neq
+ident (y)
+thensy
+ident (x)
 becomes
-string (I'm learning)
+ident (x)
+minus
+ident (y)
 semicolon
-ident (r)
-period
-ident (s)
+ifsy
+ident (x)
+gtr
+ident (y)
+thensy
+ident (x)
 becomes
-charcon (')
+ident (x)
+times
+ident (y)
 semicolon
-ident (r)
-period
-ident (s)
+ifsy
+ident (x)
+geq
+ident (y)
+thensy
+ident (x)
 becomes
-string (A'B'C)
+ident (x)
+idiv
+ident (y)
 semicolon
-ident (r)
-period
-ident (s)
+ifsy
+ident (x)
+lss
+ident (y)
+thensy
+ident (x)
 becomes
-string (123'456)
+ident (x)
+rdiv
+ident (y)
 semicolon
-ident (r)
-period
-ident (s)
+ifsy
+ident (x)
+leq
+ident (y)
+thensy
+ident (x)
 becomes
-string
+ident (x)
+imod
+ident (y)
 semicolon
-ident (r)
-period
-ident (s)
+ifsy
+notsy
+lparent
+ident (x)
+eql
+ident (y)
+rparent
+andsy
+lparent
+ident (x)
+gtr
+ident (y)
+rparent
+orsy
+lparent
+ident (y)
+lss
+ident (x)
+rparent
+thensy
+ident (x)
 becomes
-charcon ( )
+ident (y)
 semicolon
-ident (r)
-period
-ident (s)
-becomes
-string ('Hello')
-semicolon
-ident (r)
-period
-ident (s)
-becomes
-string (End with quote')
-semicolon
-ident (r)
-period
-ident (s)
-becomes
-unknown (Unclosed string;      { tidak ditutup })
-ident (r)
-period
-ident (s)
-becomes
-unknown (Line)
-ident (break)
-unknown (;                         { multiline (error) })
 endsy
 period
