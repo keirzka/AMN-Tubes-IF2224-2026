@@ -1,0 +1,12 @@
+program Pretest Milestone 2;
+
+begin
+  katasambung;
+  kata pisah;
+  a := kata;
+
+  b := 1.23;
+  ident:=1;
+  .23.e-+/1.e-+/1
+
+end.

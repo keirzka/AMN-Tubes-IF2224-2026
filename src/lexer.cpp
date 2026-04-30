@@ -12,14 +12,14 @@ void INPUT_FILE ()
         string fileName;
         getline(cin, fileName);
 
-        ifstream fInput("test/milestone-1/" + fileName);
+        ifstream fInput("test/milestone-2/" + fileName);
 
         if (!fInput.is_open()) {
             cout << "File dengan nama: " << fileName << " tidak ditemukan!" << endl;
         }
         else {
             fInput.close();
-            fileStream.open("test/milestone-1/" + fileName);
+            fileStream.open("test/milestone-2/" + fileName);
             break;
         }
     }
@@ -314,6 +314,20 @@ void READ_SPECIAL_TOKEN() {
     }
 }
 
+void READ_UNKNOWN() {
+    string lexeme = "";
+
+    while (
+        currentChar != '\0' &&
+        !IS_WHITESPACE(currentChar)
+    ) {
+        lexeme += currentChar;
+        ADV();
+    }
+
+    ADD_TOKEN("unknown", lexeme);
+}
+
 void READ_ALL_FILE () 
 {
     START_FILE();
@@ -329,7 +343,23 @@ void READ_ALL_FILE ()
             READ_NUMBER();
         }
         else {
-            READ_SPECIAL_TOKEN();
+            // Cek Untuk kemungkinan valid token lanjutan
+            if(currentChar == ':' || currentChar == '<' || currentChar == '>' || currentChar == '='){
+                READ_SPECIAL_TOKEN();
+            }
+            // Cek untuk pasti single token
+            else if(currentChar == '+' || currentChar == '-' || currentChar == '*' || currentChar == '/' || currentChar == ')' || currentChar == '[' || currentChar == ']' || currentChar == ',' || currentChar == ';'){
+                if (!IS_WHITESPACE(peek()) && !IS_LETTER(peek()) && !IS_DIGIT(peek())) {
+                    READ_UNKNOWN(); 
+                } 
+                else {
+                    READ_SPECIAL_TOKEN(); // normal
+                }
+            }
+            // Untuk token yang tidak pernah match
+            else{
+                READ_UNKNOWN();
+            }
         }
     }
 }
@@ -347,7 +377,7 @@ void SAVE_TOKEN_LIST ()
     string fileName;
     getline(cin, fileName);
 
-    ofstream outputStream("test/milestone-1/" + fileName + ".txt");
+    ofstream outputStream("test/milestone-2/" + fileName + ".txt");
     for (int i = 0; i < (int)token_list.size(); i++) {
         outputStream << token_list[i] << endl;
     }

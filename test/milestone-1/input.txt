@@ -1,0 +1,10 @@
+program Test1;
+
+var
+  katasambung;
+  kata pisah;
+
+begin
+  a := kata;
+  b := a + 10;
+end.

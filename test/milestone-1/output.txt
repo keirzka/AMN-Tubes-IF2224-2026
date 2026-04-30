@@ -1,0 +1,24 @@
+programsy
+ident (Test1)
+semicolon
+varsy
+ident (a)
+comma
+ident (b)
+colon
+ident (integer)
+ident (real)
+semicolon
+beginsy
+ident (a)
+becomes
+intcon (5)
+semicolon
+ident (b)
+becomes
+ident (a)
+plus
+intcon (10)
+semicolon
+endsy
+period

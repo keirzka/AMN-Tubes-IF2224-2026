@@ -1,0 +1,22 @@
+programsy
+ident (Test1)
+semicolon
+varsy
+ident (katasambung)
+semicolon
+ident (kata)
+ident (pisah)
+semicolon
+beginsy
+ident (a)
+becomes
+ident (kata)
+semicolon
+ident (b)
+becomes
+ident (a)
+plus
+intcon (10)
+semicolon
+endsy
+period
