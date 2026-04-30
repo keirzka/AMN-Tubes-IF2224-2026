@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -Wall -std=c++11
+CXXFLAGS = -Wall -std=c++11 -I$(SRC_DIR)
 
 SRC_DIR = src
 OBJ_DIR = obj
