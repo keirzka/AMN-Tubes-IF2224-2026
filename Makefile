@@ -1,36 +1,31 @@
 CXX = g++
 CXXFLAGS = -Wall -std=c++11
 
-# Definisi Folder
 SRC_DIR = src
 OBJ_DIR = obj
 BIN_DIR = bin
 
-# Mencari file sumber
-SRCS = $(wildcard $(SRC_DIR)/*.cpp)
-
-# Mengubah src/file.cpp menjadi obj/file.o
-OBJS = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRCS))
-
-# Nama target dengan path folder bin
 TARGET = $(BIN_DIR)/main
+
+# Ambil semua file .cpp secara rekursif
+SRCS = $(shell find $(SRC_DIR) -name "*.cpp")
+
+# Ubah src/... jadi obj/...
+OBJS = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRCS))
 
 .PHONY: build run clean help
 
-# Target 'build' sekarang bergantung pada keberadaan folder
-build: $(BIN_DIR) $(OBJ_DIR) $(TARGET)
+build: $(TARGET)
 
-# Link file objek menjadi eksekusi
+# Link
 $(TARGET): $(OBJS)
+	@mkdir -p $(BIN_DIR)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
-# Kompilasi file .cpp menjadi .o di dalam folder obj
+# Compile + buat folder obj otomatis
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-# Rule untuk membuat direktori jika belum ada
-$(BIN_DIR) $(OBJ_DIR):
-	mkdir -p $@
 
 run: build
 	./$(TARGET)
@@ -40,7 +35,6 @@ clean:
 
 help:
 	@echo "Available targets:"
-	@echo "  make build  - Compile the program (outputs to bin/ and obj/)"
-	@echo "  make run    - Build and run the program"
-	@echo "  make clean  - Remove bin/ and obj/ directories"
-	@echo "  make help   - Show this help message"
+	@echo "  make build  - Compile program"
+	@echo "  make run    - Build and run"
+	@echo "  make clean  - Remove build files"

@@ -1,4 +1,7 @@
-#include "lexer.hpp"
+#include "lexer/lexer.hpp"
+#include "io/reader.hpp"
+#include "io/writer.hpp"
+
 
 int main () {
     INIT_DICTIONARY();
