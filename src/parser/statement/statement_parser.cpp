@@ -46,6 +46,10 @@ Node* parseStatement(TokenStream& ts){
     else if (ts.check("casesy")) return parseCaseStatement(ts);
     else if (ts.check("beginsy")) return parseCompoundStatement(ts);
 
+    if (ts.isEOF() || ts.check("endsy") || ts.check("untilsy") || ts.check("elsesy")) {
+        return new Node("<statement>");
+    }
+
     Node* node = new Node("<unknown-statement>");
     node->addChild(new Node(ts.current()));
     ts.advance();
