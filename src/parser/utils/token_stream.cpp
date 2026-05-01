@@ -28,6 +28,10 @@ std::string TokenStream::currentType() const{
         type.push_back(curr[i]);
         i++;
     }
+    
+    while (!type.empty() && type.back() == ' ') {
+        type.pop_back();
+    }
 
     return type;
 }

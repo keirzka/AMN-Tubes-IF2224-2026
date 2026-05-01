@@ -1,5 +1,6 @@
 #include "parser/core/program_parser.hpp"
 #include "parser/utils/error.hpp"
+#include "parser/statement/statement_parser.hpp"
 
 Node* parseProgram(TokenStream& ts){
     Node* node = new Node("<program>");
@@ -34,12 +35,17 @@ Node* parseProgramHeader(TokenStream& ts) {
     node->addChild(new Node(ts.current()));
     ts.advance();
 
-    // Expect identifier (nama program)
+    // Expect minimal 1 identifier
     if (!ts.check("ident")) {
         throwSyntaxError(ts.current(), "ident", ts.getIndex());
     }
-    node->addChild(new Node(ts.current())); // misal: ident(Hello)
+    node->addChild(new Node(ts.current()));
     ts.advance();
+
+    while (ts.check("ident") || ts.check("intcon")) {
+        node->addChild(new Node(ts.current()));
+        ts.advance();
+    }
 
     // Expect semicolon
     if (!ts.check("semicolon")) {
@@ -74,6 +80,5 @@ Node* parseDeclarationPartCoordinator(TokenStream& ts){
 
 // koordinasi statement : list/if/while/..
 Node* parseCompoundStatementCoordinator(TokenStream& ts){
-// TODO
-    return nullptr;
+    return parseCompoundStatement(ts);
 }

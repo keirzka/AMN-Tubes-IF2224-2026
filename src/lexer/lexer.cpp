@@ -309,6 +309,14 @@ void READ_ALL_FILE ()
             if(currentChar == ':' || currentChar == '<' || currentChar == '>' || currentChar == '='){
                 READ_SPECIAL_TOKEN();
             }
+
+            else if (currentChar == '.') {
+                if (IS_DIGIT(peek())) {
+                    READ_UNKNOWN();
+                } else {
+                    READ_SPECIAL_TOKEN(); 
+                }
+}
             // Cek untuk pasti single token
             else if(currentChar == '+' || currentChar == '-' || currentChar == '*' || currentChar == '/' || currentChar == ')' || currentChar == '[' || currentChar == ']' || currentChar == ',' || currentChar == ';'){
                 if (!IS_WHITESPACE(peek()) && !IS_LETTER(peek()) && !IS_DIGIT(peek())) {
