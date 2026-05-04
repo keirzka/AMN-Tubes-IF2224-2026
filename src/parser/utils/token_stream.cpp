@@ -104,8 +104,9 @@ int TokenStream::getIndex() const{
 std::string TokenStream::expect(const std::string& type, const std::string& context){
     if (!check(type)) {
         // lempar error — akan diimplementasikan setelah error.hpp selesai
-        throw std::runtime_error(
-            "Syntax error: unexpected '" + current() + "', expected '" + type + "'" + (context.empty() ? "" : " in " + context));
+        // throw std::runtime_error(
+        //     "Syntax error: unexpected '" + current() + "', expected '" + type + "'" + (context.empty() ? "" : " in " + context));
+        throwSyntaxError(current(), type, currentIndex);
     }
     std::string tok = current();
     advance();

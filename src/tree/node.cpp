@@ -10,6 +10,10 @@ void Node::addChild(Node* child){
     this->children.push_back(child);
 }
 
+std::string Node::getLabel () {
+    return this->label;
+}
+
 // Destructor untuk cleanup memory
 Node::~Node(){
     for(Node* child : children){

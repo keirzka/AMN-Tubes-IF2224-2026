@@ -1,27 +1,30 @@
 #include "expression_parser.hpp"
 #include "parser/utils/error.hpp"
 
-/**
- * <expression> → <simple-expression>
- */
+
 Node* parseExpression(TokenStream& ts){
     Node* node = new Node("<expression>");
 
     node->addChild(parseSimpleExpression(ts));
 
-    // TODO (Fakhry):
-    // Tambahkan relop handling:
-    // if (ts.check("eql") || ts.check("neq") ...)
-    //     parseSimpleExpression lagi
+    while (ts.check("eql") || ts.check("neq") || ts.check("gtr") || ts.check("geq") || ts.check("lss") || ts.check("leq")) {
+        node->addChild(new Node (ts.current()));
+        ts.advance();
+
+        node->addChild(parseSimpleExpression(ts));
+    }
 
     return node;
 }
 
-/**
- * <simple-expression> → <term> (addop <term>)*
- */
+
 Node* parseSimpleExpression(TokenStream& ts){
     Node* node = new Node("<simple-expression>");
+
+    while (ts.check("plus") || ts.check("minus") || ts.check("orsy")) {
+        node->addChild(new Node (ts.current()));
+        ts.advance();
+    }
 
     node->addChild(parseTerm(ts));
 
@@ -35,15 +38,12 @@ Node* parseSimpleExpression(TokenStream& ts){
     return node;
 }
 
-/**
- * <term> → <factor> (mulop <factor>)*
- */
 Node* parseTerm(TokenStream& ts){
     Node* node = new Node("<term>");
 
     node->addChild(parseFactor(ts));
 
-    while (ts.check("times") || ts.check("rdiv") || ts.check("idiv") || ts.check("andsy")) {
+    while (ts.check("times") || ts.check("rdiv") || ts.check("idiv") || ts.check("imod") || ts.check("andsy")) {
         node->addChild(new Node(ts.current())); // operator
         ts.advance();
 
@@ -53,19 +53,53 @@ Node* parseTerm(TokenStream& ts){
     return node;
 }
 
-/**
- * <factor> →
- *      ident
- *    | intcon
- *    | realcon
- *    | (expression)
- */
+Node* parseVariableTanpaIdent (TokenStream& ts) {
+    Node* node = new Node ("<variable>");
+
+    node->addChild(parseComponentVariable(ts));
+
+    return node;
+}
+
+Node* parseProcedureCallTanpaIdent (TokenStream& ts) {
+    Node* node = new Node("<procedure-call>");
+
+    if (ts.check("lparent")) {
+        node->addChild(new Node(ts.current()));
+        ts.advance();
+
+        if (!ts.check("rparent")) {
+            node->addChild(parseParameterList(ts));
+        }
+
+        node->addChild(new Node(ts.expect("rparent", "procedure call")));
+    }
+
+    while (ts.check("ident")) {
+        node->addChild(new Node(ts.current()));
+        ts.advance();
+    }
+
+    return node;
+}
+
 Node* parseFactor(TokenStream& ts){
     Node* node = new Node("<factor>");
 
-    if (ts.check("ident") || ts.check("intcon") || ts.check("realcon")) {
+    if (ts.check("intcon") || ts.check("realcon") || ts.check("charcon") || ts.check("string")) {
         node->addChild(new Node(ts.current()));
         ts.advance();
+    }
+    else if (ts.check("ident")) {
+        node->addChild(new Node(ts.current()));
+        ts.advance();
+
+        if (ts.check("ident")) { // variabel
+            node->addChild(parseVariableTanpaIdent(ts));
+        }
+        else if (ts.check("lparent")) { // procedure call
+            node->addChild(parseProcedureCallTanpaIdent(ts));
+        }
     }
     else if (ts.check("lparent")) {
         node->addChild(new Node(ts.current())); // (
@@ -75,8 +109,157 @@ Node* parseFactor(TokenStream& ts){
 
         node->addChild(new Node(ts.expect("rparent", "factor")));
     }
+    else if (ts.check("notsy")) {
+        node->addChild(new Node(ts.current()));
+        ts.advance();
+        node->addChild(parseFactor(ts));
+    }
     else {
         throwSyntaxError(ts.current(), "factor", ts.getIndex());
+    }
+
+    return node;
+}
+
+Node* parseVariable (TokenStream& ts) {
+    Node* node = new Node ("<variable>");
+
+    if (ts.check("ident")) {
+        node->addChild(new Node(ts.current()));
+        ts.advance();
+    }
+    else {
+        node->addChild(parseComponentVariable(ts));
+    }
+
+    return node;
+}
+
+Node* parseComponentVariable (TokenStream& ts) {
+    Node* node = new Node ("<component-variable>");
+
+    node->addChild(parseVariable(ts));
+
+    if (ts.check("lbrack")) {
+        node->addChild (parseIndexList(ts));
+
+        if (ts.check("rbrack")) {
+            node->addChild (new Node (ts.current()));
+        }
+        else {
+            throwSyntaxError(ts.current(), "rbrack", ts.getIndex());
+        }
+    }
+    else if (ts.check("period")) {
+        node->addChild (new Node (ts.current()));
+        ts.advance();
+
+        if (ts.check("ident")) {
+            node->addChild (new Node (ts.current()));
+            ts.advance();
+        }
+        else {
+            throwSyntaxError(ts.current(), "ident", ts.getIndex());
+        }
+    }
+    else {
+        throwSyntaxError(ts.current(), "[ or .", ts.getIndex());
+    }
+
+    return node;
+}
+
+Node* parseIndexList (TokenStream& ts) {
+    Node* node = new Node ("<index-list>");
+
+    if (ts.check("intcon") || ts.check("charcon") || ts.check("ident")) {
+        node->addChild (new Node(ts.current()));
+        ts.advance();
+
+        while (ts.check("comma")) {
+            node->addChild (new Node(ts.current()));
+            ts.advance();
+
+            node->addChild (parseIndexList(ts));
+        }
+    }
+    else {
+        throwSyntaxError(ts.current(), "intcon, charcon, ident", ts.getIndex());
+    }
+
+    return node;
+}
+
+// Node* parseAssignmentStatement (TokenStream& ts) {
+//     Node* node = new Node ("<assignment-statement>");
+
+//     node->addChild(parseVariable(ts));
+
+//     if (ts.check("becomes")) {
+//         node->addChild(new Node (ts.current()));
+//         ts.advance();
+
+//         node->addChild(parseExpression(ts));
+//     }
+//     else {
+//         throwSyntaxError (ts.current(), "becomes", ts.getIndex());
+//     }
+
+//     return node;
+// }
+
+Node* parseParameterList (TokenStream& ts) {
+    Node* node = new Node ("<parameter-list>");
+
+    node->addChild(parseExpression(ts));
+
+    while (ts.check("comma")) {
+        node->addChild(new Node (ts.current()));
+        ts.advance();
+
+        node->addChild(parseExpression(ts));
+    }
+
+    return node;
+}
+
+Node* parseRelationalOperator (TokenStream& ts) {
+    Node* node = new Node ("<relational-operator>");
+    // eql | neq | gtr | geq | lss | leq
+    if (ts.check("eql") || ts.check("neq") || ts.check("gtr") || ts.check("geq") || ts.check("lss") || ts.check("leq")) {
+        node->addChild (new Node(ts.current()));
+        ts.advance();
+    }
+    else {
+        throwSyntaxError(ts.current(), "relational operator", ts.getIndex());
+    }
+
+    return node;
+}
+
+Node* parseAdditiveOperator (TokenStream& ts) {
+    Node* node = new Node ("<additive-operator>");
+    // eql | neq | gtr | geq | lss | leq
+    if (ts.check("plus") || ts.check("minus") || ts.check("orsy")) {
+        node->addChild (new Node(ts.current()));
+        ts.advance();
+    }
+    else {
+        throwSyntaxError(ts.current(), "additive operator", ts.getIndex());
+    }
+
+    return node;
+}
+
+Node* parseMultiplicativeOperator (TokenStream& ts) {
+    Node* node = new Node ("<multiplicative-operator>");
+    // eql | neq | gtr | geq | lss | leq
+    if (ts.check("times") || ts.check("rdiv") || ts.check("idiv") || ts.check("imod") || ts.check("andsy")) {
+        node->addChild (new Node(ts.current()));
+        ts.advance();
+    }
+    else {
+        throwSyntaxError(ts.current(), "multiplicative operator", ts.getIndex());
     }
 
     return node;

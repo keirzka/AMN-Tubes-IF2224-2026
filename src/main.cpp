@@ -4,7 +4,8 @@
 #include "parser/parser.hpp"
 #include "parser/utils/error.hpp"
 
-extern std::vector<std::string> token_list;
+// std::vector<std::string> token_list;
+// Node* root;
 
 int main () {
 
@@ -20,9 +21,9 @@ int main () {
         Parser parser(token_list);
         Node* root = parser.parse();
 
-        // TODO : print tree
+        PRINT_PARSE_TREE (root, 0);
 
-        // TODO : save tree to file
+        SAVE_PARSE_TREE (root, 0);
 
         delete root;
     } catch (const SyntaxError& e){

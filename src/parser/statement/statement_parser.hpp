@@ -29,14 +29,14 @@ Node* parseStatementList(TokenStream& ts);
 Node* parseStatement(TokenStream& ts);
 
 /**
- * <assignment> → ident becomes <expression>
+ * <assignment> → variable becomes <expression>
  */
-Node* parseAssignment(TokenStream& ts);
+Node* parseAssignmentStatement(TokenStream& ts);
 
 /**
  * <procedure-call> → ident (lparent <expression-list>? rparent)?
  */
-Node* parseProcedureCall(TokenStream& ts);
+Node* parseProcedureFunctionCall(TokenStream& ts);
 
 /**
  * <if-statement> →
@@ -93,6 +93,6 @@ Node* parseConstantList(TokenStream& ts);
  * <expression-list> →
  *      <expression> (comma <expression>)*
  */
-Node* parseExpressionList(TokenStream& ts);
+// Node* parseExpressionList(TokenStream& ts);
 
 #endif

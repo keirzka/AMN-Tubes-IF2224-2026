@@ -34,9 +34,9 @@ Node* parseStatementList(TokenStream& ts){
 Node* parseStatement(TokenStream& ts){
     if (ts.check("ident")) {
         if (ts.peekType() == "becomes") {
-            return parseAssignment(ts);
+            return parseAssignmentStatement(ts);
         } else {
-            return parseProcedureCall(ts);
+            return parseProcedureFunctionCall(ts);
         }
     }
     else if (ts.check("ifsy")) return parseIfStatement(ts);
@@ -56,10 +56,11 @@ Node* parseStatement(TokenStream& ts){
     return node;
     }
 
-Node* parseAssignment(TokenStream& ts){
-    Node* node = new Node("<assignment>");
+Node* parseAssignmentStatement(TokenStream& ts){
+    Node* node = new Node("<assignment-statement>");
 
-    node->addChild(new Node(ts.expect("ident", "assignment")));
+    // node->addChild(new Node(ts.expect("ident", "assignment")));
+    node->addChild (parseVariable(ts));
     node->addChild(new Node(ts.expect("becomes", "assignment")));
 
     node->addChild(parseExpression(ts)); 
@@ -67,8 +68,8 @@ Node* parseAssignment(TokenStream& ts){
     return node;
 }
 
-Node* parseProcedureCall(TokenStream& ts){
-    Node* node = new Node("<procedure-call>");
+Node* parseProcedureFunctionCall(TokenStream& ts){
+    Node* node = new Node("<procedure/function-call>");
 
     node->addChild(new Node(ts.expect("ident", "procedure call")));
 
@@ -77,7 +78,8 @@ Node* parseProcedureCall(TokenStream& ts){
         ts.advance();
 
         if (!ts.check("rparent")) {
-            node->addChild(parseExpressionList(ts));
+            // node->addChild(parseExpressionList(ts));
+            node->addChild (parseParameterList(ts));
         }
 
         node->addChild(new Node(ts.expect("rparent", "procedure call")));
@@ -214,16 +216,16 @@ Node* parseConstantList(TokenStream& ts){
     return node;
 }
 
-Node* parseExpressionList(TokenStream& ts){
-    Node* node = new Node("<expression-list>");
+// Node* parseExpressionList(TokenStream& ts){
+//     Node* node = new Node("<expression-list>");
 
-    node->addChild(parseExpression(ts));
+//     node->addChild(parseExpression(ts));
 
-    while (ts.check("comma")) {
-        node->addChild(new Node(ts.current()));
-        ts.advance();
-        node->addChild(parseExpression(ts));
-    }
+//     while (ts.check("comma")) {
+//         node->addChild(new Node(ts.current()));
+//         ts.advance();
+//         node->addChild(parseExpression(ts));
+//     }
 
-    return node;
-}
+//     return node;
+// }

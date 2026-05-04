@@ -16,6 +16,8 @@ public:
     // Tambahkan child ke node ini
     void addChild(Node* child);
 
+    std::string getLabel ();
+
     // Destructor untuk cleanup memory
     ~Node();
 };

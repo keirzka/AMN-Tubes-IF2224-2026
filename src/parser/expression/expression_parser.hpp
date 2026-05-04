@@ -3,25 +3,22 @@
 
 #include "parser/utils/token_stream.hpp"
 #include "tree/node.hpp"
+#include "parser/statement/statement_parser.hpp"
 
-/**
- * IMPLEMENTASI MINIMAL (TIDAK FULL GRAMMAR)
- * 
- * Sudah mengikuti struktur:
- * <expression> → <simple-expression>
- * <simple-expression> → <term> (addop <term>)*
- * <term> → <factor> (mulop <factor>)*
- * <factor> → ident | number | (expression)
- * 
- * TODO (Fakhry):
- * - Tambah relop
- * - Tambah NOT, unary minus
- * - Tambah boolean expression
- */
+Node* parseExpression(TokenStream& ts); // ✅
+Node* parseSimpleExpression(TokenStream& ts); // ✅
+Node* parseTerm(TokenStream& ts); // ✅
+Node* parseVariableTanpaIdent (TokenStream& ts); // ✅
+Node* parseProcedureCallTanpaIdent (TokenStream& ts); // ✅
+Node* parseFactor(TokenStream& ts); // ✅
+Node* parseVariable (TokenStream& ts); // ✅
+Node* parseComponentVariable (TokenStream& ts); // ✅
+Node* parseIndexList (TokenStream& ts); // ✅
+// Node* parseAssignmentStatement (TokenStream& ts); // ✅
+Node* parseParameterList (TokenStream& ts); // ✅
+Node* parseRelationalOperator (TokenStream& ts); // ✅
+Node* parseAdditiveOperator (TokenStream& ts); // ✅
+Node* parseMultiplicativeOperator (TokenStream& ts); // ✅
 
-Node* parseExpression(TokenStream& ts);
-Node* parseSimpleExpression(TokenStream& ts);
-Node* parseTerm(TokenStream& ts);
-Node* parseFactor(TokenStream& ts);
 
 #endif
