@@ -129,7 +129,9 @@ Node* parseVariable (TokenStream& ts) {
         ts.advance();
     }
     else {
-        node->addChild(parseComponentVariable(ts));
+        while (ts.check("lbrack") || ts.check("period")) {
+            node->addChild(parseComponentVariable(ts));
+        }
     }
 
     return node;
@@ -138,7 +140,7 @@ Node* parseVariable (TokenStream& ts) {
 Node* parseComponentVariable (TokenStream& ts) {
     Node* node = new Node ("<component-variable>");
 
-    node->addChild(parseVariable(ts));
+    // node->addChild(parseVariable(ts));
 
     if (ts.check("lbrack")) {
         node->addChild (parseIndexList(ts));
