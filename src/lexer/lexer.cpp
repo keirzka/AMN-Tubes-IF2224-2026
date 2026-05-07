@@ -85,6 +85,11 @@ void READ_NUMBER() {
     }
 
     if (currentChar == '.') {
+        if (peek() == '.') {
+            ADD_TOKEN("intcon", lexeme);
+            return;
+        }
+
         ADV();
 
         if (IS_DIGIT(currentChar)) {
@@ -309,8 +314,24 @@ void READ_ALL_FILE ()
             if(currentChar == ':' || currentChar == '<' || currentChar == '>' || currentChar == '='){
                 READ_SPECIAL_TOKEN();
             }
-            // Cek untuk pasti single token
-            else if(currentChar == '+' || currentChar == '-' || currentChar == '*' || currentChar == '/' || currentChar == ')' || currentChar == '[' || currentChar == ']' || currentChar == ',' || currentChar == ';'){
+
+            else if(currentChar == '\'' || currentChar == '{' || currentChar == '(') {
+                READ_SPECIAL_TOKEN();
+            }
+
+            else if (currentChar == '.') {
+                READ_SPECIAL_TOKEN();
+            }
+
+            else if(currentChar == ';' || currentChar == ',') {
+                READ_SPECIAL_TOKEN();
+            }
+
+            else if(currentChar == ')' || currentChar == ']') {
+                READ_SPECIAL_TOKEN();
+            }
+
+            else if(currentChar == '+' || currentChar == '-' || currentChar == '*' || currentChar == '/' || currentChar == '['){
                 if (!IS_WHITESPACE(peek()) && !IS_LETTER(peek()) && !IS_DIGIT(peek())) {
                     READ_UNKNOWN(); 
                 } 

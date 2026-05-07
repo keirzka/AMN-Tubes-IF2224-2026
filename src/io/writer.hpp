@@ -5,6 +5,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include "tree/node.hpp"
 
 using namespace std;
 
@@ -29,5 +30,15 @@ void PRINT_TOKEN_LIST ();
  * 
  */
 void SAVE_TOKEN_LIST ();
+
+/*
+Print parse tree
+*/
+
+void PRINT_PARSE_TREE (Node* akar, int depth);
+
+void SAVE_PARSE_TREE (Node* akar, int depth);
+
+void SAVE_PARSE_TREE_RECCURSIVE (Node* akar, int depth, ofstream& os);
 
 #endif

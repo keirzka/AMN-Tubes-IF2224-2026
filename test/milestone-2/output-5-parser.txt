@@ -1,0 +1,227 @@
+<program>
+    <program-header>
+        programsy
+        ident (CommentTest)
+        semicolon
+    <declaration-part>
+        <var-declaration>
+            varsy
+            <identifier-list>
+                ident (x)
+            colon
+            <type>
+                ident (integer)
+            semicolon
+            <identifier-list>
+                ident (i)
+            colon
+            <type>
+                ident (integer)
+            semicolon
+    <compound-statement>
+        beginsy
+        <statement-list>
+            <assignment-statement>
+                <variable>
+                    ident (x)
+                becomes
+                <expression>
+                    <simple-expression>
+                        <term>
+                            <factor>
+                                intcon (5)
+            semicolon
+            <assignment-statement>
+                <variable>
+                    ident (x)
+                becomes
+                <expression>
+                    <simple-expression>
+                        <term>
+                            <factor>
+                                ident (x)
+                        <additive-operator>
+                            plus
+                        <term>
+                            <factor>
+                                intcon (10)
+            semicolon
+            <assignment-statement>
+                <variable>
+                    ident (x)
+                becomes
+                <expression>
+                    <simple-expression>
+                        <term>
+                            <factor>
+                                string (Not a { comment })
+            semicolon
+            <for-statement>
+                forsy
+                ident (i)
+                becomes
+                <expression>
+                    <simple-expression>
+                        <term>
+                            <factor>
+                                intcon (1)
+                tosy
+                <expression>
+                    <simple-expression>
+                        <term>
+                            <factor>
+                                intcon (10)
+                dosy
+                <assignment-statement>
+                    <variable>
+                        ident (i)
+                    becomes
+                    <expression>
+                        <simple-expression>
+                            <term>
+                                <factor>
+                                    ident (i)
+                            <additive-operator>
+                                plus
+                            <term>
+                                <factor>
+                                    intcon (1)
+            semicolon
+            <for-statement>
+                forsy
+                ident (i)
+                becomes
+                <expression>
+                    <simple-expression>
+                        <term>
+                            <factor>
+                                intcon (10)
+                downtosy
+                <expression>
+                    <simple-expression>
+                        <term>
+                            <factor>
+                                intcon (1)
+                dosy
+                <assignment-statement>
+                    <variable>
+                        ident (i)
+                    becomes
+                    <expression>
+                        <simple-expression>
+                            <term>
+                                <factor>
+                                    ident (i)
+                            <additive-operator>
+                                minus
+                            <term>
+                                <factor>
+                                    intcon (1)
+            semicolon
+            <while-statement>
+                whilesy
+                <expression>
+                    <simple-expression>
+                        <term>
+                            <factor>
+                                ident (i)
+                    gtr
+                    <simple-expression>
+                        <term>
+                            <factor>
+                                intcon (0)
+                dosy
+                <assignment-statement>
+                    <variable>
+                        ident (i)
+                    becomes
+                    <expression>
+                        <simple-expression>
+                            <term>
+                                <factor>
+                                    ident (i)
+                            <additive-operator>
+                                minus
+                            <term>
+                                <factor>
+                                    intcon (1)
+            semicolon
+            <repeat-statement>
+                repeatsy
+                <statement-list>
+                    <assignment-statement>
+                        <variable>
+                            ident (i)
+                        becomes
+                        <expression>
+                            <simple-expression>
+                                <term>
+                                    <factor>
+                                        ident (i)
+                                <additive-operator>
+                                    plus
+                                <term>
+                                    <factor>
+                                        intcon (1)
+                    semicolon
+                untilsy
+                <expression>
+                    <simple-expression>
+                        <term>
+                            <factor>
+                                ident (i)
+                    eql
+                    <simple-expression>
+                        <term>
+                            <factor>
+                                intcon (10)
+            semicolon
+            <case-statement>
+                casesy
+                <expression>
+                    <simple-expression>
+                        <term>
+                            <factor>
+                                ident (i)
+                ofsy
+                <case-list>
+                    <case-branch>
+                        <constant-list>
+                            <expression>
+                                <simple-expression>
+                                    <term>
+                                        <factor>
+                                            intcon (1)
+                        colon
+                        <assignment-statement>
+                            <variable>
+                                ident (i)
+                            becomes
+                            <expression>
+                                <simple-expression>
+                                    <term>
+                                        <factor>
+                                            intcon (100)
+                    semicolon
+                    <case-branch>
+                        <constant-list>
+                            <expression>
+                                <simple-expression>
+                                    <term>
+                                        <factor>
+                                            intcon (2)
+                        colon
+                        <assignment-statement>
+                            <variable>
+                                ident (i)
+                            becomes
+                            <expression>
+                                <simple-expression>
+                                    <term>
+                                        <factor>
+                                            intcon (200)
+                    semicolon
+                endsy
+            semicolon
+        endsy
+    period

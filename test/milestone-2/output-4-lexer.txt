@@ -1,0 +1,6 @@
+programsy
+ident (tesprogramkecil)
+semicolon
+beginsy
+endsy
+period
