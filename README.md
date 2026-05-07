@@ -66,7 +66,7 @@ atau jalankan langsung:
 ### 5. Contoh Penggunaan
 **Input:** File bernama `input-1.txt`
 ```
-program Test1;
+program Hello;
 
 var
   a, b: integer;
@@ -74,13 +74,14 @@ var
 begin
   a := 5;
   b := a + 10;
+  writeln('Result = ', b);
 end.
 ```
 
 **Output yang ditampilkan di terminal:**
 ```
 programsy
-ident (Test1)
+ident (Hello)
 semicolon
 varsy
 ident (a)
@@ -99,6 +100,13 @@ becomes
 ident (a)
 plus
 intcon (10)
+semicolon
+ident (writeln)
+lparent
+string (Result = )
+comma
+ident (b)
+rparent
 semicolon
 endsy
 period
