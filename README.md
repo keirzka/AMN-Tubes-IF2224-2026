@@ -7,7 +7,9 @@ Disusun oleh:
 
 ## Deskripsi Program
 
-Program ini adalah **Lexical Analyzer (Lexer)** untuk bahasa pemrograman mirip Pascal yang mengimplementasikan automata hingga dalam mengenali token-token dari kode sumber. Program membaca file teks berisi kode sumber dan menganalisisnya karakter per karakter, kemudian mengubahnya menjadi daftar token yang sesuai dengan definisi bahasa.
+Pada milestone 1, program ini adalah **Lexical Analyzer (Lexer)** untuk bahasa pemrograman mirip Pascal yang mengimplementasikan automata hingga dalam mengenali token-token dari kode sumber. Program membaca file teks berisi kode sumber dan menganalisisnya karakter per karakter, kemudian mengubahnya menjadi daftar token yang sesuai dengan definisi bahasa.
+
+Kemudian pada milestone 2, program dilanjutkan dengan implementasi **Syntax Analyzer (Parser)**. Pada bagian ini, program akan menerima hasil list token yang didapat dari lexer. Token-token tersebut kemudian akan dibangun menjadi sebuah parse tree. Pada bagian ini juga, program sudah bisa menganalisi beberapa error syntaxis, seperti penulisan nama variabel yang menggunakan simbol aneh ('*', '&', dan lain lain).
 
 ### Fitur Utama:
 - **Pembacaan File**: Membaca file input dari folder `test/milestone-1/`
@@ -78,7 +80,7 @@ begin
 end.
 ```
 
-**Output yang ditampilkan di terminal:**
+**Output yang hasil lexer ditampilkan di terminal:**
 ```
 programsy
 ident (Hello)
@@ -112,6 +114,73 @@ endsy
 period
 ```
 
+**Output yang hasil parser ditampilkan di terminal:**
+```
+<program>
+    <program-header>
+        programsy
+        ident (Hello)
+        semicolon
+    <declaration-part>
+        <var-declaration>
+            varsy
+            <identifier-list>
+                ident (a)
+                comma
+                ident (b)
+            colon
+            <type>
+                ident (integer)
+            semicolon
+    <compound-statement>
+        beginsy
+        <statement-list>
+            <assignment-statement>
+                <variable>
+                    ident (a)
+                becomes
+                <expression>
+                    <simple-expression>
+                        <term>
+                            <factor>
+                                intcon (5)
+            semicolon
+            <assignment-statement>
+                <variable>
+                    ident (b)
+                becomes
+                <expression>
+                    <simple-expression>
+                        <term>
+                            <factor>
+                                ident (a)
+                        <additive-operator>
+                            plus
+                        <term>
+                            <factor>
+                                intcon (10)
+            semicolon
+            <procedure/function-call>
+                ident (writeln)
+                lparent
+                <parameter-list>
+                    <expression>
+                        <simple-expression>
+                            <term>
+                                <factor>
+                                    string (Result = )
+                    comma
+                    <expression>
+                        <simple-expression>
+                            <term>
+                                <factor>
+                                    ident (b)
+                rparent
+            semicolon
+        endsy
+    period
+```
+
 ### 6. Target Make Lainnya
 ```bash
 make clean   # Menghapus folder obj/ dan bin/
@@ -121,22 +190,38 @@ make help    # Menampilkan informasi bantuan
 ## Pembagian Tugas
 
 13524071 Kalyca Nathania Benedicta Manullang 
-- Mengerjakan laporan
+- Mengerjakan laporan milestone 1
 - Mengerjakan implementasi program lexer
+- Membuat implementasi program bagian statement dan control flow 
+- Mengerjakan laporan tugas bagian implementasi program milestone 2
+
 
 13524073 Keisha Rizka Syofyani 
 - Membuat inisialisasi dokumen laporan
 - Membuat diagram transisi DFA
 - Mengerjakan implementasi program lexer
+- Membuat implementasi core program parser dan program utama
+- Refactor dan menyesuaikan struktur file dan program Milestone 1 serta revisi program pada Milestone 1
+- Membuat inisialisasi laporan, quality controlling isi laporan, mengerjakan bagian kesimpulan dan saran, serta finishing readme dan submission milestone 2
+
 
 13524087 Muhammad Fakhry Zaki 
-- Mengerjakan laporan
+- Mengerjakan laporan milestone 1
 - Mengerjakan implementasi program lexer
 - Membuat dictionary
+- Membuat implementasi program bagian expression parser dan operator
+- Membuat implementasi parser tree builder
+- Melakukan testing dan bug fixing
+- Mengerjakan laporan bagian testing program
+
 
 13524109 Helena Kristela Sarhawa 
 - Membuat diagram transisi DFA
 - Mengerjakan implementasi program lexer
+- Membuat implementasi program bagian declaration parser dan menangani edge case parsing declaration
+- Mengerjakan laporan tugas bagian landasan teori milestone 2
+
+
 
 
 
