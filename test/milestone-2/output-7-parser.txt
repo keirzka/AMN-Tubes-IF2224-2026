@@ -1,0 +1,46 @@
+<program>
+    <program-header>
+        programsy
+        ident (salahTapiTetepBener)
+        semicolon
+    <declaration-part>
+        <var-declaration>
+            varsy
+            <identifier-list>
+                ident (aajsbdsj)
+                comma
+                ident (bkadkn)
+            colon
+            <type>
+                ident (integer)
+            semicolon
+    <compound-statement>
+        beginsy
+        <statement-list>
+            <assignment-statement>
+                <variable>
+                    ident (a)
+                becomes
+                <expression>
+                    <simple-expression>
+                        <term>
+                            <factor>
+                                string (halo dunia)
+            semicolon
+            <assignment-statement>
+                <variable>
+                    ident (b)
+                becomes
+                <expression>
+                    <simple-expression>
+                        <term>
+                            <factor>
+                                ident (bkadkn)
+                        <additive-operator>
+                            plus
+                        <term>
+                            <factor>
+                                ident (a)
+            semicolon
+        endsy
+    period

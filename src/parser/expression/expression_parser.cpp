@@ -128,10 +128,10 @@ Node* parseFactor(TokenStream& ts){
 }
 
 Node* parseVariable (TokenStream& ts) {
-    if (ts.getIndex() > 90) {
-        std::cout << "masuk vairabel\n";
-        std::cout << ts.current() << std::endl;
-    }
+    // if (ts.getIndex() > 90) {
+    //     std::cout << "masuk vairabel\n";
+    //     std::cout << ts.current() << std::endl;
+    // }
     Node* node = new Node ("<variable>");
 
     if (ts.check("ident")) {
@@ -139,9 +139,9 @@ Node* parseVariable (TokenStream& ts) {
         ts.advance();
     }
     // else {
-    std::cout << "masuk sini" << std::endl;
+    // std::cout << "masuk sini" << std::endl;
     while (ts.check("lbrack") || ts.check("period")) {
-        std::cout << "masuk loop" << std::endl;
+        // std::cout << "masuk loop" << std::endl;
         node->addChild(parseComponentVariable(ts));
     }
     // }

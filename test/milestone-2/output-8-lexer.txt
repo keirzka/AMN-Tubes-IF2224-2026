@@ -1,0 +1,30 @@
+programsy
+ident (errorLagi)
+semicolon
+varsy
+ident (halodunia)
+comma
+ident (apala)
+comma
+ident (inimasibener)
+comma
+ident (yanginibarusalah)
+unknown (_)
+colon
+ident (integer)
+semicolon
+beginsy
+ident (halodunia)
+unknown (=)
+string (halo dunia beneran)
+semicolon
+ident (inimasibener)
+unknown (=)
+charcon (i)
+semicolon
+ident (writeln)
+lparent
+ident (yanginibarusalah)
+unknown (_);)
+endsy
+period

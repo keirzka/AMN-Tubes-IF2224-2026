@@ -1,0 +1,10 @@
+program salahTapiTetepBener;
+
+var
+  aajsbdsj, bkadkn: integer;
+
+begin
+  a := 'halo dunia';
+  b := bkadkn + a;
+
+end.

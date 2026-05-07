@@ -1,0 +1,11 @@
+program errorLagi;
+
+var
+  halodunia, apala, inimasibener, yanginibarusalah_ : integer; { underscrode gaboleh }
+
+begin
+  halodunia = 'halo dunia beneran';
+  inimasibener = 'i';
+  writeln(yanginibarusalah_);
+
+end.

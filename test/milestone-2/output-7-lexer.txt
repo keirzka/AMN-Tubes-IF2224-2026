@@ -1,0 +1,23 @@
+programsy
+ident (salahTapiTetepBener)
+semicolon
+varsy
+ident (aajsbdsj)
+comma
+ident (bkadkn)
+colon
+ident (integer)
+semicolon
+beginsy
+ident (a)
+becomes
+string (halo dunia)
+semicolon
+ident (b)
+becomes
+ident (bkadkn)
+plus
+ident (a)
+semicolon
+endsy
+period

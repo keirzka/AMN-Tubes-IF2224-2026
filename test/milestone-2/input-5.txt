@@ -11,7 +11,7 @@ begin
   (* ini komentar
      multi-line *)
 
-  x := x + 10;
+  x := x + {ini ada komen di tengah2 sini tapi tetep aman} 10;
 
   { komentar dengan simbol aneh + - * / := }
 
@@ -23,7 +23,7 @@ begin
   for i := 10 downto 1 do
     i := i - 1;
 
-  while i > 0 do
+  while i {halo dunia} > 0 do
     i := i - 1;
 
   repeat
