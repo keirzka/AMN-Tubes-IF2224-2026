@@ -4,6 +4,7 @@
 #include "parser/utils/token_stream.hpp"
 #include "tree/node.hpp"
 #include "parser/statement/statement_parser.hpp"
+#include <iostream>
 
 Node* parseExpression(TokenStream& ts); // ✅
 Node* parseSimpleExpression(TokenStream& ts); // ✅

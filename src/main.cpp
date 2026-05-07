@@ -28,7 +28,7 @@ int main () {
         delete root;
     } catch (const SyntaxError& e){
         std::cerr << e.what() <<std::endl;
-        return 1;
+        // return 1;
     }
 
     return 0;

@@ -36,7 +36,8 @@
                         <term>
                             <factor>
                                 ident (a)
-                        plus
+                        <additive-operator>
+                            plus
                         <term>
                             <factor>
                                 intcon (10)

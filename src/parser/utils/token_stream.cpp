@@ -101,6 +101,12 @@ int TokenStream::getIndex() const{
     return this->currentIndex;
 }
 
+void TokenStream::setIndex(int index){
+    if (index >= 0 && index < (int)this->tokens.size()) {
+        this->currentIndex = index;
+    }
+}
+
 std::string TokenStream::expect(const std::string& type, const std::string& context){
     if (!check(type)) {
         // lempar error — akan diimplementasikan setelah error.hpp selesai

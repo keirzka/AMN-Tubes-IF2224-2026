@@ -1,0 +1,39 @@
+program CommentTest;
+
+var
+  x: integer;
+  i: integer;
+
+begin
+  { ini komentar biasa }
+  x := 5;
+
+  (* ini komentar
+     multi-line *)
+
+  x := x + 10;
+
+  { komentar dengan simbol aneh + - * / := }
+
+  x := 'Not a { comment }';
+
+  for i := 1 to 10 do
+    i := i + 1;
+
+  for i := 10 downto 1 do
+    i := i - 1;
+
+  while i > 0 do
+    i := i - 1;
+
+  repeat
+    i := i + 1;
+  until i == 10;
+
+  case i of
+    1: i := 100;
+    2: i := 200;
+  end;
+end.
+
+

@@ -1,0 +1,111 @@
+programsy
+ident (OpsTest)
+semicolon
+varsy
+ident (x)
+comma
+ident (y)
+colon
+ident (integer)
+semicolon
+beginsy
+ident (x)
+becomes
+intcon (10)
+semicolon
+ident (y)
+becomes
+intcon (5)
+semicolon
+ifsy
+ident (x)
+eql
+ident (y)
+thensy
+ident (x)
+becomes
+ident (x)
+plus
+ident (y)
+semicolon
+ifsy
+ident (x)
+neq
+ident (y)
+thensy
+ident (x)
+becomes
+ident (x)
+minus
+ident (y)
+semicolon
+ifsy
+ident (x)
+gtr
+ident (y)
+thensy
+ident (x)
+becomes
+ident (x)
+times
+ident (y)
+semicolon
+ifsy
+ident (x)
+geq
+ident (y)
+thensy
+ident (x)
+becomes
+ident (x)
+idiv
+ident (y)
+semicolon
+ifsy
+ident (x)
+lss
+ident (y)
+thensy
+ident (x)
+becomes
+ident (x)
+rdiv
+ident (y)
+semicolon
+ifsy
+ident (x)
+leq
+ident (y)
+thensy
+ident (x)
+becomes
+ident (x)
+imod
+ident (y)
+semicolon
+ifsy
+notsy
+lparent
+ident (x)
+eql
+ident (y)
+rparent
+andsy
+lparent
+ident (x)
+gtr
+ident (y)
+rparent
+orsy
+lparent
+ident (y)
+lss
+ident (x)
+rparent
+thensy
+ident (x)
+becomes
+ident (y)
+semicolon
+endsy
+period

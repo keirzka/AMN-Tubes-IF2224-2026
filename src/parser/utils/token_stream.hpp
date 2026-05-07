@@ -41,6 +41,7 @@ public:
 
     // Posisi saat ini (berguna untuk error message)
     int getIndex() const;
+    void setIndex(int index);
 
     std::string expect(const std::string& type, const std::string& context = "");
 };

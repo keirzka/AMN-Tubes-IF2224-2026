@@ -33,9 +33,11 @@ Node* parseStatementList(TokenStream& ts){
 
 Node* parseStatement(TokenStream& ts){
     if (ts.check("ident")) {
-        if (ts.peekType() == "becomes") {
+        int saveIndex = ts.getIndex();
+        try {
             return parseAssignmentStatement(ts);
-        } else {
+        } catch (...) {
+            ts.setIndex(saveIndex);
             return parseProcedureFunctionCall(ts);
         }
     }

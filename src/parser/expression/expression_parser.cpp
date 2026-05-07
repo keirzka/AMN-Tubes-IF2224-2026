@@ -29,8 +29,9 @@ Node* parseSimpleExpression(TokenStream& ts){
     node->addChild(parseTerm(ts));
 
     while (ts.check("plus") || ts.check("minus") || ts.check("orsy")) {
-        node->addChild(new Node(ts.current())); // operator
-        ts.advance();
+        // node->addChild(new Node(ts.current())); // operator
+        node->addChild(parseAdditiveOperator(ts));
+        // ts.advance();
 
         node->addChild(parseTerm(ts));
     }
@@ -56,7 +57,12 @@ Node* parseTerm(TokenStream& ts){
 Node* parseVariableTanpaIdent (TokenStream& ts) {
     Node* node = new Node ("<variable>");
 
-    node->addChild(parseComponentVariable(ts));
+    while (ts.check("lbrack") || ts.check("period")) {
+        // std::cout << "masuk loop" << std::endl;
+        node->addChild(parseComponentVariable(ts));
+    }
+
+    // node->addChild(parseComponentVariable(ts));
 
     return node;
 }
@@ -94,7 +100,7 @@ Node* parseFactor(TokenStream& ts){
         node->addChild(new Node(ts.current()));
         ts.advance();
 
-        if (ts.check("ident")) { // variabel
+        if (ts.check("lbrack") || ts.check("period")) { // variabel
             node->addChild(parseVariableTanpaIdent(ts));
         }
         else if (ts.check("lparent")) { // procedure call
@@ -122,17 +128,23 @@ Node* parseFactor(TokenStream& ts){
 }
 
 Node* parseVariable (TokenStream& ts) {
+    if (ts.getIndex() > 90) {
+        std::cout << "masuk vairabel\n";
+        std::cout << ts.current() << std::endl;
+    }
     Node* node = new Node ("<variable>");
 
     if (ts.check("ident")) {
         node->addChild(new Node(ts.current()));
         ts.advance();
     }
-    else {
-        while (ts.check("lbrack") || ts.check("period")) {
-            node->addChild(parseComponentVariable(ts));
-        }
+    // else {
+    std::cout << "masuk sini" << std::endl;
+    while (ts.check("lbrack") || ts.check("period")) {
+        std::cout << "masuk loop" << std::endl;
+        node->addChild(parseComponentVariable(ts));
     }
+    // }
 
     return node;
 }
@@ -143,10 +155,14 @@ Node* parseComponentVariable (TokenStream& ts) {
     // node->addChild(parseVariable(ts));
 
     if (ts.check("lbrack")) {
+        node->addChild (new Node (ts.current()));
+        ts.advance();
+
         node->addChild (parseIndexList(ts));
 
         if (ts.check("rbrack")) {
             node->addChild (new Node (ts.current()));
+            ts.advance();
         }
         else {
             throwSyntaxError(ts.current(), "rbrack", ts.getIndex());
