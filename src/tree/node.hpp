@@ -1,4 +1,3 @@
-// node.hpp
 #ifndef NODE_HPP
 #define NODE_HPP
 
@@ -14,20 +13,12 @@ public:
     int sem_lev;
     bool sem_initialized;
 
-    // Constructor untuk membuat node dengan label
     explicit Node(const std::string& lbl);
-
-    // Tambahkan child ke node ini
     void addChild(Node* child);
-
-    std::string getLabel () const;
-
-    // Destructor untuk cleanup memory
+    std::string getLabel() const;
     ~Node();
-
-    // Set semua field semantik sekaligus
     void annotate(int typeCode, int tabIndex, int lexLevel);
-    
+    void setInitialized(bool val);
     bool isAnnotated() const;
 };
 

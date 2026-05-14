@@ -178,25 +178,24 @@ int SymbolTable::insert(const std::string& id, ObjClass obj, TypeCode type, int 
 int SymbolTable::lookup(const std::string& id) const {
     std::string idLower = id;
     std::transform(idLower.begin(), idLower.end(), idLower.begin(), ::tolower);
+
     for (int lv = currentLevel; lv >= 0; lv--) {
         int blk = display[lv];
         int k = btab[blk].last;
         while (k != 0) {
             std::string tabIdLower = tab[k].identifier;
             std::transform(tabIdLower.begin(), tabIdLower.end(), tabIdLower.begin(), ::tolower);
-            if (tabIdLower == idLower) {
-                return k;
-            }
+            if (tabIdLower == idLower) return k;
             k = tab[k].link;
         }
     }
-    for (int i = 0; i < static_cast<int>(tab.size()); i++) {
+
+    for (int i = 0; i < 32 && i < (int)tab.size(); i++) {
         std::string tabIdLower = tab[i].identifier;
         std::transform(tabIdLower.begin(), tabIdLower.end(), tabIdLower.begin(), ::tolower);
-        if (tabIdLower == idLower) {
-            return i;
-        }
+        if (tabIdLower == idLower) return i;
     }
+
     return -1;
 }
 
@@ -208,9 +207,7 @@ int SymbolTable::lookupCurrentBlock(const std::string& id) const {
     while (k != 0) {
         std::string tabIdLower = tab[k].identifier;
         std::transform(tabIdLower.begin(), tabIdLower.end(), tabIdLower.begin(), ::tolower);
-        if (tabIdLower == idLower) {
-            return k;
-        }
+        if (tabIdLower == idLower) return k;
         k = tab[k].link;
     }
     return -1;
@@ -233,69 +230,119 @@ int SymbolTable::insertArray(int xtyp, int etyp, int eref, int low, int high, in
 
 int SymbolTable::sizeOf(TypeCode t) const {
     switch (t) {
-        case TypeCode::INTEGER: return 1;
-        case TypeCode::REAL: return 2;
-        case TypeCode::CHAR: return 1;
-        case TypeCode::BOOLEAN: return 1;
-        case TypeCode::STRING: return 4;
-        case TypeCode::ARRAY: return 0;
-        case TypeCode::RECORD: return 0;
-        default: return 1;
+        case TypeCode::INTEGER:  return 1;
+        case TypeCode::REAL:     return 2;
+        case TypeCode::CHAR:     return 1;
+        case TypeCode::BOOLEAN:  return 1;
+        case TypeCode::STRING:   return 4;
+        case TypeCode::ARRAY:    return 0;
+        case TypeCode::RECORD:   return 0;
+        default:                 return 1;
     }
 }
 
 static std::string typeCodeName(int tc) {
     switch (static_cast<TypeCode>(tc)) {
-        case TypeCode::NOTYPE: return "notype";
-        case TypeCode::INTEGER: return "integer";
-        case TypeCode::REAL: return "real";
-        case TypeCode::CHAR: return "char";
-        case TypeCode::BOOLEAN: return "boolean";
-        case TypeCode::STRING: return "string";
-        case TypeCode::ARRAY: return "array";
-        case TypeCode::RECORD: return "record";
-        case TypeCode::SUBRANGE: return "subrange";
+        case TypeCode::NOTYPE:     return "notype";
+        case TypeCode::INTEGER:    return "integer";
+        case TypeCode::REAL:       return "real";
+        case TypeCode::CHAR:       return "char";
+        case TypeCode::BOOLEAN:    return "boolean";
+        case TypeCode::STRING:     return "string";
+        case TypeCode::ARRAY:      return "array";
+        case TypeCode::RECORD:     return "record";
+        case TypeCode::SUBRANGE:   return "subrange";
         case TypeCode::ENUMERATED: return "enumerated";
-        default: return "?";
+        default:                   return "?";
     }
 }
 
 static std::string objClassName(ObjClass oc) {
     switch (oc) {
-        case ObjClass::CONSTANT: return "constant";
-        case ObjClass::VARIABLE: return "variable";
-        case ObjClass::TYPE: return "type";
+        case ObjClass::CONSTANT:  return "constant";
+        case ObjClass::VARIABLE:  return "variable";
+        case ObjClass::TYPE:      return "type";
         case ObjClass::PROCEDURE: return "procedure";
-        case ObjClass::FUNCTION: return "function";
-        case ObjClass::PROGRAM: return "program";
-        case ObjClass::FIELD: return "field";
-        default: return "?";
+        case ObjClass::FUNCTION:  return "function";
+        case ObjClass::PROGRAM:   return "program";
+        case ObjClass::FIELD:     return "field";
+        default:                  return "?";
     }
 }
 
 void SymbolTable::printTab() const {
     std::cout << "TAB" << std::endl;
-    std::cout << std::left << std::setw(6) << "idx" << std::setw(20) << "identifier" << std::setw(12) << "obj" << std::setw(12) << "type" << std::setw(6) << "ref" << std::setw(6) << "nrm" << std::setw(6) << "lev" << std::setw(6) << "adr" << std::setw(6) << "link" << std::endl;
+    std::cout << std::left
+              << std::setw(6)  << "idx"
+              << std::setw(20) << "identifier"
+              << std::setw(12) << "obj"
+              << std::setw(12) << "type"
+              << std::setw(6)  << "ref"
+              << std::setw(6)  << "nrm"
+              << std::setw(6)  << "lev"
+              << std::setw(6)  << "adr"
+              << std::setw(6)  << "link"
+              << std::endl;
     for (int i = 0; i < static_cast<int>(tab.size()); i++) {
         const TabEntry& e = tab[i];
-        std::cout << std::left << std::setw(6) << i << std::setw(20) << e.identifier << std::setw(12) << objClassName(e.obj) << std::setw(12) << typeCodeName(static_cast<int>(e.type)) << std::setw(6) << e.ref << std::setw(6) << e.nrm << std::setw(6) << e.lev << std::setw(6) << e.adr << std::setw(6) << e.link << std::endl;
+        std::cout << std::left
+                  << std::setw(6)  << i
+                  << std::setw(20) << e.identifier
+                  << std::setw(12) << objClassName(e.obj)
+                  << std::setw(12) << typeCodeName(static_cast<int>(e.type))
+                  << std::setw(6)  << e.ref
+                  << std::setw(6)  << e.nrm
+                  << std::setw(6)  << e.lev
+                  << std::setw(6)  << e.adr
+                  << std::setw(6)  << e.link
+                  << std::endl;
     }
 }
 
 void SymbolTable::printAtab() const {
     std::cout << "ATAB" << std::endl;
-    std::cout << std::left << std::setw(6) << "idx" << std::setw(10) << "xtyp" << std::setw(10) << "etyp" << std::setw(6) << "eref" << std::setw(6) << "low" << std::setw(6) << "high" << std::setw(6) << "elsz" << std::setw(8) << "size" << std::endl;
+    std::cout << std::left
+              << std::setw(6)  << "idx"
+              << std::setw(10) << "xtyp"
+              << std::setw(10) << "etyp"
+              << std::setw(6)  << "eref"
+              << std::setw(6)  << "low"
+              << std::setw(6)  << "high"
+              << std::setw(6)  << "elsz"
+              << std::setw(8)  << "size"
+              << std::endl;
     for (int i = 1; i < static_cast<int>(atab.size()); i++) {
         const AtabEntry& a = atab[i];
-        std::cout << std::left << std::setw(6) << i << std::setw(10) << typeCodeName(a.xtyp) << std::setw(10) << typeCodeName(a.etyp) << std::setw(6) << a.eref << std::setw(6) << a.low << std::setw(6) << a.high << std::setw(6) << a.elsz << std::setw(8) << a.size << std::endl;
+        std::cout << std::left
+                  << std::setw(6)  << i
+                  << std::setw(10) << typeCodeName(a.xtyp)
+                  << std::setw(10) << typeCodeName(a.etyp)
+                  << std::setw(6)  << a.eref
+                  << std::setw(6)  << a.low
+                  << std::setw(6)  << a.high
+                  << std::setw(6)  << a.elsz
+                  << std::setw(8)  << a.size
+                  << std::endl;
     }
 }
 
 void SymbolTable::printBtab() const {
     std::cout << "BTAB" << std::endl;
-    std::cout << std::left << std::setw(6) << "idx" << std::setw(8) << "last" << std::setw(8) << "lpar" << std::setw(8) << "psze" << std::setw(8) << "vsze" << std::endl;
+    std::cout << std::left
+              << std::setw(6) << "idx"
+              << std::setw(8) << "last"
+              << std::setw(8) << "lpar"
+              << std::setw(8) << "psze"
+              << std::setw(8) << "vsze"
+              << std::endl;
     for (int i = 0; i < static_cast<int>(btab.size()); i++) {
         const BtabEntry& b = btab[i];
-        std::cout << std::left << std::setw(6) << i << std::setw(8) << b.last << std::setw(8) << b.lpar << std::setw(8) << b.psze << std::setw(8) << b.vsze << std::endl;
+        std::cout << std::left
+                  << std::setw(6) << i
+                  << std::setw(8) << b.last
+                  << std::setw(8) << b.lpar
+                  << std::setw(8) << b.psze
+                  << std::setw(8) << b.vsze
+                  << std::endl;
     }
 }

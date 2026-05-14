@@ -1,10 +1,9 @@
 #include "lexer.hpp"
 #include "../io/reader.hpp"
 
-// Variabel Global
 vector<string> token_list;
 
-int CHARACTER_STATE () 
+int CHARACTER_STATE()
 {
     if ((currentChar >= 'a' && currentChar <= 'z')
     || (currentChar >= 'A' && currentChar <= 'Z')
@@ -94,15 +93,13 @@ void READ_NUMBER() {
 
         if (IS_DIGIT(currentChar)) {
             lexeme += '.';
-
             while (currentChar != '\0' && IS_DIGIT(currentChar)) {
                 lexeme += currentChar;
                 ADV();
             }
-
             ADD_TOKEN("realcon", lexeme);
             return;
-        } 
+        }
         else {
             ADD_TOKEN("intcon", lexeme);
             ADD_TOKEN("period", "");
@@ -115,16 +112,16 @@ void READ_NUMBER() {
 
 void READ_STRING_OR_CHAR() {
     string lexeme = "";
-    ADV(); 
+    ADV();
 
     while (currentChar != '\0') {
         if (currentChar == '\'') {
-            if (peek() == '\'') { // escape '
-                ADV(); // ke '
+            if (peek() == '\'') {
+                ADV();
                 lexeme += '\'';
-                ADV(); // lanjut setelah escape
-            } 
-            else { // ' sebagai closing
+                ADV();
+            }
+            else {
                 ADV();
                 if (lexeme.length() == 1) {
                     ADD_TOKEN("charcon", lexeme);
@@ -134,13 +131,11 @@ void READ_STRING_OR_CHAR() {
                 return;
             }
         }
-
         else if (currentChar == '\n') {
             cout << "Lexical error: string tidak boleh multiline\n";
             ADD_TOKEN("unknown", lexeme);
             return;
         }
-
         else {
             lexeme += currentChar;
             ADV();
@@ -152,16 +147,13 @@ void READ_STRING_OR_CHAR() {
 }
 
 void SKIP_COMMENT_CURLY() {
-    ADV(); 
+    ADV();
 
     while (currentChar != '\0') {
         if (currentChar == '}') {
             ADV();
             return;
         }
-        // else if (currentChar == '(') { 
-        //     return;
-        // }
         ADV();
     }
 
@@ -169,7 +161,7 @@ void SKIP_COMMENT_CURLY() {
 }
 
 void SKIP_COMMENT_PAREN() {
-    ADV(); 
+    ADV();
 
     while (currentChar != '\0') {
         if (currentChar == '*') {
@@ -179,7 +171,7 @@ void SKIP_COMMENT_PAREN() {
                 return;
             }
         }
-        else if (currentChar == '{') { 
+        else if (currentChar == '{') {
             return;
         }
         else {
@@ -203,9 +195,9 @@ void READ_SPECIAL_TOKEN() {
     }
 
     else if (currentChar == '(') {
-        if (peek() == '*') { // cek next dulu
-            ADV(); // skip (
-            ADV(); // skip *
+        if (peek() == '*') {
+            ADV();
+            ADV();
             SKIP_COMMENT_PAREN();
             return;
         } else {
@@ -283,19 +275,14 @@ void READ_SPECIAL_TOKEN() {
 
 void READ_UNKNOWN() {
     string lexeme = "";
-
-    while (
-        currentChar != '\0' &&
-        !IS_WHITESPACE(currentChar)
-    ) {
+    while (currentChar != '\0' && !IS_WHITESPACE(currentChar)) {
         lexeme += currentChar;
         ADV();
     }
-
     ADD_TOKEN("unknown", lexeme);
 }
 
-void READ_ALL_FILE () 
+void READ_ALL_FILE()
 {
     START_FILE();
 
@@ -310,39 +297,7 @@ void READ_ALL_FILE ()
             READ_NUMBER();
         }
         else {
-            // Cek Untuk kemungkinan valid token lanjutan
-            if(currentChar == ':' || currentChar == '<' || currentChar == '>' || currentChar == '='){
-                READ_SPECIAL_TOKEN();
-            }
-
-            else if(currentChar == '\'' || currentChar == '{' || currentChar == '(') {
-                READ_SPECIAL_TOKEN();
-            }
-
-            else if (currentChar == '.') {
-                READ_SPECIAL_TOKEN();
-            }
-
-            else if(currentChar == ';' || currentChar == ',') {
-                READ_SPECIAL_TOKEN();
-            }
-
-            else if(currentChar == ')' || currentChar == ']') {
-                READ_SPECIAL_TOKEN();
-            }
-
-            else if(currentChar == '+' || currentChar == '-' || currentChar == '*' || currentChar == '/' || currentChar == '['){
-                if (!IS_WHITESPACE(peek()) && !IS_LETTER(peek()) && !IS_DIGIT(peek())) {
-                    READ_UNKNOWN(); 
-                } 
-                else {
-                    READ_SPECIAL_TOKEN(); // normal
-                }
-            }
-            // Untuk token yang tidak pernah match
-            else{
-                READ_UNKNOWN();
-            }
+            READ_SPECIAL_TOKEN();
         }
     }
 }
