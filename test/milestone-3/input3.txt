@@ -1,0 +1,6 @@
+program TestError;
+var
+  a: integer;
+begin
+  a := b + 5;
+end.

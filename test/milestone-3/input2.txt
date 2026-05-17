@@ -1,0 +1,9 @@
+program TestBoolean;
+var
+  a, b: integer;
+  flag: boolean;
+begin
+  a := 5;
+  b := 10;
+  flag := a > b;
+end.

@@ -1,0 +1,10 @@
+program TestEkspresi;
+var
+  a, b, c: integer;
+  x: real;
+begin
+  a := 5;
+  b := 10;
+  c := a + b;
+  x := a / b;
+end.

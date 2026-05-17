@@ -674,37 +674,685 @@ void visit_program(Node* node, SemanticContext& ctx) {
 }
 
 TypeInfo visit_expression(Node* node, SemanticContext& ctx) {
-    (void)node; (void)ctx;
+    if (!node) return TypeInfo(TypeCode::NOTYPE);
+
+    if (node->label != "<expression>") {
+        return visit_simple_expression(node, ctx);
+    }
+
+    if (node->children.empty()) return TypeInfo(TypeCode::NOTYPE);
+
+    // Kumpulkan simple-expression dan relational-operator
+    std::vector<Node*> simpleExprs;
+    std::string relOp = "";
+
+    for (Node* c : node->children) {
+        if (c->label == "<simple-expression>") {
+            simpleExprs.push_back(c);
+        } else if (c->label == "<relational-operator>") {
+            // Ambil operator dari dalam node <relational-operator>
+            for (Node* rc : c->children) {
+                std::string rtt = nodeTokenType(rc);
+                if (rtt == "eql")   { relOp = "eql"; break; }
+                if (rtt == "neq")   { relOp = "neq"; break; }
+                if (rtt == "lss")   { relOp = "lss"; break; }
+                if (rtt == "leq")   { relOp = "leq"; break; }
+                if (rtt == "gtr")   { relOp = "gtr"; break; }
+                if (rtt == "geq")   { relOp = "geq"; break; }
+            }
+        } else {
+            // Operator relasional mungkin langsung sebagai token (tanpa wrapper)
+            std::string tt = nodeTokenType(c);
+            if (tt == "eql" || tt == "neq" || tt == "lss" || tt == "leq" ||
+                tt == "gtr" || tt == "geq") {
+                relOp = tt;
+            }
+        }
+    }
+
+    // Hanya satu simple-expression, tidak ada operasi relasional
+    if (simpleExprs.size() == 1) {
+        TypeInfo ti = visit_simple_expression(simpleExprs[0], ctx);
+        node->annotate((int)ti.baseType, ti.ref, ctx.st.currentLev());
+        return ti;
+    }
+
+    // Dua simple-expression dengan operator relasional
+    if (simpleExprs.size() == 2) {
+        TypeInfo leftTi  = visit_simple_expression(simpleExprs[0], ctx);
+        TypeInfo rightTi = visit_simple_expression(simpleExprs[1], ctx);
+
+        if (relOp.empty()) {
+            ctx.errors.add("Operator relasional tidak ditemukan dalam expression");
+            node->annotate((int)TypeCode::BOOLEAN, -1, ctx.st.currentLev());
+            return TypeInfo(TypeCode::BOOLEAN);
+        }
+
+        // Validasi kompatibilitas operand
+        bool compatible = isCompatible(leftTi, rightTi, ctx.st)
+                       || (leftTi.isNumeric() && rightTi.isNumeric());
+
+        if (!compatible) {
+            ctx.errors.add("Operand operator '" + relOp + "' tidak kompatibel: "
+                           + leftTi.toString() + " vs " + rightTi.toString());
+        }
+
+        // Hasil operator relasional selalu Boolean
+        node->annotate((int)TypeCode::BOOLEAN, -1, ctx.st.currentLev());
+        return TypeInfo(TypeCode::BOOLEAN);
+    }
+
+    // Fallback: lebih dari 2 simple-expression (seharusnya tidak terjadi)
+    if (!simpleExprs.empty()) {
+        TypeInfo ti = visit_simple_expression(simpleExprs[0], ctx);
+        node->annotate((int)ti.baseType, ti.ref, ctx.st.currentLev());
+        return ti;
+    }
+
     return TypeInfo(TypeCode::NOTYPE);
 }
 
 TypeInfo visit_simple_expression(Node* node, SemanticContext& ctx) {
-    (void)node; (void)ctx;
-    return TypeInfo(TypeCode::NOTYPE);
+    if (!node) return TypeInfo(TypeCode::NOTYPE);
+
+    if (node->label != "<simple-expression>") {
+        return visit_term(node, ctx);
+    }
+
+    if (node->children.empty()) return TypeInfo(TypeCode::NOTYPE);
+
+    TypeInfo current(TypeCode::NOTYPE);
+    std::string pendingOp = "";
+    bool firstOperand = true;
+    bool unaryMinus   = false;
+    bool unaryPlus    = false;
+
+    for (Node* c : node->children) {
+        std::string tt = nodeTokenType(c);
+
+        // Operator additive
+        if (tt == "plus" || tt == "minus" || tt == "orsy") {
+            if (firstOperand && current.baseType == TypeCode::NOTYPE) {
+                // Ini unary operator
+                if (tt == "minus") unaryMinus = true;
+                else if (tt == "plus") unaryPlus = true;
+                // orsy tidak valid sebagai unary
+            } else {
+                if (tt == "plus")  pendingOp = "plus";
+                if (tt == "minus") pendingOp = "minus";
+                if (tt == "orsy")  pendingOp = "orsy";
+            }
+            continue;
+        }
+
+        // Operand
+        TypeInfo operandTi(TypeCode::NOTYPE);
+        if (c->label == "<term>") {
+            operandTi = visit_term(c, ctx);
+        } else if (c->label == "<simple-expression>") {
+            operandTi = visit_simple_expression(c, ctx);
+        } else {
+            continue;
+        }
+
+        // Terapkan unary operator pada operand pertama
+        if (firstOperand) {
+            if (unaryMinus || unaryPlus) {
+                std::string uop = unaryMinus ? "minus" : "plus";
+                TypeInfo uRes = resultTypeUnary(uop, operandTi);
+                if (uRes.baseType == TypeCode::NOTYPE) {
+                    ctx.errors.add("Operator unary '" + uop + "' tidak bisa diterapkan pada tipe: "
+                                   + operandTi.toString());
+                }
+                current = uRes.baseType != TypeCode::NOTYPE ? uRes : operandTi;
+            } else {
+                current = operandTi;
+            }
+            firstOperand = false;
+            continue;
+        }
+
+        // Operand selanjutnya (biner)
+        if (pendingOp.empty()) {
+            ctx.errors.add("Operator tidak ditemukan di antara operand dalam simple-expression");
+            continue;
+        }
+
+        if (pendingOp == "orsy") {
+            if (!current.isBoolean() || !operandTi.isBoolean()) {
+                ctx.errors.add("Operator 'or' membutuhkan operand bertipe Boolean, "
+                               "ditemukan: " + current.toString() + " dan " + operandTi.toString());
+                current   = TypeInfo(TypeCode::NOTYPE);
+                pendingOp = "";
+                continue;
+            }
+        }
+
+        TypeInfo res = resultType(pendingOp, current, operandTi, ctx.st);
+        if (res.baseType == TypeCode::NOTYPE) {
+            ctx.errors.add("Operasi '" + pendingOp + "' tidak kompatibel untuk tipe: "
+                           + current.toString() + " dan " + operandTi.toString());
+        }
+        current   = res;
+        pendingOp = "";
+    }
+
+    node->annotate((int)current.baseType, current.ref, ctx.st.currentLev());
+    return current;
 }
 
 TypeInfo visit_term(Node* node, SemanticContext& ctx) {
-    (void)node; (void)ctx;
-    return TypeInfo(TypeCode::NOTYPE);
+    if (!node) return TypeInfo(TypeCode::NOTYPE);
+
+    if (node->label != "<term>") {
+        // Mungkin langsung dipanggil dengan child factor
+        return visit_factor(node, ctx);
+    }
+
+    if (node->children.empty()) return TypeInfo(TypeCode::NOTYPE);
+
+    // <term> bisa punya struktur flat:
+    // <factor>  |  <term> <mulop> <factor>
+    // Karena parse tree bisa di-flatten, kita iterasi left-to-right
+    TypeInfo current(TypeCode::NOTYPE);
+    std::string pendingOp = "";
+
+    for (Node* c : node->children) {
+        std::string tt = nodeTokenType(c);
+
+        // Operator: times(*), rdiv(/), idiv(div), imod(mod), andsy(and)
+        if (tt == "times" || tt == "rdiv" || tt == "slash" ||
+            tt == "idiv"  || tt == "imod" ||
+            tt == "divsy" || tt == "modsy" || tt == "andsy") {
+            // Normalisasi nama operator agar cocok dengan resultType()
+            if (tt == "times") pendingOp = "times";
+            else if (tt == "rdiv") pendingOp = "rdiv";
+            else if (tt == "idiv") pendingOp = "idiv";
+            else if (tt == "imod") pendingOp = "imod";
+            else if (tt == "andsy") pendingOp = "andsy";
+            continue;
+        }
+
+        // Operand: <factor> atau <term>
+        TypeInfo operandTi(TypeCode::NOTYPE);
+        if (c->label == "<factor>") {
+            operandTi = visit_factor(c, ctx);
+        } else if (c->label == "<term>") {
+            operandTi = visit_term(c, ctx);
+        } else {
+            // Skip non-operand nodes (terminal lain)
+            continue;
+        }
+
+        if (current.baseType == TypeCode::NOTYPE) {
+            // Ini operand pertama
+            current = operandTi;
+        } else {
+            // Ada operator + operand kedua
+            if (pendingOp.empty()) {
+                ctx.errors.add("Operator tidak ditemukan di antara operand dalam term");
+                continue;
+            }
+
+            // Validasi khusus per operator
+            if (pendingOp == "idiv" || pendingOp == "imod") {
+                if (!current.isInteger() || !operandTi.isInteger()) {
+                    ctx.errors.add("Operator '" + pendingOp + "' membutuhkan operand bertipe Integer, "
+                                   "ditemukan: " + current.toString() + " dan " + operandTi.toString());
+                    current = TypeInfo(TypeCode::NOTYPE);
+                    pendingOp = "";
+                    continue;
+                }
+            }
+            if (pendingOp == "andsy") {
+                if (!current.isBoolean() || !operandTi.isBoolean()) {
+                    ctx.errors.add("Operator 'and' membutuhkan operand bertipe Boolean, "
+                                   "ditemukan: " + current.toString() + " dan " + operandTi.toString());
+                    current = TypeInfo(TypeCode::NOTYPE);
+                    pendingOp = "";
+                    continue;
+                }
+            }
+
+            TypeInfo res = resultType(pendingOp, current, operandTi, ctx.st);
+            if (res.baseType == TypeCode::NOTYPE) {
+                ctx.errors.add("Operasi '" + pendingOp + "' tidak kompatibel untuk tipe: "
+                               + current.toString() + " dan " + operandTi.toString());
+            }
+            current    = res;
+            pendingOp  = "";
+        }
+    }
+
+    node->annotate((int)current.baseType, current.ref, ctx.st.currentLev());
+    return current;
 }
 
 TypeInfo visit_factor(Node* node, SemanticContext& ctx) {
-    (void)node; (void)ctx;
+    if (!node) return TypeInfo(TypeCode::NOTYPE);
+
+    // Jika node ini adalah <factor>, telusuri child-nya
+    if (node->label == "<factor>") {
+        if (node->children.empty()) return TypeInfo(TypeCode::NOTYPE);
+
+        Node* first = node->children[0];
+        std::string tt = nodeTokenType(first);
+
+        // NOT <factor>
+        if (tt == "notsy") {
+            if (node->children.size() < 2) {
+                ctx.errors.add("Ekspresi NOT tidak lengkap");
+                return TypeInfo(TypeCode::NOTYPE);
+            }
+            TypeInfo operand = visit_factor(node->children[1], ctx);
+            if (operand.baseType != TypeCode::BOOLEAN) {
+                ctx.errors.add("Operand NOT harus bertipe Boolean, ditemukan: " + operand.toString());
+                node->annotate((int)TypeCode::NOTYPE, -1, ctx.st.currentLev());
+                return TypeInfo(TypeCode::NOTYPE);
+            }
+            node->annotate((int)TypeCode::BOOLEAN, -1, ctx.st.currentLev());
+            return TypeInfo(TypeCode::BOOLEAN);
+        }
+
+        // ( expression )
+        if (tt == "lparent") {
+            // cari child <expression>
+            for (Node* c : node->children) {
+                if (c->label == "<expression>") {
+                    TypeInfo ti = visit_expression(c, ctx);
+                    node->annotate((int)ti.baseType, ti.ref, ctx.st.currentLev());
+                    return ti;
+                }
+            }
+            return TypeInfo(TypeCode::NOTYPE);
+        }
+
+        // <variable> — akses variabel (termasuk array/record)
+        if (first->label == "<variable>") {
+            TypeInfo ti = visit_variable(first, ctx);
+            node->annotate((int)ti.baseType, ti.ref, ctx.st.currentLev());
+            return ti;
+        }
+
+        // <procedure/function-call> yang berupa function (punya nilai kembalian)
+        if (first->label == "<procedure/function-call>") {
+            // Kita perlu tahu return type-nya
+            // Cari ident dari call node
+            Node* callIdentNode = findChildByTokenType(first, "ident");
+            if (callIdentNode) {
+                std::string funcName = nodeTokenValue(callIdentNode);
+                int idx = ctx.st.lookup(funcName);
+                if (idx >= 0 && ctx.st.tab[idx].obj == ObjClass::FUNCTION) {
+                    visit_procedure_function_call(first, ctx);
+                    TypeInfo ti = typeInfoFromTab(idx, ctx.st);
+                    node->annotate((int)ti.baseType, ti.ref, ctx.st.currentLev());
+                    return ti;
+                }
+            }
+            visit_procedure_function_call(first, ctx);
+            return TypeInfo(TypeCode::NOTYPE);
+        }
+
+        // Literal: intcon, realcon, charcon, string
+        if (tt == "intcon") {
+            TypeInfo ti(TypeCode::INTEGER);
+            try { int v = std::stoi(nodeTokenValue(first)); ti.low = v; ti.high = v; }
+            catch (...) {}
+            first->annotate((int)TypeCode::INTEGER, -1, ctx.st.currentLev());
+            node->annotate((int)TypeCode::INTEGER, -1, ctx.st.currentLev());
+            return ti;
+        }
+        if (tt == "realcon") {
+            first->annotate((int)TypeCode::REAL, -1, ctx.st.currentLev());
+            node->annotate((int)TypeCode::REAL, -1, ctx.st.currentLev());
+            return TypeInfo(TypeCode::REAL);
+        }
+        if (tt == "charcon") {
+            first->annotate((int)TypeCode::CHAR, -1, ctx.st.currentLev());
+            node->annotate((int)TypeCode::CHAR, -1, ctx.st.currentLev());
+            return TypeInfo(TypeCode::CHAR);
+        }
+        if (tt == "string") {
+            first->annotate((int)TypeCode::STRING, -1, ctx.st.currentLev());
+            node->annotate((int)TypeCode::STRING, -1, ctx.st.currentLev());
+            return TypeInfo(TypeCode::STRING);
+        }
+
+        // Identifier langsung (True, False, konstanta, dll)
+        if (tt == "ident") {
+            std::string name = nodeTokenValue(first);
+            int idx = ctx.st.lookup(name);
+            if (idx < 0) {
+                ctx.errors.add("Identifier tidak ditemukan: '" + name + "'");
+                node->annotate((int)TypeCode::NOTYPE, -1, ctx.st.currentLev());
+                return TypeInfo(TypeCode::NOTYPE);
+            }
+            TypeInfo ti = typeInfoFromTab(idx, ctx.st);
+            first->annotate((int)ti.baseType, idx, ctx.st.currentLev());
+            node->annotate((int)ti.baseType, idx, ctx.st.currentLev());
+            return ti;
+        }
+
+        // Fallback: delegate ke child pertama
+        return visit_factor(first, ctx);
+    }
+
+    // Jika node ini langsung terminal (dipanggil rekursif dari NOT)
+    std::string tt = nodeTokenType(node);
+    if (tt == "intcon") {
+        TypeInfo ti(TypeCode::INTEGER);
+        try { int v = std::stoi(nodeTokenValue(node)); ti.low = v; ti.high = v; }
+        catch (...) {}
+        node->annotate((int)TypeCode::INTEGER, -1, ctx.st.currentLev());
+        return ti;
+    }
+    if (tt == "realcon") { node->annotate((int)TypeCode::REAL,    -1, ctx.st.currentLev()); return TypeInfo(TypeCode::REAL); }
+    if (tt == "charcon") { node->annotate((int)TypeCode::CHAR,    -1, ctx.st.currentLev()); return TypeInfo(TypeCode::CHAR); }
+    if (tt == "string")  { node->annotate((int)TypeCode::STRING,  -1, ctx.st.currentLev()); return TypeInfo(TypeCode::STRING); }
+    if (tt == "ident") {
+        std::string name = nodeTokenValue(node);
+        int idx = ctx.st.lookup(name);
+        if (idx < 0) {
+            ctx.errors.add("Identifier tidak ditemukan: '" + name + "'");
+            return TypeInfo(TypeCode::NOTYPE);
+        }
+        TypeInfo ti = typeInfoFromTab(idx, ctx.st);
+        node->annotate((int)ti.baseType, idx, ctx.st.currentLev());
+        return ti;
+    }
+
     return TypeInfo(TypeCode::NOTYPE);
 }
 
 TypeInfo visit_variable(Node* node, SemanticContext& ctx) {
-    (void)node; (void)ctx;
-    return TypeInfo(TypeCode::NOTYPE);
+    if (!node) return TypeInfo(TypeCode::NOTYPE);
+
+    // Kumpulkan semua child yang relevan
+    Node* identNode   = nullptr;
+    Node* componentNode = nullptr; // <component-variable> jika ada
+
+    for (Node* c : node->children) {
+        if (nodeTokenType(c) == "ident" && !identNode) identNode = c;
+        if (c->label == "<component-variable>")         componentNode = c;
+    }
+
+    if (!identNode) {
+        // Mungkin satu-satunya child adalah <component-variable>
+        if (componentNode)
+            return visit_component_variable(componentNode, ctx, TypeInfo(TypeCode::NOTYPE));
+        return TypeInfo(TypeCode::NOTYPE);
+    }
+
+    std::string name = nodeTokenValue(identNode);
+    int idx = ctx.st.lookup(name);
+    if (idx < 0) {
+        ctx.errors.add("Variabel tidak ditemukan: '" + name + "'");
+        node->annotate((int)TypeCode::NOTYPE, -1, ctx.st.currentLev());
+        return TypeInfo(TypeCode::NOTYPE);
+    }
+
+    const TabEntry& e = ctx.st.tab[idx];
+
+    // Pastikan ini bukan tipe atau prosedur yang dipakai sebagai variabel
+    if (e.obj == ObjClass::TYPE) {
+        ctx.errors.add("'" + name + "' adalah tipe, bukan variabel");
+        node->annotate((int)TypeCode::NOTYPE, idx, ctx.st.currentLev());
+        return TypeInfo(TypeCode::NOTYPE);
+    }
+    if (e.obj == ObjClass::PROCEDURE) {
+        ctx.errors.add("'" + name + "' adalah prosedur, tidak bisa digunakan sebagai nilai");
+        node->annotate((int)TypeCode::NOTYPE, idx, ctx.st.currentLev());
+        return TypeInfo(TypeCode::NOTYPE);
+    }
+
+    TypeInfo baseType = typeInfoFromTab(idx, ctx.st);
+    identNode->annotate((int)baseType.baseType, idx, ctx.st.currentLev());
+
+    // Jika ada akses komponen (array subscript atau record field), lanjutkan
+    if (componentNode) {
+        TypeInfo resultTi = visit_component_variable(componentNode, ctx, baseType);
+        node->annotate((int)resultTi.baseType, resultTi.ref, ctx.st.currentLev());
+        return resultTi;
+    }
+
+    node->annotate((int)baseType.baseType, idx, ctx.st.currentLev());
+    return baseType;
 }
 
 TypeInfo visit_component_variable(Node* node, SemanticContext& ctx, TypeInfo baseType) {
-    (void)node; (void)ctx;
+    if (!node) return baseType;
+
+    for (Node* c : node->children) {
+
+        // ---- Akses array: arr[expression] ----
+        if (nodeTokenType(c) == "lbrack") {
+            // Pastikan baseType adalah array
+            if (baseType.baseType != TypeCode::ARRAY) {
+                ctx.errors.add("Subscript hanya bisa dilakukan pada tipe Array, ditemukan: "
+                               + baseType.toString());
+                return TypeInfo(TypeCode::NOTYPE);
+            }
+
+            // Ambil info array dari atab
+            if (baseType.ref <= 0 || baseType.ref >= (int)ctx.st.atab.size()) {
+                ctx.errors.add("Referensi array tidak valid");
+                return TypeInfo(TypeCode::NOTYPE);
+            }
+            const AtabEntry& arrayInfo = ctx.st.atab[baseType.ref];
+            TypeInfo indexType(static_cast<TypeCode>(arrayInfo.xtyp));
+
+            // Cari expression index (child setelah '[')
+            bool foundLbrack = false;
+            for (Node* sub : node->children) {
+                if (nodeTokenType(sub) == "lbrack") { foundLbrack = true; continue; }
+                if (foundLbrack && sub->label == "<expression>") {
+                    TypeInfo idxTi = visit_expression(sub, ctx);
+
+                    // Index harus kompatibel dengan tipe indeks array
+                    if (!isCompatible(idxTi, indexType, ctx.st)) {
+                        // Integer ke subrange integer masih ok
+                        if (!(idxTi.isInteger() && indexType.isInteger()) &&
+                            !(idxTi.isInteger() && indexType.isSubrange())) {
+                            ctx.errors.add("Tipe indeks array tidak kompatibel: ditemukan "
+                                           + idxTi.toString() + ", diharapkan "
+                                           + indexType.toString());
+                        }
+                    }
+                    foundLbrack = false; // reset untuk multi-dim
+                    break;
+                }
+            }
+
+            // Tipe hasil = tipe elemen array
+            TypeInfo elemType(static_cast<TypeCode>(arrayInfo.etyp), arrayInfo.eref);
+            baseType = elemType;
+
+            node->annotate((int)elemType.baseType, elemType.ref, ctx.st.currentLev());
+            continue;
+        }
+
+        // ---- Akses field record: rec.field ----
+        if (nodeTokenType(c) == "period") {
+            // Pastikan baseType adalah record
+            if (baseType.baseType != TypeCode::RECORD) {
+                ctx.errors.add("Akses field '.' hanya bisa dilakukan pada tipe Record, ditemukan: "
+                               + baseType.toString());
+                return TypeInfo(TypeCode::NOTYPE);
+            }
+        }
+
+        if (nodeTokenType(c) == "ident" &&
+            baseType.baseType == TypeCode::RECORD) {
+            std::string fieldName = nodeTokenValue(c);
+
+            // Cari field di btab[ref] record ini
+            if (baseType.ref <= 0 || baseType.ref >= (int)ctx.st.btab.size()) {
+                ctx.errors.add("Referensi record tidak valid untuk field '" + fieldName + "'");
+                return TypeInfo(TypeCode::NOTYPE);
+            }
+
+            int fieldIdx = -1;
+            int k = ctx.st.btab[baseType.ref].last;
+            while (k != 0 && k < (int)ctx.st.tab.size()) {
+                std::string tabId = ctx.st.tab[k].identifier;
+                // case-insensitive compare
+                std::string tabIdLow = tabId, fnLow = fieldName;
+                std::transform(tabIdLow.begin(), tabIdLow.end(), tabIdLow.begin(), ::tolower);
+                std::transform(fnLow.begin(), fnLow.end(), fnLow.begin(), ::tolower);
+                if (tabIdLow == fnLow) { fieldIdx = k; break; }
+                k = ctx.st.tab[k].link;
+            }
+
+            if (fieldIdx < 0) {
+                ctx.errors.add("Field '" + fieldName + "' tidak ditemukan dalam record '"
+                               + baseType.namedId + "'");
+                return TypeInfo(TypeCode::NOTYPE);
+            }
+
+            TypeInfo fieldType = typeInfoFromTab(fieldIdx, ctx.st);
+            c->annotate((int)fieldType.baseType, fieldIdx, ctx.st.currentLev());
+            baseType = fieldType;
+
+            node->annotate((int)fieldType.baseType, fieldType.ref, ctx.st.currentLev());
+            continue;
+        }
+
+        // Akses komponen berlapis (array of record, dll) — rekursif
+        if (c->label == "<component-variable>") {
+            baseType = visit_component_variable(c, ctx, baseType);
+        }
+    }
+
     return baseType;
 }
 
 void visit_procedure_function_call(Node* node, SemanticContext& ctx) {
-    (void)node; (void)ctx;
+    if (!node) return;
+
+    // Ambil nama procedure/function dari ident pertama
+    Node* identNode = findChildByTokenType(node, "ident");
+    if (!identNode) {
+        ctx.errors.add("Pemanggilan prosedur/fungsi tanpa nama");
+        return;
+    }
+
+    std::string name = nodeTokenValue(identNode);
+    int idx = ctx.st.lookup(name);
+
+    if (idx < 0) {
+        ctx.errors.add("Prosedur/fungsi tidak ditemukan: '" + name + "'");
+        node->annotate((int)TypeCode::NOTYPE, -1, ctx.st.currentLev());
+        return;
+    }
+
+    const TabEntry& e = ctx.st.tab[idx];
+    if (e.obj != ObjClass::PROCEDURE && e.obj != ObjClass::FUNCTION) {
+        ctx.errors.add("'" + name + "' bukan prosedur atau fungsi");
+        return;
+    }
+
+    // Anotasi identifier call
+    identNode->annotate((int)e.type, idx, ctx.st.currentLev());
+
+    // Kumpulkan argumen dari <parameter-list> atau <actual-parameter-list>
+    std::vector<Node*> args;
+    for (Node* c : node->children) {
+        if (c->label == "<parameter-list>" ||
+            c->label == "<actual-parameter-list>") {
+            for (Node* pc : c->children) {
+                if (pc->label == "<expression>" ||
+                    pc->label == "<actual-parameter>") {
+                    args.push_back(pc);
+                }
+            }
+        }
+        // Parameter bisa juga langsung sebagai <expression> child
+        if (c->label == "<expression>") {
+            args.push_back(c);
+        }
+    }
+
+    // Untuk predefined procedures (writeln, readln, write, read):
+    // tidak perlu validasi ketat jumlah/tipe parameter
+    bool isPredefined = (name == "writeln" || name == "readln" ||
+                         name == "write"   || name == "read");
+    if (isPredefined) {
+        // Tetap visit semua argumen agar teranotasi
+        for (Node* arg : args) {
+            if (arg->label == "<actual-parameter>") {
+                for (Node* ac : arg->children) {
+                    if (ac->label == "<expression>") visit_expression(ac, ctx);
+                }
+            } else {
+                visit_expression(arg, ctx);
+            }
+        }
+        node->annotate((int)e.type, idx, ctx.st.currentLev());
+        return;
+    }
+
+    // Untuk prosedur/fungsi user-defined: kumpulkan info parameter formal
+    std::vector<TypeInfo> formalParams;
+    if (e.ref > 0 && e.ref < (int)ctx.st.btab.size()) {
+        int lparIdx = ctx.st.btab[e.ref].lpar;
+        // Kumpulkan parameter dari lpar ke belakang (via link)
+        std::vector<int> paramIndices;
+        int k = lparIdx;
+        while (k != 0 && k < (int)ctx.st.tab.size()) {
+            paramIndices.push_back(k);
+            k = ctx.st.tab[k].link;
+        }
+        // Balik urutan agar sesuai dengan urutan deklarasi
+        std::reverse(paramIndices.begin(), paramIndices.end());
+        for (int pi : paramIndices) {
+            formalParams.push_back(typeInfoFromTab(pi, ctx.st));
+        }
+    }
+
+    // Cek jumlah argumen
+    if (args.size() != formalParams.size()) {
+        ctx.errors.add("Jumlah argumen tidak sesuai untuk '" + name + "': "
+                       "diharapkan " + std::to_string(formalParams.size()) +
+                       ", diberikan " + std::to_string(args.size()));
+    }
+
+    // Cek tipe tiap argumen
+    int checkCount = std::min(args.size(), formalParams.size());
+    for (int i = 0; i < checkCount; i++) {
+        TypeInfo argType(TypeCode::NOTYPE);
+
+        if (args[i]->label == "<actual-parameter>") {
+            for (Node* ac : args[i]->children) {
+                if (ac->label == "<expression>") {
+                    argType = visit_expression(ac, ctx);
+                    break;
+                }
+            }
+        } else {
+            argType = visit_expression(args[i], ctx);
+        }
+
+        if (!isAssignmentCompatible(formalParams[i], argType, ctx.st)) {
+            ctx.errors.add("Tipe argumen ke-" + std::to_string(i + 1) +
+                           " untuk '" + name + "' tidak kompatibel: "
+                           "diharapkan " + formalParams[i].toString() +
+                           ", diberikan " + argType.toString());
+        }
+    }
+
+    // Visit argumen yang sisa (jika jumlahnya lebih)
+    for (int i = (int)checkCount; i < (int)args.size(); i++) {
+        if (args[i]->label == "<actual-parameter>") {
+            for (Node* ac : args[i]->children) {
+                if (ac->label == "<expression>") visit_expression(ac, ctx);
+            }
+        } else {
+            visit_expression(args[i], ctx);
+        }
+    }
+
+    TypeInfo retTi = typeInfoFromTab(idx, ctx.st);
+    node->annotate((int)retTi.baseType, idx, ctx.st.currentLev());
 }
 
 void visit_compound_statement(Node* node, SemanticContext& ctx) {

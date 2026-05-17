@@ -13,7 +13,7 @@ void SAVE_TOKEN_LIST ()
     string fileName;
     getline(cin, fileName);
 
-    ofstream outputStream("test/milestone-2/" + fileName + ".txt");
+    ofstream outputStream("test/milestone-3/" + fileName + ".txt");
     if (!outputStream.is_open()) {
         cerr << "Error: Tidak dapat membuka file untuk penulisan" << endl;
         return;
