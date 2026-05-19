@@ -1,0 +1,56 @@
+[tab]
+ Index          Identifier         Object           Type       Ref     Nrm     Lev   Address
+     0                 and           TYPE         NOTYPE         0       1       0         0
+     1               array           TYPE         NOTYPE         0       1       0         0
+     2               begin           TYPE         NOTYPE         0       1       0         0
+     3                case           TYPE         NOTYPE         0       1       0         0
+     4               const           TYPE         NOTYPE         0       1       0         0
+     5                 div           TYPE         NOTYPE         0       1       0         0
+     6              downto           TYPE         NOTYPE         0       1       0         0
+     7                  do           TYPE         NOTYPE         0       1       0         0
+     8                else           TYPE         NOTYPE         0       1       0         0
+     9                 end           TYPE         NOTYPE         0       1       0         0
+    10                 for           TYPE         NOTYPE         0       1       0         0
+    11            function           TYPE         NOTYPE         0       1       0         0
+    12                  if           TYPE         NOTYPE         0       1       0         0
+    13                 mod           TYPE         NOTYPE         0       1       0         0
+    14                 not           TYPE         NOTYPE         0       1       0         0
+    15                  of           TYPE         NOTYPE         0       1       0         0
+    16                  or           TYPE         NOTYPE         0       1       0         0
+    17           procedure           TYPE         NOTYPE         0       1       0         0
+    18             program           TYPE         NOTYPE         0       1       0         0
+    19              record           TYPE         NOTYPE         0       1       0         0
+    20              repeat           TYPE         NOTYPE         0       1       0         0
+    21             integer           TYPE         NOTYPE         0       1       0         0
+    22                real           TYPE         NOTYPE         0       1       0         0
+    23             boolean           TYPE         NOTYPE         0       1       0         0
+    24                char           TYPE         NOTYPE         0       1       0         0
+    25              string           TYPE         NOTYPE         0       1       0         0
+    26                then           TYPE         NOTYPE         0       1       0         0
+    27                  to           TYPE         NOTYPE         0       1       0         0
+    28                type           TYPE         NOTYPE         0       1       0         0
+    29               until           TYPE         NOTYPE         0       1       0         0
+    30                 var           TYPE         NOTYPE         0       1       0         0
+    31               while           TYPE         NOTYPE         0       1       0         0
+    32                true           TYPE         NOTYPE         0       1       0         0
+    33               false           TYPE         NOTYPE         0       1       0         0
+    34             Integer           TYPE        INTEGER         0       1       0         0
+    35                Real           TYPE           REAL         0       1       0         0
+    36                Char           TYPE           CHAR         0       1       0         0
+    37             Boolean           TYPE        BOOLEAN         0       1       0         0
+    38              String           TYPE         STRING         0       1       0         0
+    39                True       CONSTANT        BOOLEAN         0       1       0         1
+    40               False       CONSTANT        BOOLEAN         0       1       0         0
+    41             writeln      PROCEDURE         NOTYPE         0       1       0         0
+    42              readln      PROCEDURE         NOTYPE         0       1       0         0
+    43               write      PROCEDURE         NOTYPE         0       1       0         0
+    44                read      PROCEDURE         NOTYPE         0       1       0         0
+    45               Hello        PROGRAM         NOTYPE         0       1       0         0
+    46                   a       VARIABLE        INTEGER         0       1       0         0
+    47                   b       VARIABLE        INTEGER         0       1       0         0
+[atab]
+ Index     Index Type   Element Type      ERef     Low    High    ElSize      Size
+     0         NOTYPE         NOTYPE         0       0       0         1         0
+[btab]
+ Index           Last     Last Param     Param Size       Var Size
+     0             47              0              0              2

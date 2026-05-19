@@ -18,7 +18,7 @@ void INPUT_FILE ()
         }
         else {
             fInput.close();
-            fileStream.open("test/milestone-2/" + fileName);
+            fileStream.open("test/milestone-3/" + fileName);
             break;
         }
     }

@@ -60,7 +60,7 @@ struct BtabEntry {
 
 class SymbolTable {
 public:
-    std::vector<TabEntry> tab; // tab[0..31] = reserved words, tab[32+] = identifier user
+    std::vector<TabEntry> tab; // tab[0..33] = reserved words, tab[34+] = identifier user
     std::vector<AtabEntry> atab; // diakses via ref pada TabEntry
     std::vector<BtabEntry> btab; // btab[0] = global block
 private:
@@ -79,13 +79,13 @@ public:
     int lookup(const std::string& id) const;
     int lookupCurrentBlock(const std::string& id) const;
     int insertArray(int xtyp, int etyp, int eref, int low, int high, int elsz);
-    void printTab() const;
-    void printAtab() const;
-    void printBtab() const;
 private:
     void initReservedWords();
     void initPredefined();
     int sizeOf(TypeCode t) const;
 };
+
+std::string typeCodeToString(TypeCode tc);
+std::string objClassToString(ObjClass oc);
 
 #endif

@@ -64,6 +64,8 @@ void SymbolTable::initReservedWords() {
     pushRW("until");
     pushRW("var");
     pushRW("while");
+    pushRW("true");
+    pushRW("false");
 }
 
 void SymbolTable::initPredefined() {
@@ -190,7 +192,7 @@ int SymbolTable::lookup(const std::string& id) const {
         }
     }
 
-    for (int i = 0; i < 32 && i < (int)tab.size(); i++) {
+    for (int i = 0; i < 34 && i < (int)tab.size(); i++) {
         std::string tabIdLower = tab[i].identifier;
         std::transform(tabIdLower.begin(), tabIdLower.end(), tabIdLower.begin(), ::tolower);
         if (tabIdLower == idLower) return i;
@@ -241,108 +243,31 @@ int SymbolTable::sizeOf(TypeCode t) const {
     }
 }
 
-static std::string typeCodeName(int tc) {
-    switch (static_cast<TypeCode>(tc)) {
-        case TypeCode::NOTYPE:     return "notype";
-        case TypeCode::INTEGER:    return "integer";
-        case TypeCode::REAL:       return "real";
-        case TypeCode::CHAR:       return "char";
-        case TypeCode::BOOLEAN:    return "boolean";
-        case TypeCode::STRING:     return "string";
-        case TypeCode::ARRAY:      return "array";
-        case TypeCode::RECORD:     return "record";
-        case TypeCode::SUBRANGE:   return "subrange";
-        case TypeCode::ENUMERATED: return "enumerated";
-        default:                   return "?";
+std::string typeCodeToString(TypeCode tc) {
+    switch (tc) {
+        case TypeCode::NOTYPE:     return "NOTYPE";
+        case TypeCode::INTEGER:    return "INTEGER";
+        case TypeCode::REAL:       return "REAL";
+        case TypeCode::CHAR:       return "CHAR";
+        case TypeCode::BOOLEAN:    return "BOOLEAN";
+        case TypeCode::STRING:     return "STRING";
+        case TypeCode::ARRAY:      return "ARRAY";
+        case TypeCode::RECORD:     return "RECORD";
+        case TypeCode::SUBRANGE:   return "SUBRANGE";
+        case TypeCode::ENUMERATED: return "ENUMERATED";
+        default:                   return "UNKNOWN";
     }
 }
 
-static std::string objClassName(ObjClass oc) {
+std::string objClassToString(ObjClass oc) {
     switch (oc) {
-        case ObjClass::CONSTANT:  return "constant";
-        case ObjClass::VARIABLE:  return "variable";
-        case ObjClass::TYPE:      return "type";
-        case ObjClass::PROCEDURE: return "procedure";
-        case ObjClass::FUNCTION:  return "function";
-        case ObjClass::PROGRAM:   return "program";
-        case ObjClass::FIELD:     return "field";
-        default:                  return "?";
-    }
-}
-
-void SymbolTable::printTab() const {
-    std::cout << "TAB" << std::endl;
-    std::cout << std::left
-              << std::setw(6)  << "idx"
-              << std::setw(20) << "identifier"
-              << std::setw(12) << "obj"
-              << std::setw(12) << "type"
-              << std::setw(6)  << "ref"
-              << std::setw(6)  << "nrm"
-              << std::setw(6)  << "lev"
-              << std::setw(6)  << "adr"
-              << std::setw(6)  << "link"
-              << std::endl;
-    for (int i = 0; i < static_cast<int>(tab.size()); i++) {
-        const TabEntry& e = tab[i];
-        std::cout << std::left
-                  << std::setw(6)  << i
-                  << std::setw(20) << e.identifier
-                  << std::setw(12) << objClassName(e.obj)
-                  << std::setw(12) << typeCodeName(static_cast<int>(e.type))
-                  << std::setw(6)  << e.ref
-                  << std::setw(6)  << e.nrm
-                  << std::setw(6)  << e.lev
-                  << std::setw(6)  << e.adr
-                  << std::setw(6)  << e.link
-                  << std::endl;
-    }
-}
-
-void SymbolTable::printAtab() const {
-    std::cout << "ATAB" << std::endl;
-    std::cout << std::left
-              << std::setw(6)  << "idx"
-              << std::setw(10) << "xtyp"
-              << std::setw(10) << "etyp"
-              << std::setw(6)  << "eref"
-              << std::setw(6)  << "low"
-              << std::setw(6)  << "high"
-              << std::setw(6)  << "elsz"
-              << std::setw(8)  << "size"
-              << std::endl;
-    for (int i = 1; i < static_cast<int>(atab.size()); i++) {
-        const AtabEntry& a = atab[i];
-        std::cout << std::left
-                  << std::setw(6)  << i
-                  << std::setw(10) << typeCodeName(a.xtyp)
-                  << std::setw(10) << typeCodeName(a.etyp)
-                  << std::setw(6)  << a.eref
-                  << std::setw(6)  << a.low
-                  << std::setw(6)  << a.high
-                  << std::setw(6)  << a.elsz
-                  << std::setw(8)  << a.size
-                  << std::endl;
-    }
-}
-
-void SymbolTable::printBtab() const {
-    std::cout << "BTAB" << std::endl;
-    std::cout << std::left
-              << std::setw(6) << "idx"
-              << std::setw(8) << "last"
-              << std::setw(8) << "lpar"
-              << std::setw(8) << "psze"
-              << std::setw(8) << "vsze"
-              << std::endl;
-    for (int i = 0; i < static_cast<int>(btab.size()); i++) {
-        const BtabEntry& b = btab[i];
-        std::cout << std::left
-                  << std::setw(6) << i
-                  << std::setw(8) << b.last
-                  << std::setw(8) << b.lpar
-                  << std::setw(8) << b.psze
-                  << std::setw(8) << b.vsze
-                  << std::endl;
+        case ObjClass::CONSTANT:  return "CONSTANT";
+        case ObjClass::VARIABLE:  return "VARIABLE";
+        case ObjClass::TYPE:      return "TYPE";
+        case ObjClass::PROCEDURE: return "PROCEDURE";
+        case ObjClass::FUNCTION:  return "FUNCTION";
+        case ObjClass::PROGRAM:   return "PROGRAM";
+        case ObjClass::FIELD:     return "FIELD";
+        default:                  return "UNKNOWN";
     }
 }

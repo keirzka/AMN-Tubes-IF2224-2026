@@ -768,7 +768,10 @@ TypeInfo visit_simple_expression(Node* node, SemanticContext& ctx) {
     bool unaryPlus    = false;
 
     for (Node* c : node->children) {
-        std::string tt = nodeTokenType(c);
+        std::string tt;
+        if (c->getLabel() == "<additive-operator>") {
+            tt = nodeTokenType (c->children[0]);
+        }
 
         // Operator additive
         if (tt == "plus" || tt == "minus" || tt == "orsy") {
@@ -851,14 +854,17 @@ TypeInfo visit_term(Node* node, SemanticContext& ctx) {
 
     if (node->children.empty()) return TypeInfo(TypeCode::NOTYPE);
 
-    // <term> bisa punya struktur flat:
+    // <term> bisa punya anak flat:
     // <factor>  |  <term> <mulop> <factor>
     // Karena parse tree bisa di-flatten, kita iterasi left-to-right
     TypeInfo current(TypeCode::NOTYPE);
     std::string pendingOp = "";
 
     for (Node* c : node->children) {
-        std::string tt = nodeTokenType(c);
+        std::string tt;
+        if (c->getLabel() == "<multiplicative-operator>") {
+            tt = nodeTokenType(c->children[0]);
+        }
 
         // Operator: times(*), rdiv(/), idiv(div), imod(mod), andsy(and)
         if (tt == "times" || tt == "rdiv" || tt == "slash" ||
@@ -1356,45 +1362,350 @@ void visit_procedure_function_call(Node* node, SemanticContext& ctx) {
 }
 
 void visit_compound_statement(Node* node, SemanticContext& ctx) {
-    (void)node; (void)ctx;
+    // std::cout << "masuk compound statement" << std::endl;
+    if (!node) return;
+
+    // anak: beginsy <statement-list> endsy
+    for (Node* c : node->children) {
+        if (c->label == "<statement-list>") {
+            visit_statement_list(c, ctx);
+        }
+    }
+
+    node->annotate((int)TypeCode::NOTYPE, -1, ctx.st.currentLev());
 }
 
 void visit_statement_list(Node* node, SemanticContext& ctx) {
-    (void)node; (void)ctx;
+    // std::cout << "masuk statement list" << std::endl;
+    if (!node) return;
+
+    // anak: <statement> (semicolon <statement>)*
+    for (Node* c : node->children) {
+        if (c->label == "<statement>") {
+            visit_statement(c, ctx);
+        }
+    }
+
+    node->annotate((int)TypeCode::NOTYPE, -1, ctx.st.currentLev());
 }
 
 void visit_statement(Node* node, SemanticContext& ctx) {
-    (void)node; (void)ctx;
+    // std::cout << "masuk statement" << std::endl;
+    if (!node) return;
+
+    // anak : salah satu dari
+    // <assignment-statement>, <if-statement>, <while-statement>,
+    // <repeat-statement>, <for-statement>, <case-statement>,
+    // <procedure/function-call>, <compound-statement>
+
+    if (node->children.empty()) {
+        return;
+    }
+
+    Node* child = node->children[0];
+    if (child->label == "<assignment-statement>") {
+        visit_assignment_statement(child, ctx);
+    } else if (child->label == "<if-statement>") {
+        visit_if_statement(child, ctx);
+    } else if (child->label == "<while-statement>") {
+        visit_while_statement(child, ctx);
+    } else if (child->label == "<repeat-statement>") {
+        visit_repeat_statement(child, ctx);
+    } else if (child->label == "<for-statement>") {
+        visit_for_statement(child, ctx);
+    } else if (child->label == "<case-statement>") {
+        visit_case_statement(child, ctx);
+    } else if (child->label == "<procedure/function-call>") {
+        visit_procedure_function_call(child, ctx);
+    } else if (child->label == "<compound-statement>") {
+        visit_compound_statement(child, ctx);
+    }
+
+    node->annotate((int)TypeCode::NOTYPE, -1, ctx.st.currentLev());
 }
 
 void visit_assignment_statement(Node* node, SemanticContext& ctx) {
-    (void)node; (void)ctx;
+    // std::cout << "masuk assignment statement" << std::endl;
+    if (!node) return;
+
+    // anak: <variable> becomes <expression>
+    // Validasi: tipe lhs dan rhs harus assignment-compatible
+
+    Node* varNode = nullptr;
+    Node* exprNode = nullptr;
+
+    for (Node* c : node->children) {
+        if (c->label == "<variable>" && !varNode) varNode = c;
+        else if (c->label == "<expression>" && !exprNode) exprNode = c;
+    }
+
+    if (!varNode || !exprNode) {
+        ctx.errors.add("Assignment statement tidak lengkap");
+        return;
+    }
+
+    TypeInfo lhsType = visit_variable(varNode, ctx);
+    // std::cout << typeCodeToString (lhsType.baseType) << ' ' << varNode->getLabel() << std::endl;
+
+    TypeInfo rhsType = visit_expression(exprNode, ctx);
+
+    if (!isAssignmentCompatible(lhsType, rhsType, ctx.st)) {
+        ctx.errors.add("Tipe assignment tidak kompatibel: "
+                       "lhs adalah " + lhsType.toString() +
+                       ", rhs adalah " + rhsType.toString());
+    }
+
+    node->annotate((int)TypeCode::NOTYPE, -1, ctx.st.currentLev());
 }
 
 void visit_if_statement(Node* node, SemanticContext& ctx) {
-    (void)node; (void)ctx;
+    if (!node) return;
+
+    // anak: ifsy <expression> thensy <statement> (elsesy <statement>)?
+    Node* condNode = nullptr;
+    Node* thenStmt = nullptr;
+    Node* elseStmt = nullptr;
+
+    for (Node* c : node->children) {
+        if (c->label == "<expression>" && !condNode) {
+            condNode = c;
+        } else if (c->label == "<statement>" && !thenStmt) {
+            thenStmt = c;
+        } else if (c->label == "<statement>" && thenStmt && !elseStmt) {
+            elseStmt = c;
+        }
+    }
+
+    if (!condNode || !thenStmt) {
+        ctx.errors.add("If statement tidak lengkap");
+        return;
+    }
+
+    TypeInfo condType = visit_expression(condNode, ctx);
+
+    if (condType.baseType != TypeCode::BOOLEAN) {
+        ctx.errors.add("Kondisi if harus bertipe Boolean, ditemukan: " + condType.toString());
+    }
+
+    visit_statement(thenStmt, ctx);
+
+    if (elseStmt) {
+        visit_statement(elseStmt, ctx);
+    }
+
+    node->annotate((int)TypeCode::NOTYPE, -1, ctx.st.currentLev());
 }
 
 void visit_while_statement(Node* node, SemanticContext& ctx) {
-    (void)node; (void)ctx;
+    if (!node) return;
+
+    // anak: whilesy <expression> dosy <compound-statement> semicolon
+    Node* condNode = nullptr;
+    Node* compoundStmt = nullptr;
+
+    for (Node* c : node->children) {
+        if (c->label == "<expression>" && !condNode) {
+            condNode = c;
+        } else if (c->label == "<compound-statement>" && !compoundStmt) {
+            compoundStmt = c;
+        }
+    }
+
+    if (!condNode || !compoundStmt) {
+        ctx.errors.add("While statement tidak lengkap");
+        return;
+    }
+
+    TypeInfo condType = visit_expression(condNode, ctx);
+
+    if (condType.baseType != TypeCode::BOOLEAN) {
+        ctx.errors.add("Kondisi while harus bertipe Boolean, ditemukan: " + condType.toString());
+    }
+
+    visit_compound_statement(compoundStmt, ctx);
+
+    node->annotate((int)TypeCode::NOTYPE, -1, ctx.st.currentLev());
 }
 
 void visit_repeat_statement(Node* node, SemanticContext& ctx) {
-    (void)node; (void)ctx;
+    if (!node) return;
+
+    // anak: repeatsy <statement-list> untilsy <expression>
+    Node* stmtListNode = nullptr;
+    Node* condNode = nullptr;
+
+    for (Node* c : node->children) {
+        if (c->label == "<statement-list>" && !stmtListNode) {
+            stmtListNode = c;
+        } else if (c->label == "<expression>" && !condNode) {
+            condNode = c;
+        }
+    }
+
+    if (!stmtListNode || !condNode) {
+        ctx.errors.add("Repeat statement tidak lengkap");
+        return;
+    }
+
+    visit_statement_list(stmtListNode, ctx);
+
+    TypeInfo condType = visit_expression(condNode, ctx);
+
+    if (condType.baseType != TypeCode::BOOLEAN) {
+        ctx.errors.add("Kondisi until harus bertipe Boolean, ditemukan: " + condType.toString());
+    }
+
+    node->annotate((int)TypeCode::NOTYPE, -1, ctx.st.currentLev());
 }
 
 void visit_for_statement(Node* node, SemanticContext& ctx) {
-    (void)node; (void)ctx;
+    if (!node) return;
+
+    // anak: forsy ident becomes <expression> (tosy|downtosy) <expression> dosy <compound-statement> semicolon
+    Node* loopVarNode = nullptr;
+    Node* initExprNode = nullptr;
+    Node* finalExprNode = nullptr;
+    Node* compoundStmt = nullptr;
+    std::string direction = ""; // ini "to" ato "downto"
+
+    int exprCount = 0;
+    for (Node* c : node->children) {
+        if (nodeTokenType(c) == "ident" && !loopVarNode) {
+            loopVarNode = c;
+        } else if (c->label == "<expression>" && exprCount == 0) {
+            initExprNode = c;
+            exprCount++;
+        } else if (c->label == "<expression>" && exprCount == 1) {
+            finalExprNode = c;
+            exprCount++;
+        } else if (c->label == "<compound-statement>" && !compoundStmt) {
+            compoundStmt = c;
+        } else if (nodeTokenType(c) == "tosy") {
+            direction = "to";
+        } else if (nodeTokenType(c) == "downtosy") {
+            direction = "downto";
+        }
+    }
+
+    if (!loopVarNode || !initExprNode || !finalExprNode || !compoundStmt || direction.empty()) {
+        ctx.errors.add("For statement tidak lengkap");
+        return;
+    }
+
+    // Lookup loop variable
+    std::string loopVarName = nodeTokenValue(loopVarNode);
+    int loopVarIdx = ctx.st.lookup(loopVarName);
+    if (loopVarIdx < 0) {
+        ctx.errors.add("Variabel loop '" + loopVarName + "' tidak ditemukan");
+        return;
+    }
+
+    TypeInfo loopVarType = typeInfoFromTab(loopVarIdx, ctx.st);
+
+    // Validasi: loop variable harus ordinal
+    if (!loopVarType.isOrdinal()) {
+        ctx.errors.add("Variabel loop harus bertipe ordinal, ditemukan: " + loopVarType.toString());
+    }
+
+    TypeInfo initType = visit_expression(initExprNode, ctx);
+
+    TypeInfo finalType = visit_expression(finalExprNode, ctx);
+
+    if (!isAssignmentCompatible(loopVarType, initType, ctx.st)) {
+        ctx.errors.add("Tipe initial expression tidak kompatibel dengan loop variable: "
+                       "loop var adalah " + loopVarType.toString() +
+                       ", initial adalah " + initType.toString());
+    }
+
+    if (!isAssignmentCompatible(loopVarType, finalType, ctx.st)) {
+        ctx.errors.add("Tipe final expression tidak kompatibel dengan loop variable: "
+                       "loop var adalah " + loopVarType.toString() +
+                       ", final adalah " + finalType.toString());
+    }
+
+    visit_compound_statement(compoundStmt, ctx);
+
+    node->annotate((int)TypeCode::NOTYPE, -1, ctx.st.currentLev());
 }
 
 void visit_case_statement(Node* node, SemanticContext& ctx) {
-    (void)node; (void)ctx;
+    if (!node) return;
+
+    // anak: casesy <expression> ofsy <case-list> endsy
+    Node* exprNode = nullptr;
+    Node* caseListNode = nullptr;
+
+    for (Node* c : node->children) {
+        if (c->label == "<expression>" && !exprNode) {
+            exprNode = c;
+        } else if (c->label == "<case-list>" && !caseListNode) {
+            caseListNode = c;
+        }
+    }
+
+    if (!exprNode || !caseListNode) {
+        ctx.errors.add("Case statement tidak lengkap");
+        return;
+    }
+
+    TypeInfo exprType = visit_expression(exprNode, ctx);
+
+    if (!exprType.isOrdinal()) {
+        ctx.errors.add("Case expression harus bertipe ordinal, ditemukan: " + exprType.toString());
+    }
+
+    visit_case_list(caseListNode, ctx, exprType);
+
+    node->annotate((int)TypeCode::NOTYPE, -1, ctx.st.currentLev());
 }
 
 void visit_case_list(Node* node, SemanticContext& ctx, const TypeInfo& exprType) {
-    (void)node; (void)ctx; (void)exprType;
+    if (!node) return;
+
+    // anak: <case-branch> (semicolon <case-branch>)*
+    for (Node* c : node->children) {
+        if (c->label == "<case-branch>") {
+            visit_case_branch(c, ctx, exprType);
+        }
+    }
+
+    node->annotate((int)TypeCode::NOTYPE, -1, ctx.st.currentLev());
 }
 
 void visit_case_branch(Node* node, SemanticContext& ctx, const TypeInfo& exprType) {
-    (void)node; (void)ctx; (void)exprType;
+    if (!node) return;
+
+    // anak: <constant-list> colon <statement>
+    Node* constListNode = nullptr;
+    Node* stmtNode = nullptr;
+
+    for (Node* c : node->children) {
+        if (c->label == "<constant-list>" && !constListNode) {
+            constListNode = c;
+        } else if (c->label == "<statement>" && !stmtNode) {
+            stmtNode = c;
+        }
+    }
+
+    if (!constListNode || !stmtNode) {
+        ctx.errors.add("Case branch tidak lengkap");
+        return;
+    }
+
+    if (constListNode) {
+        for (Node* c : constListNode->children) {
+            if (c->label == "<constant>") {
+                TypeInfo constType = visit_constant_value(c, ctx);
+                if (!isCompatible(constType, exprType, ctx.st)) {
+                    ctx.errors.add("Tipe konstanta case tidak kompatibel dengan case expression: "
+                                   "konstanta adalah " + constType.toString() +
+                                   ", expression adalah " + exprType.toString());
+                }
+            }
+        }
+    }
+
+    visit_statement(stmtNode, ctx);
+
+    node->annotate((int)TypeCode::NOTYPE, -1, ctx.st.currentLev());
 }

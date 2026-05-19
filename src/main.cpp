@@ -3,9 +3,7 @@
 #include "io/writer.hpp"
 #include "parser/parser.hpp"
 #include "parser/utils/error.hpp"
-
-// std::vector<std::string> token_list;
-// Node* root;
+#include "semantic/semantic_analyzer.hpp"
 
 int main () {
 
@@ -17,18 +15,37 @@ int main () {
     SAVE_TOKEN_LIST();
 
     /* ========== PARSER ==========*/
+    Node* root = nullptr;
     try{
         Parser parser(token_list);
-        Node* root = parser.parse();
+        root = parser.parse();
 
         PRINT_PARSE_TREE (root, 0);
 
         SAVE_PARSE_TREE (root, 0);
+    } catch (const SyntaxError& e){
+        std::cerr << e.what() << std::endl;
+        return 0;
+    }
+
+    /* ========== SEMANTIC ANALYSIS ==========*/
+    if (root != nullptr) {
+        SemanticContext ctx;
+        analyze(root, ctx);
+
+        // Kalo ada error ga bisa hasilin symbol table sama ast 
+        if (ctx.errors.hasErrors()) {
+            std::cout << "Error" << std::endl;
+            ctx.errors.printAll();
+        } else {
+            std::cout << "Success" << std::endl;
+            PRINT_SYMBOL_TABLE(ctx.st);
+            SAVE_SYMBOL_TABLE(ctx.st);
+            PRINT_AST(root, 0, ctx.st);
+            SAVE_AST(root, 0, ctx.st);
+        }
 
         delete root;
-    } catch (const SyntaxError& e){
-        std::cerr << e.what() <<std::endl;
-        // return 1;
     }
 
     return 0;

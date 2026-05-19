@@ -1,0 +1,68 @@
+<program> [type=NOTYPE, ref=-1, lev=0]
+    <program-header> [type=NOTYPE, ref=-1, lev=0]
+        programsy
+        ident (Hello) [type=NOTYPE, ref=45, lev=0]
+        semicolon
+    <declaration-part>
+        <var-declaration>
+            varsy
+            <identifier-list>
+                ident (a) [type=INTEGER, ref=46, lev=0]
+                comma
+                ident (b) [type=INTEGER, ref=47, lev=0]
+            colon
+            <type> [type=INTEGER, ref=34, lev=0]
+                ident (integer) [type=INTEGER, ref=34, lev=0]
+            semicolon
+    <compound-statement> [type=NOTYPE, ref=-1, lev=0]
+        beginsy
+        <statement-list> [type=NOTYPE, ref=-1, lev=0]
+            <statement> [type=NOTYPE, ref=-1, lev=0]
+                <assignment-statement> [type=NOTYPE, ref=-1, lev=0]
+                    <variable> [type=INTEGER, ref=46, lev=0]
+                        ident (a) [type=INTEGER, ref=46, lev=0]
+                    becomes
+                    <expression> [type=INTEGER, ref=0, lev=0]
+                        <simple-expression> [type=INTEGER, ref=0, lev=0]
+                            <term> [type=INTEGER, ref=0, lev=0]
+                                <factor> [type=INTEGER, ref=-1, lev=0]
+                                    intcon (5) [type=INTEGER, ref=-1, lev=0]
+            semicolon
+            <statement> [type=NOTYPE, ref=-1, lev=0]
+                <assignment-statement> [type=NOTYPE, ref=-1, lev=0]
+                    <variable> [type=INTEGER, ref=47, lev=0]
+                        ident (b) [type=INTEGER, ref=47, lev=0]
+                    becomes
+                    <expression> [type=INTEGER, ref=0, lev=0]
+                        <simple-expression> [type=INTEGER, ref=0, lev=0]
+                            <term> [type=INTEGER, ref=0, lev=0]
+                                <factor> [type=INTEGER, ref=46, lev=0]
+                                    ident (a) [type=INTEGER, ref=46, lev=0]
+                            <additive-operator>
+                                plus
+                            <term> [type=INTEGER, ref=0, lev=0]
+                                <factor> [type=INTEGER, ref=-1, lev=0]
+                                    intcon (10) [type=INTEGER, ref=-1, lev=0]
+            semicolon
+            <statement> [type=NOTYPE, ref=-1, lev=0]
+                <procedure/function-call> [type=NOTYPE, ref=41, lev=0]
+                    ident (writeln) [type=NOTYPE, ref=41, lev=0]
+                    lparent
+                    <parameter-list>
+                        <expression> [type=STRING, ref=0, lev=0]
+                            <simple-expression> [type=STRING, ref=0, lev=0]
+                                <term> [type=STRING, ref=0, lev=0]
+                                    <factor> [type=STRING, ref=-1, lev=0]
+                                        string (Result = ) [type=STRING, ref=-1, lev=0]
+                        comma
+                        <expression> [type=INTEGER, ref=0, lev=0]
+                            <simple-expression> [type=INTEGER, ref=0, lev=0]
+                                <term> [type=INTEGER, ref=0, lev=0]
+                                    <factor> [type=INTEGER, ref=47, lev=0]
+                                        ident (b) [type=INTEGER, ref=47, lev=0]
+                    rparent
+            semicolon
+        endsy
+    period
+
+================================================================================

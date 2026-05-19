@@ -32,31 +32,38 @@ Node* parseStatementList(TokenStream& ts){
 }
 
 Node* parseStatement(TokenStream& ts){
+    Node* node = new Node("<statement>");
+
+    // node->addChild
+
     if (ts.check("ident")) {
         int saveIndex = ts.getIndex();
         try {
-            return parseAssignmentStatement(ts);
+            node->addChild (parseAssignmentStatement(ts));
+            // return parseAssignmentStatement(ts);
+            return node;
         } catch (...) {
             ts.setIndex(saveIndex);
-            return parseProcedureFunctionCall(ts);
+            node->addChild (parseProcedureFunctionCall(ts));
+            return node;
         }
     }
-    else if (ts.check("ifsy")) return parseIfStatement(ts);
-    else if (ts.check("whilesy")) return parseWhileStatement(ts);
-    else if (ts.check("repeatsy")) return parseRepeatStatement(ts);
-    else if (ts.check("forsy")) return parseForStatement(ts);
-    else if (ts.check("casesy")) return parseCaseStatement(ts);
-    else if (ts.check("beginsy")) return parseCompoundStatement(ts);
+    else if (ts.check("ifsy")) { node->addChild(parseIfStatement(ts)); return node; }
+    else if (ts.check("whilesy")) {node->addChild(parseWhileStatement(ts)); return node; }
+    else if (ts.check("repeatsy")) {node->addChild(parseRepeatStatement(ts)); return node;}
+    else if (ts.check("forsy")) {node->addChild(parseForStatement(ts)); return node;}
+    else if (ts.check("casesy")) {node->addChild(parseCaseStatement(ts)); return node;}
+    else if (ts.check("beginsy")) {node->addChild(parseCompoundStatement(ts)); return node;}
 
     if (ts.isEOF() || ts.check("endsy") || ts.check("untilsy") || ts.check("elsesy")) {
         return new Node("<statement>");
     }
 
-    Node* node = new Node("<unknown-statement>");
+    // Node* node = new Node("<unknown-statement>");
     node->addChild(new Node(ts.current()));
     ts.advance();
     return node;
-    }
+}
 
 Node* parseAssignmentStatement(TokenStream& ts){
     Node* node = new Node("<assignment-statement>");
@@ -120,7 +127,9 @@ Node* parseWhileStatement(TokenStream& ts){
     node->addChild(parseExpression(ts));
     node->addChild(new Node(ts.expect("dosy")));
 
-    node->addChild(parseStatement(ts));
+    // node->addChild(parseStatement(ts));
+    node->addChild (parseCompoundStatement(ts));
+    node->addChild(new Node(ts.expect("semicolon")));
 
     return node;
 }
@@ -157,7 +166,9 @@ Node* parseForStatement(TokenStream& ts){
     node->addChild(parseExpression(ts));
 
     node->addChild(new Node(ts.expect("dosy")));
-    node->addChild(parseStatement(ts));
+    // node->addChild(parseStatement(ts));
+    node->addChild(parseCompoundStatement(ts));
+    node->addChild(new Node(ts.expect("semicolon")));
 
     return node;
 }
