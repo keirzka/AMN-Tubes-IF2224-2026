@@ -32,47 +32,45 @@
     29               until           TYPE         NOTYPE         0       1       0         0
     30                 var           TYPE         NOTYPE         0       1       0         0
     31               while           TYPE         NOTYPE         0       1       0         0
-    32                true           TYPE         NOTYPE         0       1       0         0
-    33               false           TYPE         NOTYPE         0       1       0         0
-    34             Integer           TYPE        INTEGER         0       1       0         0
-    35                Real           TYPE           REAL         0       1       0         0
-    36                Char           TYPE           CHAR         0       1       0         0
-    37             Boolean           TYPE        BOOLEAN         0       1       0         0
-    38              String           TYPE         STRING         0       1       0         0
-    39                True       CONSTANT        BOOLEAN         0       1       0         1
-    40               False       CONSTANT        BOOLEAN         0       1       0         0
-    41             writeln      PROCEDURE         NOTYPE         0       1       0         0
-    42              readln      PROCEDURE         NOTYPE         0       1       0         0
-    43               write      PROCEDURE         NOTYPE         0       1       0         0
-    44                read      PROCEDURE         NOTYPE         0       1       0         0
-    45 TypeArraySubprogram        PROGRAM         NOTYPE         0       1       0         0
-    46                   x          FIELD        INTEGER         0       1       1         0
-    47                   y          FIELD        INTEGER         0       1       1         0
-    48              TPoint           TYPE         RECORD         1       1       0         0
-    49            TNumbers           TYPE          ARRAY         2       1       0         0
-    50             TMatrix           TYPE          ARRAY         6       1       0         0
-    51              points       VARIABLE          ARRAY         8       1       0         0
-    52             numbers       VARIABLE          ARRAY         2       1       0         0
-    53              matrix       VARIABLE          ARRAY         6       1       0         0
-    54                name       VARIABLE         STRING         0       1       0         0
-    55               count       VARIABLE        INTEGER         0       1       0         0
-    56          PrintPoint      PROCEDURE         NOTYPE         2       1       0         0
-    57                   p       VARIABLE         RECORD         1       1       1         0
-    58     InitializeArray      PROCEDURE         NOTYPE         3       1       0         0
-    59                 arr       VARIABLE          ARRAY         2       1       1         0
-    60                size       VARIABLE        INTEGER         0       1       1         1
-    61                   i       VARIABLE        INTEGER         0       1       1         0
-    62        CalculateSum       FUNCTION        INTEGER         4       1       0         0
-    63                 arr       VARIABLE          ARRAY         2       1       1         0
-    64                size       VARIABLE        INTEGER         0       1       1         1
-    65                   i       VARIABLE        INTEGER         0       1       1         0
-    66               total       VARIABLE        INTEGER         0       1       1         0
-    67          FillMatrix      PROCEDURE         NOTYPE         5       1       0         0
-    68                   m       VARIABLE          ARRAY         6       1       1         0
-    69                rows       VARIABLE        INTEGER         0       1       1         1
-    70                cols       VARIABLE        INTEGER         0       1       1         2
-    71                   i       VARIABLE        INTEGER         0       1       1         0
-    72                   j       VARIABLE        INTEGER         0       1       1         0
+    32             Integer           TYPE        INTEGER         0       1       0         0
+    33                Real           TYPE           REAL         0       1       0         0
+    34                Char           TYPE           CHAR         0       1       0         0
+    35             Boolean           TYPE        BOOLEAN         0       1       0         0
+    36              String           TYPE         STRING         0       1       0         0
+    37                True       CONSTANT        BOOLEAN         0       1       0         1
+    38               False       CONSTANT        BOOLEAN         0       1       0         0
+    39             writeln      PROCEDURE         NOTYPE         0       1       0         0
+    40              readln      PROCEDURE         NOTYPE         0       1       0         0
+    41               write      PROCEDURE         NOTYPE         0       1       0         0
+    42                read      PROCEDURE         NOTYPE         0       1       0         0
+    43 TypeArraySubprogram        PROGRAM         NOTYPE         0       1       0         0
+    44                   x          FIELD        INTEGER         0       1       1         0
+    45                   y          FIELD        INTEGER         0       1       1         0
+    46              TPoint           TYPE         RECORD         1       1       0         0
+    47            TNumbers           TYPE          ARRAY         2       1       0         0
+    48             TMatrix           TYPE          ARRAY         6       1       0         0
+    49              points       VARIABLE          ARRAY         8       1       0         0
+    50             numbers       VARIABLE          ARRAY         2       1       0         0
+    51              matrix       VARIABLE          ARRAY         6       1       0         0
+    52                name       VARIABLE         STRING         0       1       0         0
+    53               count       VARIABLE        INTEGER         0       1       0         0
+    54          PrintPoint      PROCEDURE         NOTYPE         2       1       0         0
+    55                   p       VARIABLE         RECORD         1       1       1         0
+    56     InitializeArray      PROCEDURE         NOTYPE         3       1       0         0
+    57                 arr       VARIABLE          ARRAY         2       1       1         0
+    58                size       VARIABLE        INTEGER         0       1       1         1
+    59                   i       VARIABLE        INTEGER         0       1       1         0
+    60        CalculateSum       FUNCTION        INTEGER         4       1       0         0
+    61                 arr       VARIABLE          ARRAY         2       1       1         0
+    62                size       VARIABLE        INTEGER         0       1       1         1
+    63                   i       VARIABLE        INTEGER         0       1       1         0
+    64               total       VARIABLE        INTEGER         0       1       1         0
+    65          FillMatrix      PROCEDURE         NOTYPE         5       1       0         0
+    66                   m       VARIABLE          ARRAY         6       1       1         0
+    67                rows       VARIABLE        INTEGER         0       1       1         1
+    68                cols       VARIABLE        INTEGER         0       1       1         2
+    69                   i       VARIABLE        INTEGER         0       1       1         0
+    70                   j       VARIABLE        INTEGER         0       1       1         0
 [atab]
  Index     Index Type   Element Type      ERef     Low    High    ElSize      Size
      0         NOTYPE         NOTYPE         0       0       0         1         0
@@ -86,9 +84,9 @@
      8       SUBRANGE         RECORD         1       1       5         1         5
 [btab]
  Index           Last     Last Param     Param Size       Var Size
-     0             67              0              0              5
-     1             47              0              0              2
-     2             57             57              1              0
-     3             61             60              2              2
-     4             66             64              2              3
-     5             72             70              3              4
+     0             65              0              0              5
+     1             45              0              0              2
+     2             55             55              1              0
+     3             59             58              2              2
+     4             64             62              2              3
+     5             70             68              3              4

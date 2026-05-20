@@ -64,8 +64,8 @@ void SymbolTable::initReservedWords() {
     pushRW("until");
     pushRW("var");
     pushRW("while");
-    pushRW("true");
-    pushRW("false");
+    // pushRW("true");
+    // pushRW("false");
 }
 
 void SymbolTable::initPredefined() {
@@ -192,7 +192,7 @@ int SymbolTable::lookup(const std::string& id) const {
         }
     }
 
-    for (int i = 0; i < 34 && i < (int)tab.size(); i++) {
+    for (int i = 0; i < 32 && i < (int)tab.size(); i++) {
         std::string tabIdLower = tab[i].identifier;
         std::transform(tabIdLower.begin(), tabIdLower.end(), tabIdLower.begin(), ::tolower);
         if (tabIdLower == idLower) return i;

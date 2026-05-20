@@ -1,65 +1,65 @@
 <program> [type=NOTYPE, ref=-1, lev=0]
     <program-header> [type=NOTYPE, ref=-1, lev=0]
         programsy
-        ident (Hello) [type=NOTYPE, ref=45, lev=0]
+        ident (Hello) [type=NOTYPE, ref=43, lev=0]
         semicolon
     <declaration-part>
         <var-declaration>
             varsy
             <identifier-list>
-                ident (a) [type=INTEGER, ref=46, lev=0]
+                ident (a) [type=INTEGER, ref=44, lev=0]
                 comma
-                ident (b) [type=INTEGER, ref=47, lev=0]
+                ident (b) [type=INTEGER, ref=45, lev=0]
             colon
-            <type> [type=INTEGER, ref=34, lev=0]
-                ident (integer) [type=INTEGER, ref=34, lev=0]
+            <type> [type=INTEGER, ref=32, lev=0]
+                ident (integer) [type=INTEGER, ref=32, lev=0]
             semicolon
-    <compound-statement>
+    <compound-statement> [type=NOTYPE, ref=-1, lev=0]
         beginsy
-        <statement-list>
-            <statement>
-                <assignment-statement>
-                    <variable>
-                        ident (a)
+        <statement-list> [type=NOTYPE, ref=-1, lev=0]
+            <statement> [type=NOTYPE, ref=-1, lev=0]
+                <assignment-statement> [type=NOTYPE, ref=-1, lev=0]
+                    <variable> [type=INTEGER, ref=44, lev=0]
+                        ident (a) [type=INTEGER, ref=44, lev=0]
                     becomes
-                    <expression>
-                        <simple-expression>
-                            <term>
-                                <factor>
-                                    intcon (5)
+                    <expression> [type=INTEGER, ref=0, lev=0]
+                        <simple-expression> [type=INTEGER, ref=0, lev=0]
+                            <term> [type=INTEGER, ref=0, lev=0]
+                                <factor> [type=INTEGER, ref=-1, lev=0]
+                                    intcon (5) [type=INTEGER, ref=-1, lev=0]
             semicolon
-            <statement>
-                <assignment-statement>
-                    <variable>
-                        ident (b)
+            <statement> [type=NOTYPE, ref=-1, lev=0]
+                <assignment-statement> [type=NOTYPE, ref=-1, lev=0]
+                    <variable> [type=INTEGER, ref=45, lev=0]
+                        ident (b) [type=INTEGER, ref=45, lev=0]
                     becomes
-                    <expression>
-                        <simple-expression>
-                            <term>
-                                <factor>
-                                    ident (a)
+                    <expression> [type=INTEGER, ref=0, lev=0]
+                        <simple-expression> [type=INTEGER, ref=0, lev=0]
+                            <term> [type=INTEGER, ref=0, lev=0]
+                                <factor> [type=INTEGER, ref=44, lev=0]
+                                    ident (a) [type=INTEGER, ref=44, lev=0]
                             <additive-operator>
                                 plus
-                            <term>
-                                <factor>
-                                    intcon (10)
+                            <term> [type=INTEGER, ref=0, lev=0]
+                                <factor> [type=INTEGER, ref=-1, lev=0]
+                                    intcon (10) [type=INTEGER, ref=-1, lev=0]
             semicolon
-            <statement>
-                <procedure/function-call>
-                    ident (writeln)
+            <statement> [type=NOTYPE, ref=-1, lev=0]
+                <procedure/function-call> [type=NOTYPE, ref=39, lev=0]
+                    ident (writeln) [type=NOTYPE, ref=39, lev=0]
                     lparent
                     <parameter-list>
-                        <expression>
-                            <simple-expression>
-                                <term>
-                                    <factor>
-                                        string (Result = )
+                        <expression> [type=STRING, ref=0, lev=0]
+                            <simple-expression> [type=STRING, ref=0, lev=0]
+                                <term> [type=STRING, ref=0, lev=0]
+                                    <factor> [type=STRING, ref=-1, lev=0]
+                                        string (Result = ) [type=STRING, ref=-1, lev=0]
                         comma
-                        <expression>
-                            <simple-expression>
-                                <term>
-                                    <factor>
-                                        ident (b)
+                        <expression> [type=INTEGER, ref=0, lev=0]
+                            <simple-expression> [type=INTEGER, ref=0, lev=0]
+                                <term> [type=INTEGER, ref=0, lev=0]
+                                    <factor> [type=INTEGER, ref=45, lev=0]
+                                        ident (b) [type=INTEGER, ref=45, lev=0]
                     rparent
             semicolon
         endsy

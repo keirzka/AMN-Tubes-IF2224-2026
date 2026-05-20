@@ -32,25 +32,23 @@
     29               until           TYPE         NOTYPE         0       1       0         0
     30                 var           TYPE         NOTYPE         0       1       0         0
     31               while           TYPE         NOTYPE         0       1       0         0
-    32                true           TYPE         NOTYPE         0       1       0         0
-    33               false           TYPE         NOTYPE         0       1       0         0
-    34             Integer           TYPE        INTEGER         0       1       0         0
-    35                Real           TYPE           REAL         0       1       0         0
-    36                Char           TYPE           CHAR         0       1       0         0
-    37             Boolean           TYPE        BOOLEAN         0       1       0         0
-    38              String           TYPE         STRING         0       1       0         0
-    39                True       CONSTANT        BOOLEAN         0       1       0         1
-    40               False       CONSTANT        BOOLEAN         0       1       0         0
-    41             writeln      PROCEDURE         NOTYPE         0       1       0         0
-    42              readln      PROCEDURE         NOTYPE         0       1       0         0
-    43               write      PROCEDURE         NOTYPE         0       1       0         0
-    44                read      PROCEDURE         NOTYPE         0       1       0         0
-    45               Hello        PROGRAM         NOTYPE         0       1       0         0
-    46                   a       VARIABLE        INTEGER         0       1       0         0
-    47                   b       VARIABLE        INTEGER         0       1       0         0
+    32             Integer           TYPE        INTEGER         0       1       0         0
+    33                Real           TYPE           REAL         0       1       0         0
+    34                Char           TYPE           CHAR         0       1       0         0
+    35             Boolean           TYPE        BOOLEAN         0       1       0         0
+    36              String           TYPE         STRING         0       1       0         0
+    37                True       CONSTANT        BOOLEAN         0       1       0         1
+    38               False       CONSTANT        BOOLEAN         0       1       0         0
+    39             writeln      PROCEDURE         NOTYPE         0       1       0         0
+    40              readln      PROCEDURE         NOTYPE         0       1       0         0
+    41               write      PROCEDURE         NOTYPE         0       1       0         0
+    42                read      PROCEDURE         NOTYPE         0       1       0         0
+    43               Hello        PROGRAM         NOTYPE         0       1       0         0
+    44                   a       VARIABLE        INTEGER         0       1       0         0
+    45                   b       VARIABLE        INTEGER         0       1       0         0
 [atab]
  Index     Index Type   Element Type      ERef     Low    High    ElSize      Size
      0         NOTYPE         NOTYPE         0       0       0         1         0
 [btab]
  Index           Last     Last Param     Param Size       Var Size
-     0             47              0              0              2
+     0             45              0              0              2
