@@ -37,10 +37,12 @@ int main () {
         if (ctx.errors.hasErrors()) {
             std::cout << "Error" << std::endl;
             ctx.errors.printAll();
+            // PRINT_SYMBOL_TABLE(ctx.st);
         } else {
             std::cout << "Success" << std::endl;
             PRINT_SYMBOL_TABLE(ctx.st);
             SAVE_SYMBOL_TABLE(ctx.st);
+            // Print dan save AST (format baru: indentation-based, tanpa box-drawing)
             PRINT_AST(root, 0, ctx.st);
             SAVE_AST(root, 0, ctx.st);
         }

@@ -104,18 +104,44 @@ bool isCompatible(const TypeInfo& t1, const TypeInfo& t2, const SymbolTable& st)
 }
 
 bool isAssignmentCompatible(const TypeInfo& t1, const TypeInfo& t2, const SymbolTable& st) {
-    if (t1.baseType == TypeCode::REAL &&
-       (t2.baseType == TypeCode::INTEGER || t2.baseType == TypeCode::SUBRANGE)) {
+    TypeInfo t1_check = t1;
+    TypeInfo t2_check = t2;
+    
+    // Unwrap ARRAY types to get element type for checking
+    if (t1.baseType == TypeCode::ARRAY && t1.ref > 0 && t1.ref < (int)st.atab.size()) {
+        const AtabEntry& atabEntry = st.atab[t1.ref];
+        t1_check = TypeInfo(static_cast<TypeCode>(atabEntry.etyp), atabEntry.eref);
+    }
+    
+    if (t2.baseType == TypeCode::ARRAY && t2.ref > 0 && t2.ref < (int)st.atab.size()) {
+        const AtabEntry& atabEntry = st.atab[t2.ref];
+        t2_check = TypeInfo(static_cast<TypeCode>(atabEntry.etyp), atabEntry.eref);
+    }
+    
+    // Unwrap RECORD types (keep ref for field checking if needed)
+    if (t1.baseType == TypeCode::RECORD && t1.ref > 0) {
+        // RECORD ref points to btab, which represents the record structure
+        // Keep as is for now
+        t1_check = t1;
+    }
+    
+    if (t2.baseType == TypeCode::RECORD && t2.ref > 0) {
+        t2_check = t2;
+    }
+    
+    // Check REAL compatibility with INTEGER/SUBRANGE
+    if (t1_check.baseType == TypeCode::REAL &&
+       (t2_check.baseType == TypeCode::INTEGER || t2_check.baseType == TypeCode::SUBRANGE)) {
         return true;
     }
 
-    if (isCompatible(t1, t2, st)) {
-        if (t1.baseType == TypeCode::SUBRANGE) {
-            if (t2.baseType == TypeCode::INTEGER || t2.baseType == TypeCode::SUBRANGE) {
+    if (isCompatible(t1_check, t2_check, st)) {
+        if (t1_check.baseType == TypeCode::SUBRANGE) {
+            if (t2_check.baseType == TypeCode::INTEGER || t2_check.baseType == TypeCode::SUBRANGE) {
                 return true;
             }
         }
-        if (t1.baseType == TypeCode::STRING && t2.baseType == TypeCode::STRING) {
+        if (t1_check.baseType == TypeCode::STRING && t2_check.baseType == TypeCode::STRING) {
             return true;
         }
         return true;
@@ -128,21 +154,35 @@ TypeInfo resultType(const std::string& op,
                     const TypeInfo& left,
                     const TypeInfo& right,
                     const SymbolTable& st) {
+    
+    // Unwrap ARRAY types to get element type for checking
+    TypeInfo left_check = left;
+    TypeInfo right_check = right;
+    
+    if (left.baseType == TypeCode::ARRAY && left.ref > 0 && left.ref < (int)st.atab.size()) {
+        const AtabEntry& atabEntry = st.atab[left.ref];
+        left_check = TypeInfo(static_cast<TypeCode>(atabEntry.etyp), atabEntry.eref);
+    }
+    
+    if (right.baseType == TypeCode::ARRAY && right.ref > 0 && right.ref < (int)st.atab.size()) {
+        const AtabEntry& atabEntry = st.atab[right.ref];
+        right_check = TypeInfo(static_cast<TypeCode>(atabEntry.etyp), atabEntry.eref);
+    }
 
     if (op == "plus" || op == "minus" || op == "times") {
-        if (!left.isNumeric() || !right.isNumeric()) return TypeInfo(TypeCode::NOTYPE);
-        if (left.isReal() || right.isReal()) return TypeInfo(TypeCode::REAL);
+        if (!left_check.isNumeric() || !right_check.isNumeric()) return TypeInfo(TypeCode::NOTYPE);
+        if (left_check.isReal() || right_check.isReal()) return TypeInfo(TypeCode::REAL);
         return TypeInfo(TypeCode::INTEGER);
     }
 
     if (op == "rdiv") {
-        if (!left.isNumeric() || !right.isNumeric()) return TypeInfo(TypeCode::NOTYPE);
+        if (!left_check.isNumeric() || !right_check.isNumeric()) return TypeInfo(TypeCode::NOTYPE);
         return TypeInfo(TypeCode::REAL);
     }
 
     if (op == "idiv" || op == "imod") {
-        if ((left.baseType == TypeCode::INTEGER || left.baseType == TypeCode::SUBRANGE) &&
-            (right.baseType == TypeCode::INTEGER || right.baseType == TypeCode::SUBRANGE)) {
+        if ((left_check.baseType == TypeCode::INTEGER || left_check.baseType == TypeCode::SUBRANGE) &&
+            (right_check.baseType == TypeCode::INTEGER || right_check.baseType == TypeCode::SUBRANGE)) {
             return TypeInfo(TypeCode::INTEGER);
         }
         return TypeInfo(TypeCode::NOTYPE);
@@ -151,19 +191,19 @@ TypeInfo resultType(const std::string& op,
     if (op == "eql" || op == "neq" ||
         op == "lss" || op == "leq" ||
         op == "gtr" || op == "geq") {
-        if (isCompatible(left, right, st)) {
+        if (isCompatible(left_check, right_check, st)) {
             return TypeInfo(TypeCode::BOOLEAN);
         }
-        if ((left.isReal() && right.isInteger()) ||
-            (left.isInteger() && right.isReal())) {
+        if ((left_check.isReal() && right_check.isInteger()) ||
+            (left_check.isInteger() && right_check.isReal())) {
             return TypeInfo(TypeCode::BOOLEAN);
         }
         return TypeInfo(TypeCode::NOTYPE);
     }
 
     if (op == "andsy" || op == "orsy") {
-        if (left.baseType == TypeCode::BOOLEAN &&
-            right.baseType == TypeCode::BOOLEAN) {
+        if (left_check.baseType == TypeCode::BOOLEAN &&
+            right_check.baseType == TypeCode::BOOLEAN) {
             return TypeInfo(TypeCode::BOOLEAN);
         }
         return TypeInfo(TypeCode::NOTYPE);

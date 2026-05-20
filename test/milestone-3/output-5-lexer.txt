@@ -1,0 +1,53 @@
+programsy
+ident (illegalUse)
+semicolon
+varsy
+ident (a)
+comma
+ident (b)
+colon
+ident (integer)
+semicolon
+ident (c)
+colon
+ident (TPoint)
+semicolon
+beginsy
+ident (a)
+becomes
+intcon (90)
+rdiv
+intcon (5)
+semicolon
+ident (b)
+becomes
+ident (a)
+times
+ident (a)
+semicolon
+ident (solve)
+lparent
+ident (a)
+comma
+ident (b)
+rparent
+semicolon
+ident (c)
+period
+ident (x)
+becomes
+intcon (0)
+semicolon
+ident (c)
+period
+ident (y)
+becomes
+intcon (0)
+semicolon
+ident (writeln)
+lparent
+string (hi dunya!)
+rparent
+semicolon
+endsy
+period

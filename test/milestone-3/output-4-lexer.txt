@@ -1,0 +1,163 @@
+programsy
+ident (CommentTest)
+semicolon
+varsy
+ident (x)
+colon
+ident (integer)
+semicolon
+ident (y)
+colon
+ident (integer)
+semicolon
+ident (i)
+colon
+ident (integer)
+semicolon
+beginsy
+ident (x)
+becomes
+intcon (5)
+semicolon
+ident (y)
+becomes
+intcon (90)
+semicolon
+ident (x)
+becomes
+ident (x)
+plus
+intcon (10)
+semicolon
+ifsy
+ident (x)
+eql
+ident (y)
+thensy
+ident (x)
+becomes
+ident (x)
+plus
+ident (y)
+semicolon
+ifsy
+ident (x)
+neq
+ident (y)
+thensy
+ident (x)
+becomes
+ident (x)
+minus
+ident (y)
+semicolon
+ifsy
+ident (x)
+gtr
+ident (y)
+thensy
+ident (x)
+becomes
+ident (x)
+times
+ident (y)
+semicolon
+ifsy
+ident (x)
+geq
+ident (y)
+thensy
+ident (x)
+becomes
+ident (x)
+idiv
+ident (y)
+semicolon
+ifsy
+ident (x)
+leq
+ident (y)
+thensy
+ident (x)
+becomes
+ident (x)
+imod
+ident (y)
+semicolon
+forsy
+ident (i)
+becomes
+intcon (1)
+tosy
+intcon (10)
+dosy
+beginsy
+ident (i)
+becomes
+ident (i)
+plus
+intcon (1)
+semicolon
+endsy
+semicolon
+forsy
+ident (i)
+becomes
+intcon (10)
+downtosy
+intcon (1)
+dosy
+beginsy
+ident (i)
+becomes
+ident (i)
+minus
+intcon (1)
+semicolon
+endsy
+semicolon
+whilesy
+ident (i)
+gtr
+intcon (0)
+dosy
+beginsy
+ident (i)
+becomes
+ident (i)
+minus
+intcon (1)
+semicolon
+endsy
+semicolon
+repeatsy
+ident (i)
+becomes
+ident (i)
+plus
+intcon (1)
+semicolon
+untilsy
+ident (i)
+eql
+intcon (10)
+semicolon
+casesy
+ident (i)
+ofsy
+intcon (1)
+colon
+ident (i)
+becomes
+intcon (100)
+semicolon
+intcon (2)
+colon
+ident (i)
+becomes
+intcon (200)
+semicolon
+endsy
+semicolon
+endsy
+period

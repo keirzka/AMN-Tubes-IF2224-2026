@@ -1,0 +1,81 @@
+program TypeArraySubprogram;
+
+type
+  TPoint == record
+    x: integer;
+    y: integer
+  end;
+  TNumbers == array[1..100] of integer;
+  TMatrix == array[1..10] of array[1..10] of real;
+
+var
+  points: array[1..5] of TPoint;
+  numbers: TNumbers;
+  matrix: TMatrix;
+  name: string;
+  count: integer;
+
+procedure PrintPoint(p: TPoint);
+begin
+  writeln('Point:');
+end;
+
+procedure InitializeArray(arr: TNumbers; size: integer);
+var
+  i: integer;
+begin
+  for i := 1 to size do
+    begin
+      arr[i] := i * 10;
+    end;
+end;
+
+function CalculateSum(arr: TNumbers; size: integer): integer;
+var
+  i: integer;
+  total: integer;
+begin
+  total := 0;
+  for i := 1 to size do
+    begin
+      total := total + arr[i];
+    end;
+  CalculateSum := total;
+end;
+
+procedure FillMatrix(m: TMatrix; rows: integer; cols: integer);
+var
+  i: integer;
+  j: integer;
+begin
+  for i := 1 to rows do
+    begin
+      for j := 1 to cols do
+        begin
+          m[i][j] := i + j;
+        end;
+    end;
+end;
+
+begin
+  count := 5;
+  
+  { Initialize points }
+  points[1].x := 1;
+  points[1].y := 2;
+  points[2].x := 3;
+  points[2].y := 4;
+  
+  { PrintPoint(points[1]); }
+  
+  { Initialize and process numbers array }
+  InitializeArray(numbers, 10);
+  writeln('Sum = ', CalculateSum(numbers, 10));
+  
+  { Fill matrix }
+  FillMatrix(matrix, 5, 5);
+  
+  { Test string }
+  name := 'TestProgram';
+  writeln('Program name: ', name);
+end.

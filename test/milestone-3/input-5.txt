@@ -1,0 +1,15 @@
+program illegalUse;
+
+var
+  a, b: integer;
+  c : TPoint;
+
+begin
+  a := 90 / 5;
+  b := a * a;
+  solve(a, b);
+  c.x := 0;
+  c.y := 0;
+  writeln('hi dunya!');
+
+end.

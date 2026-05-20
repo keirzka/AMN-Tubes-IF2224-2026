@@ -1,7 +1,7 @@
 <program>
     <program-header>
         programsy
-        ident (Hello)
+        ident (wrongType)
         semicolon
     <declaration-part>
         <var-declaration>

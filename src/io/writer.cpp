@@ -247,6 +247,42 @@ void SAVE_AST(Node* root, int depth, const SymbolTable& st) {
     outputStream.close();
 }
 
+// New AST functions using global g_astRoot
+// extern std::shared_ptr<ProgramNode> g_astRoot;
+
+// void PRINT_AST_NEW() {
+//     if (!g_astRoot) {
+//         cout << "AST tidak tersedia" << endl;
+//         return;
+//     }
+//     g_astRoot->print(0, false, false);
+// }
+
+// void SAVE_AST_NEW() {
+//     if (!g_astRoot) {
+//         cout << "AST tidak tersedia" << endl;
+//         return;
+//     }
+
+//     cout << "Masukkan nama file untuk menyimpan AST : ";
+//     string fileName;
+//     getline(cin, fileName);
+
+//     ofstream outputStream("test/milestone-3/" + fileName + ".txt");
+//     if (!outputStream.is_open()) {
+//         cerr << "Error: Tidak dapat membuka file untuk penulisan" << endl;
+//         return;
+//     }
+
+//     // Save current cout buffer
+//     std::streambuf* old = cout.rdbuf(outputStream.rdbuf());
+//     g_astRoot->print(0, false, false);
+//     cout.rdbuf(old);
+
+//     outputStream << "\n" << string(80, '=') << endl;
+//     outputStream.close();
+// }
+
 void SAVE_AST_RECURSIVE(Node* root, int depth, ofstream& os, const SymbolTable& st) {
     if (!root) return;
 

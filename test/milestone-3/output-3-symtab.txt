@@ -45,12 +45,50 @@
     42              readln      PROCEDURE         NOTYPE         0       1       0         0
     43               write      PROCEDURE         NOTYPE         0       1       0         0
     44                read      PROCEDURE         NOTYPE         0       1       0         0
-    45           wrongType        PROGRAM         NOTYPE         0       1       0         0
-    46                   a       VARIABLE        INTEGER         0       1       0         0
-    47                   b       VARIABLE        INTEGER         0       1       0         0
+    45 TypeArraySubprogram        PROGRAM         NOTYPE         0       1       0         0
+    46                   x          FIELD        INTEGER         0       1       1         0
+    47                   y          FIELD        INTEGER         0       1       1         0
+    48              TPoint           TYPE         RECORD         1       1       0         0
+    49            TNumbers           TYPE          ARRAY         2       1       0         0
+    50             TMatrix           TYPE          ARRAY         6       1       0         0
+    51              points       VARIABLE          ARRAY         8       1       0         0
+    52             numbers       VARIABLE          ARRAY         2       1       0         0
+    53              matrix       VARIABLE          ARRAY         6       1       0         0
+    54                name       VARIABLE         STRING         0       1       0         0
+    55               count       VARIABLE        INTEGER         0       1       0         0
+    56          PrintPoint      PROCEDURE         NOTYPE         2       1       0         0
+    57                   p       VARIABLE         RECORD         1       1       1         0
+    58     InitializeArray      PROCEDURE         NOTYPE         3       1       0         0
+    59                 arr       VARIABLE          ARRAY         2       1       1         0
+    60                size       VARIABLE        INTEGER         0       1       1         1
+    61                   i       VARIABLE        INTEGER         0       1       1         0
+    62        CalculateSum       FUNCTION        INTEGER         4       1       0         0
+    63                 arr       VARIABLE          ARRAY         2       1       1         0
+    64                size       VARIABLE        INTEGER         0       1       1         1
+    65                   i       VARIABLE        INTEGER         0       1       1         0
+    66               total       VARIABLE        INTEGER         0       1       1         0
+    67          FillMatrix      PROCEDURE         NOTYPE         5       1       0         0
+    68                   m       VARIABLE          ARRAY         6       1       1         0
+    69                rows       VARIABLE        INTEGER         0       1       1         1
+    70                cols       VARIABLE        INTEGER         0       1       1         2
+    71                   i       VARIABLE        INTEGER         0       1       1         0
+    72                   j       VARIABLE        INTEGER         0       1       1         0
 [atab]
  Index     Index Type   Element Type      ERef     Low    High    ElSize      Size
      0         NOTYPE         NOTYPE         0       0       0         1         0
+     1        INTEGER        INTEGER         0       1     100         1       100
+     2       SUBRANGE        INTEGER         0       1     100         1       100
+     3        INTEGER        INTEGER         0       1      10         1        10
+     4        INTEGER        INTEGER         0       1      10         1        10
+     5       SUBRANGE           REAL         0       1      10         1        10
+     6       SUBRANGE          ARRAY         5       1      10         1        10
+     7        INTEGER        INTEGER         0       1       5         1         5
+     8       SUBRANGE         RECORD         1       1       5         1         5
 [btab]
  Index           Last     Last Param     Param Size       Var Size
-     0             47              0              0              2
+     0             67              0              0              5
+     1             47              0              0              2
+     2             57             57              1              0
+     3             61             60              2              2
+     4             66             64              2              3
+     5             72             70              3              4

@@ -129,7 +129,7 @@ Node* parseWhileStatement(TokenStream& ts){
 
     // node->addChild(parseStatement(ts));
     node->addChild (parseCompoundStatement(ts));
-    node->addChild(new Node(ts.expect("semicolon")));
+    // node->addChild(new Node(ts.expect("semicolon")));
 
     return node;
 }
@@ -167,8 +167,12 @@ Node* parseForStatement(TokenStream& ts){
 
     node->addChild(new Node(ts.expect("dosy")));
     // node->addChild(parseStatement(ts));
+    std::cout << "Sebelum compoundstatement dari for" << std::endl;
     node->addChild(parseCompoundStatement(ts));
-    node->addChild(new Node(ts.expect("semicolon")));
+    std::cout << "setelah compoundstatement dari for" << std::endl;
+    // node->addChild(new Node(ts.expect("semicolon")));
+    std::cout << "setelah semicolon dari for" << std::endl;
+    std::cout << "token sekarang : " << ts.current() << std::endl;
 
     return node;
 }

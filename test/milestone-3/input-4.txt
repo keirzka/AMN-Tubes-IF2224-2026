@@ -1,0 +1,57 @@
+program CommentTest;
+
+var
+  x: integer;
+  y: integer;
+  i: integer;
+
+begin
+  { ini komentar biasa }
+  x := 5;
+  y := 90;
+
+  (* ini komentar
+     multi-line *)
+
+  x := x + {ini ada komen di tengah2 sini tapi tetep aman} 10;
+
+  { komentar dengan simbol aneh + - * / := }
+
+  if x == y then
+    x := x + y;
+  if x <> y then
+    x := x - y;
+  if x > y then
+    x := x * y;
+  if x >= y then
+    x := x div y;
+  if x <= y then
+    x := x MOD y;
+
+  for i := 1 to 10 do
+    begin
+      i := i + 1;
+    end;
+
+  for i := 10 downto 1 do
+    begin
+      i := i - 1;
+    end;
+
+  while i > 0 do
+    begin
+      i := i - 1;
+    end;
+
+  repeat
+    i := i + 1;
+  until i == 10;
+
+  case i of
+    1: i := 100;
+    2: i := 200;
+  end;
+
+end.
+
+

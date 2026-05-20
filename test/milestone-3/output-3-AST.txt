@@ -1,0 +1,652 @@
+<program> [type=NOTYPE, ref=-1, lev=0]
+    <program-header> [type=NOTYPE, ref=-1, lev=0]
+        programsy
+        ident (TypeArraySubprogram) [type=NOTYPE, ref=45, lev=0]
+        semicolon
+    <declaration-part>
+        <type-declaration>
+            typesy
+            ident (TPoint) [type=RECORD, ref=48, lev=0]
+            eql
+            <type> [type=RECORD, ref=1, lev=0]
+                <record-type> [type=RECORD, ref=1, lev=0]
+                    recordsy
+                    <field-list>
+                        <field-part>
+                            <identifier-list>
+                                ident (x) [type=INTEGER, ref=46, lev=1]
+                            colon
+                            <type> [type=INTEGER, ref=34, lev=1]
+                                ident (integer) [type=INTEGER, ref=34, lev=1]
+                        semicolon
+                        <field-part>
+                            <identifier-list>
+                                ident (y) [type=INTEGER, ref=47, lev=1]
+                            colon
+                            <type> [type=INTEGER, ref=34, lev=1]
+                                ident (integer) [type=INTEGER, ref=34, lev=1]
+                    endsy
+            semicolon
+            ident (TNumbers) [type=ARRAY, ref=49, lev=0]
+            eql
+            <type> [type=ARRAY, ref=2, lev=0]
+                <array-type> [type=ARRAY, ref=2, lev=0]
+                    arraysy
+                    lbrack
+                    <range> [type=SUBRANGE, ref=1, lev=0]
+                        <constant>
+                            intcon (1)
+                        period
+                        period
+                        <constant>
+                            intcon (100)
+                    rbrack
+                    ofsy
+                    <type> [type=INTEGER, ref=34, lev=0]
+                        ident (integer) [type=INTEGER, ref=34, lev=0]
+            semicolon
+            ident (TMatrix) [type=ARRAY, ref=50, lev=0]
+            eql
+            <type> [type=ARRAY, ref=6, lev=0]
+                <array-type> [type=ARRAY, ref=6, lev=0]
+                    arraysy
+                    lbrack
+                    <range> [type=SUBRANGE, ref=3, lev=0]
+                        <constant>
+                            intcon (1)
+                        period
+                        period
+                        <constant>
+                            intcon (10)
+                    rbrack
+                    ofsy
+                    <type> [type=ARRAY, ref=5, lev=0]
+                        <array-type> [type=ARRAY, ref=5, lev=0]
+                            arraysy
+                            lbrack
+                            <range> [type=SUBRANGE, ref=4, lev=0]
+                                <constant>
+                                    intcon (1)
+                                period
+                                period
+                                <constant>
+                                    intcon (10)
+                            rbrack
+                            ofsy
+                            <type> [type=REAL, ref=35, lev=0]
+                                ident (real) [type=REAL, ref=35, lev=0]
+            semicolon
+        <var-declaration>
+            varsy
+            <identifier-list>
+                ident (points) [type=ARRAY, ref=51, lev=0]
+            colon
+            <type> [type=ARRAY, ref=8, lev=0]
+                <array-type> [type=ARRAY, ref=8, lev=0]
+                    arraysy
+                    lbrack
+                    <range> [type=SUBRANGE, ref=7, lev=0]
+                        <constant>
+                            intcon (1)
+                        period
+                        period
+                        <constant>
+                            intcon (5)
+                    rbrack
+                    ofsy
+                    <type> [type=RECORD, ref=48, lev=0]
+                        ident (TPoint) [type=RECORD, ref=48, lev=0]
+            semicolon
+            <identifier-list>
+                ident (numbers) [type=ARRAY, ref=52, lev=0]
+            colon
+            <type> [type=ARRAY, ref=49, lev=0]
+                ident (TNumbers) [type=ARRAY, ref=49, lev=0]
+            semicolon
+            <identifier-list>
+                ident (matrix) [type=ARRAY, ref=53, lev=0]
+            colon
+            <type> [type=ARRAY, ref=50, lev=0]
+                ident (TMatrix) [type=ARRAY, ref=50, lev=0]
+            semicolon
+            <identifier-list>
+                ident (name) [type=STRING, ref=54, lev=0]
+            colon
+            <type> [type=STRING, ref=38, lev=0]
+                ident (string) [type=STRING, ref=38, lev=0]
+            semicolon
+            <identifier-list>
+                ident (count) [type=INTEGER, ref=55, lev=0]
+            colon
+            <type> [type=INTEGER, ref=34, lev=0]
+                ident (integer) [type=INTEGER, ref=34, lev=0]
+            semicolon
+        <subprogram-declaration>
+            <procedure-declaration>
+                proceduresy
+                ident (PrintPoint) [type=NOTYPE, ref=56, lev=0]
+                <formal-parameter-list>
+                    lparent
+                    <parameter-group>
+                        <identifier-list>
+                            ident (p) [type=RECORD, ref=57, lev=1]
+                        colon
+                        ident (TPoint) [type=RECORD, ref=48, lev=1]
+                    rparent
+                semicolon
+                block
+                    <compound-statement> [type=NOTYPE, ref=-1, lev=1]
+                        beginsy
+                        <statement-list> [type=NOTYPE, ref=-1, lev=1]
+                            <statement> [type=NOTYPE, ref=-1, lev=1]
+                                <procedure/function-call> [type=NOTYPE, ref=41, lev=1]
+                                    ident (writeln) [type=NOTYPE, ref=41, lev=1]
+                                    lparent
+                                    <parameter-list>
+                                        <expression> [type=STRING, ref=0, lev=1]
+                                            <simple-expression> [type=STRING, ref=0, lev=1]
+                                                <term> [type=STRING, ref=0, lev=1]
+                                                    <factor> [type=STRING, ref=-1, lev=1]
+                                                        string (Point:) [type=STRING, ref=-1, lev=1]
+                                    rparent
+                            semicolon
+                        endsy
+                semicolon
+        <subprogram-declaration>
+            <procedure-declaration>
+                proceduresy
+                ident (InitializeArray) [type=NOTYPE, ref=58, lev=0]
+                <formal-parameter-list>
+                    lparent
+                    <parameter-group>
+                        <identifier-list>
+                            ident (arr) [type=ARRAY, ref=59, lev=1]
+                        colon
+                        ident (TNumbers) [type=ARRAY, ref=49, lev=1]
+                    semicolon
+                    <parameter-group>
+                        <identifier-list>
+                            ident (size) [type=INTEGER, ref=60, lev=1]
+                        colon
+                        ident (integer) [type=INTEGER, ref=34, lev=1]
+                    rparent
+                semicolon
+                block
+                    <declaration-part>
+                        <var-declaration>
+                            varsy
+                            <identifier-list>
+                                ident (i) [type=INTEGER, ref=61, lev=1]
+                            colon
+                            <type> [type=INTEGER, ref=34, lev=1]
+                                ident (integer) [type=INTEGER, ref=34, lev=1]
+                            semicolon
+                    <compound-statement> [type=NOTYPE, ref=-1, lev=1]
+                        beginsy
+                        <statement-list> [type=NOTYPE, ref=-1, lev=1]
+                            <statement> [type=NOTYPE, ref=-1, lev=1]
+                                <for-statement> [type=NOTYPE, ref=-1, lev=1]
+                                    forsy
+                                    ident (i)
+                                    becomes
+                                    <expression> [type=INTEGER, ref=0, lev=1]
+                                        <simple-expression> [type=INTEGER, ref=0, lev=1]
+                                            <term> [type=INTEGER, ref=0, lev=1]
+                                                <factor> [type=INTEGER, ref=-1, lev=1]
+                                                    intcon (1) [type=INTEGER, ref=-1, lev=1]
+                                    tosy
+                                    <expression> [type=INTEGER, ref=0, lev=1]
+                                        <simple-expression> [type=INTEGER, ref=0, lev=1]
+                                            <term> [type=INTEGER, ref=0, lev=1]
+                                                <factor> [type=INTEGER, ref=60, lev=1]
+                                                    ident (size) [type=INTEGER, ref=60, lev=1]
+                                    dosy
+                                    <compound-statement> [type=NOTYPE, ref=-1, lev=1]
+                                        beginsy
+                                        <statement-list> [type=NOTYPE, ref=-1, lev=1]
+                                            <statement> [type=NOTYPE, ref=-1, lev=1]
+                                                <assignment-statement> [type=NOTYPE, ref=-1, lev=1]
+                                                    <variable> [type=INTEGER, ref=0, lev=1]
+                                                        ident (arr) [type=ARRAY, ref=59, lev=1]
+                                                        <component-variable> [type=INTEGER, ref=0, lev=1]
+                                                            lbrack
+                                                            <index-list>
+                                                                ident (i)
+                                                            rbrack
+                                                    becomes
+                                                    <expression> [type=INTEGER, ref=0, lev=1]
+                                                        <simple-expression> [type=INTEGER, ref=0, lev=1]
+                                                            <term> [type=INTEGER, ref=0, lev=1]
+                                                                <factor> [type=INTEGER, ref=61, lev=1]
+                                                                    ident (i) [type=INTEGER, ref=61, lev=1]
+                                                                <multiplicative-operator>
+                                                                    times
+                                                                <factor> [type=INTEGER, ref=-1, lev=1]
+                                                                    intcon (10) [type=INTEGER, ref=-1, lev=1]
+                                            semicolon
+                                        endsy
+                            semicolon
+                        endsy
+                semicolon
+        <subprogram-declaration>
+            <function-declaration>
+                functionsy
+                ident (CalculateSum) [type=INTEGER, ref=62, lev=0]
+                <formal-parameter-list>
+                    lparent
+                    <parameter-group>
+                        <identifier-list>
+                            ident (arr) [type=ARRAY, ref=63, lev=1]
+                        colon
+                        ident (TNumbers) [type=ARRAY, ref=49, lev=1]
+                    semicolon
+                    <parameter-group>
+                        <identifier-list>
+                            ident (size) [type=INTEGER, ref=64, lev=1]
+                        colon
+                        ident (integer) [type=INTEGER, ref=34, lev=1]
+                    rparent
+                colon
+                ident (integer) [type=INTEGER, ref=34, lev=0]
+                semicolon
+                block
+                    <declaration-part>
+                        <var-declaration>
+                            varsy
+                            <identifier-list>
+                                ident (i) [type=INTEGER, ref=65, lev=1]
+                            colon
+                            <type> [type=INTEGER, ref=34, lev=1]
+                                ident (integer) [type=INTEGER, ref=34, lev=1]
+                            semicolon
+                            <identifier-list>
+                                ident (total) [type=INTEGER, ref=66, lev=1]
+                            colon
+                            <type> [type=INTEGER, ref=34, lev=1]
+                                ident (integer) [type=INTEGER, ref=34, lev=1]
+                            semicolon
+                    <compound-statement> [type=NOTYPE, ref=-1, lev=1]
+                        beginsy
+                        <statement-list> [type=NOTYPE, ref=-1, lev=1]
+                            <statement> [type=NOTYPE, ref=-1, lev=1]
+                                <assignment-statement> [type=NOTYPE, ref=-1, lev=1]
+                                    <variable> [type=INTEGER, ref=66, lev=1]
+                                        ident (total) [type=INTEGER, ref=66, lev=1]
+                                    becomes
+                                    <expression> [type=INTEGER, ref=0, lev=1]
+                                        <simple-expression> [type=INTEGER, ref=0, lev=1]
+                                            <term> [type=INTEGER, ref=0, lev=1]
+                                                <factor> [type=INTEGER, ref=-1, lev=1]
+                                                    intcon (0) [type=INTEGER, ref=-1, lev=1]
+                            semicolon
+                            <statement> [type=NOTYPE, ref=-1, lev=1]
+                                <for-statement> [type=NOTYPE, ref=-1, lev=1]
+                                    forsy
+                                    ident (i)
+                                    becomes
+                                    <expression> [type=INTEGER, ref=0, lev=1]
+                                        <simple-expression> [type=INTEGER, ref=0, lev=1]
+                                            <term> [type=INTEGER, ref=0, lev=1]
+                                                <factor> [type=INTEGER, ref=-1, lev=1]
+                                                    intcon (1) [type=INTEGER, ref=-1, lev=1]
+                                    tosy
+                                    <expression> [type=INTEGER, ref=0, lev=1]
+                                        <simple-expression> [type=INTEGER, ref=0, lev=1]
+                                            <term> [type=INTEGER, ref=0, lev=1]
+                                                <factor> [type=INTEGER, ref=64, lev=1]
+                                                    ident (size) [type=INTEGER, ref=64, lev=1]
+                                    dosy
+                                    <compound-statement> [type=NOTYPE, ref=-1, lev=1]
+                                        beginsy
+                                        <statement-list> [type=NOTYPE, ref=-1, lev=1]
+                                            <statement> [type=NOTYPE, ref=-1, lev=1]
+                                                <assignment-statement> [type=NOTYPE, ref=-1, lev=1]
+                                                    <variable> [type=INTEGER, ref=66, lev=1]
+                                                        ident (total) [type=INTEGER, ref=66, lev=1]
+                                                    becomes
+                                                    <expression> [type=INTEGER, ref=0, lev=1]
+                                                        <simple-expression> [type=INTEGER, ref=0, lev=1]
+                                                            <term> [type=INTEGER, ref=0, lev=1]
+                                                                <factor> [type=INTEGER, ref=66, lev=1]
+                                                                    ident (total) [type=INTEGER, ref=66, lev=1]
+                                                            <additive-operator>
+                                                                plus
+                                                            <term> [type=ARRAY, ref=2, lev=1]
+                                                                <factor> [type=ARRAY, ref=63, lev=1]
+                                                                    ident (arr) [type=ARRAY, ref=63, lev=1]
+                                                                    <variable>
+                                                                        <component-variable>
+                                                                            lbrack
+                                                                            <index-list>
+                                                                                ident (i)
+                                                                            rbrack
+                                            semicolon
+                                        endsy
+                            semicolon
+                            <statement> [type=NOTYPE, ref=-1, lev=1]
+                                <assignment-statement> [type=NOTYPE, ref=-1, lev=1]
+                                    <variable> [type=INTEGER, ref=62, lev=1]
+                                        ident (CalculateSum) [type=INTEGER, ref=62, lev=1]
+                                    becomes
+                                    <expression> [type=INTEGER, ref=0, lev=1]
+                                        <simple-expression> [type=INTEGER, ref=0, lev=1]
+                                            <term> [type=INTEGER, ref=0, lev=1]
+                                                <factor> [type=INTEGER, ref=66, lev=1]
+                                                    ident (total) [type=INTEGER, ref=66, lev=1]
+                            semicolon
+                        endsy
+                semicolon
+        <subprogram-declaration>
+            <procedure-declaration>
+                proceduresy
+                ident (FillMatrix) [type=NOTYPE, ref=67, lev=0]
+                <formal-parameter-list>
+                    lparent
+                    <parameter-group>
+                        <identifier-list>
+                            ident (m) [type=ARRAY, ref=68, lev=1]
+                        colon
+                        ident (TMatrix) [type=ARRAY, ref=50, lev=1]
+                    semicolon
+                    <parameter-group>
+                        <identifier-list>
+                            ident (rows) [type=INTEGER, ref=69, lev=1]
+                        colon
+                        ident (integer) [type=INTEGER, ref=34, lev=1]
+                    semicolon
+                    <parameter-group>
+                        <identifier-list>
+                            ident (cols) [type=INTEGER, ref=70, lev=1]
+                        colon
+                        ident (integer) [type=INTEGER, ref=34, lev=1]
+                    rparent
+                semicolon
+                block
+                    <declaration-part>
+                        <var-declaration>
+                            varsy
+                            <identifier-list>
+                                ident (i) [type=INTEGER, ref=71, lev=1]
+                            colon
+                            <type> [type=INTEGER, ref=34, lev=1]
+                                ident (integer) [type=INTEGER, ref=34, lev=1]
+                            semicolon
+                            <identifier-list>
+                                ident (j) [type=INTEGER, ref=72, lev=1]
+                            colon
+                            <type> [type=INTEGER, ref=34, lev=1]
+                                ident (integer) [type=INTEGER, ref=34, lev=1]
+                            semicolon
+                    <compound-statement> [type=NOTYPE, ref=-1, lev=1]
+                        beginsy
+                        <statement-list> [type=NOTYPE, ref=-1, lev=1]
+                            <statement> [type=NOTYPE, ref=-1, lev=1]
+                                <for-statement> [type=NOTYPE, ref=-1, lev=1]
+                                    forsy
+                                    ident (i)
+                                    becomes
+                                    <expression> [type=INTEGER, ref=0, lev=1]
+                                        <simple-expression> [type=INTEGER, ref=0, lev=1]
+                                            <term> [type=INTEGER, ref=0, lev=1]
+                                                <factor> [type=INTEGER, ref=-1, lev=1]
+                                                    intcon (1) [type=INTEGER, ref=-1, lev=1]
+                                    tosy
+                                    <expression> [type=INTEGER, ref=0, lev=1]
+                                        <simple-expression> [type=INTEGER, ref=0, lev=1]
+                                            <term> [type=INTEGER, ref=0, lev=1]
+                                                <factor> [type=INTEGER, ref=69, lev=1]
+                                                    ident (rows) [type=INTEGER, ref=69, lev=1]
+                                    dosy
+                                    <compound-statement> [type=NOTYPE, ref=-1, lev=1]
+                                        beginsy
+                                        <statement-list> [type=NOTYPE, ref=-1, lev=1]
+                                            <statement> [type=NOTYPE, ref=-1, lev=1]
+                                                <for-statement> [type=NOTYPE, ref=-1, lev=1]
+                                                    forsy
+                                                    ident (j)
+                                                    becomes
+                                                    <expression> [type=INTEGER, ref=0, lev=1]
+                                                        <simple-expression> [type=INTEGER, ref=0, lev=1]
+                                                            <term> [type=INTEGER, ref=0, lev=1]
+                                                                <factor> [type=INTEGER, ref=-1, lev=1]
+                                                                    intcon (1) [type=INTEGER, ref=-1, lev=1]
+                                                    tosy
+                                                    <expression> [type=INTEGER, ref=0, lev=1]
+                                                        <simple-expression> [type=INTEGER, ref=0, lev=1]
+                                                            <term> [type=INTEGER, ref=0, lev=1]
+                                                                <factor> [type=INTEGER, ref=70, lev=1]
+                                                                    ident (cols) [type=INTEGER, ref=70, lev=1]
+                                                    dosy
+                                                    <compound-statement> [type=NOTYPE, ref=-1, lev=1]
+                                                        beginsy
+                                                        <statement-list> [type=NOTYPE, ref=-1, lev=1]
+                                                            <statement> [type=NOTYPE, ref=-1, lev=1]
+                                                                <assignment-statement> [type=NOTYPE, ref=-1, lev=1]
+                                                                    <variable> [type=ARRAY, ref=5, lev=1]
+                                                                        ident (m) [type=ARRAY, ref=68, lev=1]
+                                                                        <component-variable>
+                                                                            lbrack
+                                                                            <index-list>
+                                                                                ident (i)
+                                                                            rbrack
+                                                                        <component-variable> [type=ARRAY, ref=5, lev=1]
+                                                                            lbrack
+                                                                            <index-list>
+                                                                                ident (j)
+                                                                            rbrack
+                                                                    becomes
+                                                                    <expression> [type=INTEGER, ref=0, lev=1]
+                                                                        <simple-expression> [type=INTEGER, ref=0, lev=1]
+                                                                            <term> [type=INTEGER, ref=0, lev=1]
+                                                                                <factor> [type=INTEGER, ref=71, lev=1]
+                                                                                    ident (i) [type=INTEGER, ref=71, lev=1]
+                                                                            <additive-operator>
+                                                                                plus
+                                                                            <term> [type=INTEGER, ref=0, lev=1]
+                                                                                <factor> [type=INTEGER, ref=72, lev=1]
+                                                                                    ident (j) [type=INTEGER, ref=72, lev=1]
+                                                            semicolon
+                                                        endsy
+                                            semicolon
+                                        endsy
+                            semicolon
+                        endsy
+                semicolon
+    <compound-statement> [type=NOTYPE, ref=-1, lev=0]
+        beginsy
+        <statement-list> [type=NOTYPE, ref=-1, lev=0]
+            <statement> [type=NOTYPE, ref=-1, lev=0]
+                <assignment-statement> [type=NOTYPE, ref=-1, lev=0]
+                    <variable> [type=INTEGER, ref=55, lev=0]
+                        ident (count) [type=INTEGER, ref=55, lev=0]
+                    becomes
+                    <expression> [type=INTEGER, ref=0, lev=0]
+                        <simple-expression> [type=INTEGER, ref=0, lev=0]
+                            <term> [type=INTEGER, ref=0, lev=0]
+                                <factor> [type=INTEGER, ref=-1, lev=0]
+                                    intcon (5) [type=INTEGER, ref=-1, lev=0]
+            semicolon
+            <statement> [type=NOTYPE, ref=-1, lev=0]
+                <assignment-statement> [type=NOTYPE, ref=-1, lev=0]
+                    <variable> [type=INTEGER, ref=0, lev=0]
+                        ident (points) [type=ARRAY, ref=51, lev=0]
+                        <component-variable>
+                            lbrack
+                            <index-list>
+                                intcon (1)
+                            rbrack
+                        <component-variable> [type=INTEGER, ref=0, lev=0]
+                            period
+                            ident (x) [type=INTEGER, ref=46, lev=0]
+                    becomes
+                    <expression> [type=INTEGER, ref=0, lev=0]
+                        <simple-expression> [type=INTEGER, ref=0, lev=0]
+                            <term> [type=INTEGER, ref=0, lev=0]
+                                <factor> [type=INTEGER, ref=-1, lev=0]
+                                    intcon (1) [type=INTEGER, ref=-1, lev=0]
+            semicolon
+            <statement> [type=NOTYPE, ref=-1, lev=0]
+                <assignment-statement> [type=NOTYPE, ref=-1, lev=0]
+                    <variable> [type=INTEGER, ref=0, lev=0]
+                        ident (points) [type=ARRAY, ref=51, lev=0]
+                        <component-variable>
+                            lbrack
+                            <index-list>
+                                intcon (1)
+                            rbrack
+                        <component-variable> [type=INTEGER, ref=0, lev=0]
+                            period
+                            ident (y) [type=INTEGER, ref=47, lev=0]
+                    becomes
+                    <expression> [type=INTEGER, ref=0, lev=0]
+                        <simple-expression> [type=INTEGER, ref=0, lev=0]
+                            <term> [type=INTEGER, ref=0, lev=0]
+                                <factor> [type=INTEGER, ref=-1, lev=0]
+                                    intcon (2) [type=INTEGER, ref=-1, lev=0]
+            semicolon
+            <statement> [type=NOTYPE, ref=-1, lev=0]
+                <assignment-statement> [type=NOTYPE, ref=-1, lev=0]
+                    <variable> [type=INTEGER, ref=0, lev=0]
+                        ident (points) [type=ARRAY, ref=51, lev=0]
+                        <component-variable>
+                            lbrack
+                            <index-list>
+                                intcon (2)
+                            rbrack
+                        <component-variable> [type=INTEGER, ref=0, lev=0]
+                            period
+                            ident (x) [type=INTEGER, ref=46, lev=0]
+                    becomes
+                    <expression> [type=INTEGER, ref=0, lev=0]
+                        <simple-expression> [type=INTEGER, ref=0, lev=0]
+                            <term> [type=INTEGER, ref=0, lev=0]
+                                <factor> [type=INTEGER, ref=-1, lev=0]
+                                    intcon (3) [type=INTEGER, ref=-1, lev=0]
+            semicolon
+            <statement> [type=NOTYPE, ref=-1, lev=0]
+                <assignment-statement> [type=NOTYPE, ref=-1, lev=0]
+                    <variable> [type=INTEGER, ref=0, lev=0]
+                        ident (points) [type=ARRAY, ref=51, lev=0]
+                        <component-variable>
+                            lbrack
+                            <index-list>
+                                intcon (2)
+                            rbrack
+                        <component-variable> [type=INTEGER, ref=0, lev=0]
+                            period
+                            ident (y) [type=INTEGER, ref=47, lev=0]
+                    becomes
+                    <expression> [type=INTEGER, ref=0, lev=0]
+                        <simple-expression> [type=INTEGER, ref=0, lev=0]
+                            <term> [type=INTEGER, ref=0, lev=0]
+                                <factor> [type=INTEGER, ref=-1, lev=0]
+                                    intcon (4) [type=INTEGER, ref=-1, lev=0]
+            semicolon
+            <statement> [type=NOTYPE, ref=-1, lev=0]
+                <procedure/function-call> [type=NOTYPE, ref=58, lev=0]
+                    ident (InitializeArray) [type=NOTYPE, ref=58, lev=0]
+                    lparent
+                    <parameter-list>
+                        <expression> [type=ARRAY, ref=2, lev=0]
+                            <simple-expression> [type=ARRAY, ref=2, lev=0]
+                                <term> [type=ARRAY, ref=2, lev=0]
+                                    <factor> [type=ARRAY, ref=52, lev=0]
+                                        ident (numbers) [type=ARRAY, ref=52, lev=0]
+                        comma
+                        <expression> [type=INTEGER, ref=0, lev=0]
+                            <simple-expression> [type=INTEGER, ref=0, lev=0]
+                                <term> [type=INTEGER, ref=0, lev=0]
+                                    <factor> [type=INTEGER, ref=-1, lev=0]
+                                        intcon (10) [type=INTEGER, ref=-1, lev=0]
+                    rparent
+            semicolon
+            <statement> [type=NOTYPE, ref=-1, lev=0]
+                <procedure/function-call> [type=NOTYPE, ref=41, lev=0]
+                    ident (writeln) [type=NOTYPE, ref=41, lev=0]
+                    lparent
+                    <parameter-list>
+                        <expression> [type=STRING, ref=0, lev=0]
+                            <simple-expression> [type=STRING, ref=0, lev=0]
+                                <term> [type=STRING, ref=0, lev=0]
+                                    <factor> [type=STRING, ref=-1, lev=0]
+                                        string (Sum = ) [type=STRING, ref=-1, lev=0]
+                        comma
+                        <expression> [type=INTEGER, ref=4, lev=0]
+                            <simple-expression> [type=INTEGER, ref=4, lev=0]
+                                <term> [type=INTEGER, ref=4, lev=0]
+                                    <factor> [type=INTEGER, ref=62, lev=0]
+                                        ident (CalculateSum) [type=INTEGER, ref=62, lev=0]
+                                        <procedure-call>
+                                            lparent
+                                            <parameter-list>
+                                                <expression>
+                                                    <simple-expression>
+                                                        <term>
+                                                            <factor>
+                                                                ident (numbers)
+                                                comma
+                                                <expression>
+                                                    <simple-expression>
+                                                        <term>
+                                                            <factor>
+                                                                intcon (10)
+                                            rparent
+                    rparent
+            semicolon
+            <statement> [type=NOTYPE, ref=-1, lev=0]
+                <procedure/function-call> [type=NOTYPE, ref=67, lev=0]
+                    ident (FillMatrix) [type=NOTYPE, ref=67, lev=0]
+                    lparent
+                    <parameter-list>
+                        <expression> [type=ARRAY, ref=6, lev=0]
+                            <simple-expression> [type=ARRAY, ref=6, lev=0]
+                                <term> [type=ARRAY, ref=6, lev=0]
+                                    <factor> [type=ARRAY, ref=53, lev=0]
+                                        ident (matrix) [type=ARRAY, ref=53, lev=0]
+                        comma
+                        <expression> [type=INTEGER, ref=0, lev=0]
+                            <simple-expression> [type=INTEGER, ref=0, lev=0]
+                                <term> [type=INTEGER, ref=0, lev=0]
+                                    <factor> [type=INTEGER, ref=-1, lev=0]
+                                        intcon (5) [type=INTEGER, ref=-1, lev=0]
+                        comma
+                        <expression> [type=INTEGER, ref=0, lev=0]
+                            <simple-expression> [type=INTEGER, ref=0, lev=0]
+                                <term> [type=INTEGER, ref=0, lev=0]
+                                    <factor> [type=INTEGER, ref=-1, lev=0]
+                                        intcon (5) [type=INTEGER, ref=-1, lev=0]
+                    rparent
+            semicolon
+            <statement> [type=NOTYPE, ref=-1, lev=0]
+                <assignment-statement> [type=NOTYPE, ref=-1, lev=0]
+                    <variable> [type=STRING, ref=54, lev=0]
+                        ident (name) [type=STRING, ref=54, lev=0]
+                    becomes
+                    <expression> [type=STRING, ref=0, lev=0]
+                        <simple-expression> [type=STRING, ref=0, lev=0]
+                            <term> [type=STRING, ref=0, lev=0]
+                                <factor> [type=STRING, ref=-1, lev=0]
+                                    string (TestProgram) [type=STRING, ref=-1, lev=0]
+            semicolon
+            <statement> [type=NOTYPE, ref=-1, lev=0]
+                <procedure/function-call> [type=NOTYPE, ref=41, lev=0]
+                    ident (writeln) [type=NOTYPE, ref=41, lev=0]
+                    lparent
+                    <parameter-list>
+                        <expression> [type=STRING, ref=0, lev=0]
+                            <simple-expression> [type=STRING, ref=0, lev=0]
+                                <term> [type=STRING, ref=0, lev=0]
+                                    <factor> [type=STRING, ref=-1, lev=0]
+                                        string (Program name: ) [type=STRING, ref=-1, lev=0]
+                        comma
+                        <expression> [type=STRING, ref=0, lev=0]
+                            <simple-expression> [type=STRING, ref=0, lev=0]
+                                <term> [type=STRING, ref=0, lev=0]
+                                    <factor> [type=STRING, ref=54, lev=0]
+                                        ident (name) [type=STRING, ref=54, lev=0]
+                    rparent
+            semicolon
+        endsy
+    period
+
+================================================================================

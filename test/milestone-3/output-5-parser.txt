@@ -1,0 +1,115 @@
+<program>
+    <program-header>
+        programsy
+        ident (illegalUse)
+        semicolon
+    <declaration-part>
+        <var-declaration>
+            varsy
+            <identifier-list>
+                ident (a)
+                comma
+                ident (b)
+            colon
+            <type>
+                ident (integer)
+            semicolon
+            <identifier-list>
+                ident (c)
+            colon
+            <type>
+                ident (TPoint)
+            semicolon
+    <compound-statement>
+        beginsy
+        <statement-list>
+            <statement>
+                <assignment-statement>
+                    <variable>
+                        ident (a)
+                    becomes
+                    <expression>
+                        <simple-expression>
+                            <term>
+                                <factor>
+                                    intcon (90)
+                                <multiplicative-operator>
+                                    rdiv
+                                <factor>
+                                    intcon (5)
+            semicolon
+            <statement>
+                <assignment-statement>
+                    <variable>
+                        ident (b)
+                    becomes
+                    <expression>
+                        <simple-expression>
+                            <term>
+                                <factor>
+                                    ident (a)
+                                <multiplicative-operator>
+                                    times
+                                <factor>
+                                    ident (a)
+            semicolon
+            <statement>
+                <procedure/function-call>
+                    ident (solve)
+                    lparent
+                    <parameter-list>
+                        <expression>
+                            <simple-expression>
+                                <term>
+                                    <factor>
+                                        ident (a)
+                        comma
+                        <expression>
+                            <simple-expression>
+                                <term>
+                                    <factor>
+                                        ident (b)
+                    rparent
+            semicolon
+            <statement>
+                <assignment-statement>
+                    <variable>
+                        ident (c)
+                        <component-variable>
+                            period
+                            ident (x)
+                    becomes
+                    <expression>
+                        <simple-expression>
+                            <term>
+                                <factor>
+                                    intcon (0)
+            semicolon
+            <statement>
+                <assignment-statement>
+                    <variable>
+                        ident (c)
+                        <component-variable>
+                            period
+                            ident (y)
+                    becomes
+                    <expression>
+                        <simple-expression>
+                            <term>
+                                <factor>
+                                    intcon (0)
+            semicolon
+            <statement>
+                <procedure/function-call>
+                    ident (writeln)
+                    lparent
+                    <parameter-list>
+                        <expression>
+                            <simple-expression>
+                                <term>
+                                    <factor>
+                                        string (hi dunya!)
+                    rparent
+            semicolon
+        endsy
+    period

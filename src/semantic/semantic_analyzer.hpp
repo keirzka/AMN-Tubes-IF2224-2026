@@ -2,10 +2,13 @@
 #define SEMANTIC_ANALYZER_HPP
 
 #include "tree/node.hpp"
+// #include "tree/ast_node.hpp"
 #include "semantic/symbol_table.hpp"
 #include "semantic/type_checker.hpp"
 #include "semantic/semantic_error.hpp"
 #include <string>
+#include <memory>
+#include <vector>
 
 struct SemanticContext {
     SymbolTable           st;
@@ -75,5 +78,15 @@ void visit_case_list(Node* node, SemanticContext& ctx,
                      const TypeInfo& exprType);
 void visit_case_branch(Node* node, SemanticContext& ctx,
                        const TypeInfo& exprType);
+
+// AST Transformation Functions
+// std::shared_ptr<ASTNode> visit_expression_toAST(Node* node, SemanticContext& ctx);
+// std::shared_ptr<ASTNode> visit_simple_expression_toAST(Node* node, SemanticContext& ctx);
+// std::shared_ptr<ASTNode> visit_term_toAST(Node* node, SemanticContext& ctx);
+// std::shared_ptr<ASTNode> visit_factor_toAST(Node* node, SemanticContext& ctx);
+// std::shared_ptr<ASTNode> visit_variable_toAST(Node* node, SemanticContext& ctx);
+
+// // Global AST root
+// extern std::shared_ptr<ProgramNode> g_astRoot;
 
 #endif 

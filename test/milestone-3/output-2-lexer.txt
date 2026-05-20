@@ -1,5 +1,5 @@
 programsy
-ident (Hello)
+ident (wrongType)
 semicolon
 varsy
 ident (a)

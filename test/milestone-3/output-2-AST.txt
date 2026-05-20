@@ -1,75 +1,79 @@
 <program> [type=NOTYPE, ref=-1, lev=0]
     <program-header> [type=NOTYPE, ref=-1, lev=0]
-        programsy [type=UNKNOWN, ref=-1, lev=-1]
-        ident (Hello) [type=NOTYPE, ref=45, lev=0]
-        semicolon [type=UNKNOWN, ref=-1, lev=-1]
-    <declaration-part> [type=UNKNOWN, ref=-1, lev=-1]
-        <var-declaration> [type=UNKNOWN, ref=-1, lev=-1]
-            varsy [type=UNKNOWN, ref=-1, lev=-1]
-            <identifier-list> [type=UNKNOWN, ref=-1, lev=-1]
+        programsy
+        ident (wrongType) [type=NOTYPE, ref=45, lev=0]
+        semicolon
+    <declaration-part>
+        <var-declaration>
+            varsy
+            <identifier-list>
                 ident (a) [type=INTEGER, ref=46, lev=0]
-                comma [type=UNKNOWN, ref=-1, lev=-1]
+                comma
                 ident (b) [type=INTEGER, ref=47, lev=0]
-            colon [type=UNKNOWN, ref=-1, lev=-1]
+            colon
             <type> [type=INTEGER, ref=34, lev=0]
                 ident (integer) [type=INTEGER, ref=34, lev=0]
-            semicolon [type=UNKNOWN, ref=-1, lev=-1]
-    <compound-statement> [type=NOTYPE, ref=-1, lev=0]
-        beginsy [type=UNKNOWN, ref=-1, lev=-1]
-        <statement-list> [type=NOTYPE, ref=-1, lev=0]
-            <assignment-statement> [type=UNKNOWN, ref=-1, lev=-1]
-                <variable> [type=UNKNOWN, ref=-1, lev=-1]
-                    ident (a) [type=UNKNOWN, ref=-1, lev=-1]
-                becomes [type=UNKNOWN, ref=-1, lev=-1]
-                <expression> [type=UNKNOWN, ref=-1, lev=-1]
-                    <simple-expression> [type=UNKNOWN, ref=-1, lev=-1]
-                        <term> [type=UNKNOWN, ref=-1, lev=-1]
-                            <factor> [type=UNKNOWN, ref=-1, lev=-1]
-                                string (hi) [type=UNKNOWN, ref=-1, lev=-1]
-            semicolon [type=UNKNOWN, ref=-1, lev=-1]
-            <assignment-statement> [type=UNKNOWN, ref=-1, lev=-1]
-                <variable> [type=UNKNOWN, ref=-1, lev=-1]
-                    ident (halodunia) [type=UNKNOWN, ref=-1, lev=-1]
-                becomes [type=UNKNOWN, ref=-1, lev=-1]
-                <expression> [type=UNKNOWN, ref=-1, lev=-1]
-                    <simple-expression> [type=UNKNOWN, ref=-1, lev=-1]
-                        <term> [type=UNKNOWN, ref=-1, lev=-1]
-                            <factor> [type=UNKNOWN, ref=-1, lev=-1]
-                                string (halo) [type=UNKNOWN, ref=-1, lev=-1]
-            semicolon [type=UNKNOWN, ref=-1, lev=-1]
-            <assignment-statement> [type=UNKNOWN, ref=-1, lev=-1]
-                <variable> [type=UNKNOWN, ref=-1, lev=-1]
-                    ident (b) [type=UNKNOWN, ref=-1, lev=-1]
-                becomes [type=UNKNOWN, ref=-1, lev=-1]
-                <expression> [type=UNKNOWN, ref=-1, lev=-1]
-                    <simple-expression> [type=UNKNOWN, ref=-1, lev=-1]
-                        <term> [type=UNKNOWN, ref=-1, lev=-1]
-                            <factor> [type=UNKNOWN, ref=-1, lev=-1]
-                                ident (a) [type=UNKNOWN, ref=-1, lev=-1]
-                        <additive-operator> [type=UNKNOWN, ref=-1, lev=-1]
-                            plus [type=UNKNOWN, ref=-1, lev=-1]
-                        <term> [type=UNKNOWN, ref=-1, lev=-1]
-                            <factor> [type=UNKNOWN, ref=-1, lev=-1]
-                                intcon (10) [type=UNKNOWN, ref=-1, lev=-1]
-            semicolon [type=UNKNOWN, ref=-1, lev=-1]
-            <procedure/function-call> [type=UNKNOWN, ref=-1, lev=-1]
-                ident (writeln) [type=UNKNOWN, ref=-1, lev=-1]
-                lparent [type=UNKNOWN, ref=-1, lev=-1]
-                <parameter-list> [type=UNKNOWN, ref=-1, lev=-1]
-                    <expression> [type=UNKNOWN, ref=-1, lev=-1]
-                        <simple-expression> [type=UNKNOWN, ref=-1, lev=-1]
-                            <term> [type=UNKNOWN, ref=-1, lev=-1]
-                                <factor> [type=UNKNOWN, ref=-1, lev=-1]
-                                    string (Result = ) [type=UNKNOWN, ref=-1, lev=-1]
-                    comma [type=UNKNOWN, ref=-1, lev=-1]
-                    <expression> [type=UNKNOWN, ref=-1, lev=-1]
-                        <simple-expression> [type=UNKNOWN, ref=-1, lev=-1]
-                            <term> [type=UNKNOWN, ref=-1, lev=-1]
-                                <factor> [type=UNKNOWN, ref=-1, lev=-1]
-                                    ident (b) [type=UNKNOWN, ref=-1, lev=-1]
-                rparent [type=UNKNOWN, ref=-1, lev=-1]
-            semicolon [type=UNKNOWN, ref=-1, lev=-1]
-        endsy [type=UNKNOWN, ref=-1, lev=-1]
-    period [type=UNKNOWN, ref=-1, lev=-1]
+            semicolon
+    <compound-statement>
+        beginsy
+        <statement-list>
+            <statement>
+                <assignment-statement>
+                    <variable>
+                        ident (a)
+                    becomes
+                    <expression>
+                        <simple-expression>
+                            <term>
+                                <factor>
+                                    string (hi)
+            semicolon
+            <statement>
+                <assignment-statement>
+                    <variable>
+                        ident (halodunia)
+                    becomes
+                    <expression>
+                        <simple-expression>
+                            <term>
+                                <factor>
+                                    string (halo)
+            semicolon
+            <statement>
+                <assignment-statement>
+                    <variable>
+                        ident (b)
+                    becomes
+                    <expression>
+                        <simple-expression>
+                            <term>
+                                <factor>
+                                    ident (a)
+                            <additive-operator>
+                                plus
+                            <term>
+                                <factor>
+                                    intcon (10)
+            semicolon
+            <statement>
+                <procedure/function-call>
+                    ident (writeln)
+                    lparent
+                    <parameter-list>
+                        <expression>
+                            <simple-expression>
+                                <term>
+                                    <factor>
+                                        string (Result = )
+                        comma
+                        <expression>
+                            <simple-expression>
+                                <term>
+                                    <factor>
+                                        ident (b)
+                    rparent
+            semicolon
+        endsy
+    period
 
 ================================================================================

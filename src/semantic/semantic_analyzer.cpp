@@ -263,7 +263,7 @@ TypeInfo visit_array_type(Node* node, SemanticContext& ctx) {
     }
 
     int elemRef = 0;
-    if (elemType.baseType == TypeCode::ARRAY || elemType.baseType == TypeCode::SUBRANGE) {
+    if (elemType.baseType == TypeCode::ARRAY || elemType.baseType == TypeCode::SUBRANGE || elemType.baseType == TypeCode::RECORD) {
         elemRef = elemType.ref;
     }
 
@@ -665,6 +665,11 @@ void visit_program_header(Node* node, SemanticContext& ctx) {
 
 void visit_program(Node* node, SemanticContext& ctx) {
     if (!node) return;
+
+    // std::string programName = "program";
+    // Node* declPartNode = nullptr;
+    // Node* compoundStmtNode = nullptr;
+
     for (Node* c : node->children) {
         if (c->label == "<program-header>")          visit_program_header(c, ctx);
         else if (c->label == "<declaration-part>")   visit_declaration_part(c, ctx);
@@ -792,8 +797,8 @@ TypeInfo visit_simple_expression(Node* node, SemanticContext& ctx) {
         TypeInfo operandTi(TypeCode::NOTYPE);
         if (c->label == "<term>") {
             operandTi = visit_term(c, ctx);
-        } else if (c->label == "<simple-expression>") {
-            operandTi = visit_simple_expression(c, ctx);
+        // } else if (c->label == "<simple-expression>") {
+        //     operandTi = visit_simple_expression(c, ctx);
         } else {
             continue;
         }
@@ -855,7 +860,7 @@ TypeInfo visit_term(Node* node, SemanticContext& ctx) {
     if (node->children.empty()) return TypeInfo(TypeCode::NOTYPE);
 
     // <term> bisa punya anak flat:
-    // <factor>  |  <term> <mulop> <factor>
+    // <factor> +  (<mulop> <factor>)*
     // Karena parse tree bisa di-flatten, kita iterasi left-to-right
     TypeInfo current(TypeCode::NOTYPE);
     std::string pendingOp = "";
@@ -867,9 +872,9 @@ TypeInfo visit_term(Node* node, SemanticContext& ctx) {
         }
 
         // Operator: times(*), rdiv(/), idiv(div), imod(mod), andsy(and)
-        if (tt == "times" || tt == "rdiv" || tt == "slash" ||
+        if (tt == "times" || tt == "rdiv" ||
             tt == "idiv"  || tt == "imod" ||
-            tt == "divsy" || tt == "modsy" || tt == "andsy") {
+            tt == "andsy") {
             // Normalisasi nama operator agar cocok dengan resultType()
             if (tt == "times") pendingOp = "times";
             else if (tt == "rdiv") pendingOp = "rdiv";
@@ -883,8 +888,8 @@ TypeInfo visit_term(Node* node, SemanticContext& ctx) {
         TypeInfo operandTi(TypeCode::NOTYPE);
         if (c->label == "<factor>") {
             operandTi = visit_factor(c, ctx);
-        } else if (c->label == "<term>") {
-            operandTi = visit_term(c, ctx);
+        // } else if (c->label == "<term>") {
+        //     operandTi = visit_term(c, ctx);
         } else {
             // Skip non-operand nodes (terminal lain)
             continue;
@@ -896,6 +901,7 @@ TypeInfo visit_term(Node* node, SemanticContext& ctx) {
         } else {
             // Ada operator + operand kedua
             if (pendingOp.empty()) {
+                std::cout << "Label: " << node->getLabel() << std::endl;
                 ctx.errors.add("Operator tidak ditemukan di antara operand dalam term");
                 continue;
             }
@@ -1128,7 +1134,9 @@ TypeInfo visit_variable(Node* node, SemanticContext& ctx) {
 TypeInfo visit_component_variable(Node* node, SemanticContext& ctx, TypeInfo baseType) {
     if (!node) return baseType;
 
-    for (Node* c : node->children) {
+    // Gunakan indexed for loop untuk handle multidimensional subscript dengan benar
+    for (int i = 0; i < (int)node->children.size(); i++) {
+        Node* c = node->children[i];
 
         // ---- Akses array: arr[expression] ----
         if (nodeTokenType(c) == "lbrack") {
@@ -1147,12 +1155,15 @@ TypeInfo visit_component_variable(Node* node, SemanticContext& ctx, TypeInfo bas
             const AtabEntry& arrayInfo = ctx.st.atab[baseType.ref];
             TypeInfo indexType(static_cast<TypeCode>(arrayInfo.xtyp));
 
-            // Cari expression index (child setelah '[')
-            bool foundLbrack = false;
-            for (Node* sub : node->children) {
-                if (nodeTokenType(sub) == "lbrack") { foundLbrack = true; continue; }
-                if (foundLbrack && sub->label == "<expression>") {
+            // Cari expression di antara '[' dan ']'
+            // Loop dari i+1 sampai menemukan expression
+            bool foundExpr = false;
+            for (int j = i + 1; j < (int)node->children.size(); j++) {
+                Node* sub = node->children[j];
+                
+                if (sub->label == "<expression>") {
                     TypeInfo idxTi = visit_expression(sub, ctx);
+                    foundExpr = true;
 
                     // Index harus kompatibel dengan tipe indeks array
                     if (!isCompatible(idxTi, indexType, ctx.st)) {
@@ -1164,7 +1175,12 @@ TypeInfo visit_component_variable(Node* node, SemanticContext& ctx, TypeInfo bas
                                            + indexType.toString());
                         }
                     }
-                    foundLbrack = false; // reset untuk multi-dim
+                    i = j; // Skip ke expression yang baru saja diproses
+                    break;
+                }
+                
+                if (nodeTokenType(sub) == "rbrack") {
+                    i = j; // Skip ke rbrack
                     break;
                 }
             }
@@ -1179,8 +1195,25 @@ TypeInfo visit_component_variable(Node* node, SemanticContext& ctx, TypeInfo bas
 
         // ---- Akses field record: rec.field ----
         if (nodeTokenType(c) == "period") {
-            // Pastikan baseType adalah record
-            if (baseType.baseType != TypeCode::RECORD) {
+            // Pastikan baseType adalah record, atau ARRAY dari record
+            bool isValidForFieldAccess = false;
+            
+            if (baseType.baseType == TypeCode::RECORD) {
+                isValidForFieldAccess = true;
+            } else if (baseType.baseType == TypeCode::ARRAY) {
+                // Cek tipe elemen array
+                if (baseType.ref > 0 && baseType.ref < (int)ctx.st.atab.size()) {
+                    const AtabEntry& arrayInfo = ctx.st.atab[baseType.ref];
+                    TypeCode elemType = static_cast<TypeCode>(arrayInfo.etyp);
+                    if (elemType == TypeCode::RECORD) {
+                        isValidForFieldAccess = true;
+                        // Update baseType ke tipe elemen (RECORD)
+                        baseType = TypeInfo(TypeCode::RECORD, arrayInfo.eref);
+                    }
+                }
+            }
+            
+            if (!isValidForFieldAccess) {
                 ctx.errors.add("Akses field '.' hanya bisa dilakukan pada tipe Record, ditemukan: "
                                + baseType.toString());
                 return TypeInfo(TypeCode::NOTYPE);
@@ -1445,8 +1478,6 @@ void visit_assignment_statement(Node* node, SemanticContext& ctx) {
     }
 
     TypeInfo lhsType = visit_variable(varNode, ctx);
-    // std::cout << typeCodeToString (lhsType.baseType) << ' ' << varNode->getLabel() << std::endl;
-
     TypeInfo rhsType = visit_expression(exprNode, ctx);
 
     if (!isAssignmentCompatible(lhsType, rhsType, ctx.st)) {

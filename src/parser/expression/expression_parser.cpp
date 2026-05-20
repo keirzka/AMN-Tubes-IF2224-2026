@@ -8,8 +8,9 @@ Node* parseExpression(TokenStream& ts){
     node->addChild(parseSimpleExpression(ts));
 
     while (ts.check("eql") || ts.check("neq") || ts.check("gtr") || ts.check("geq") || ts.check("lss") || ts.check("leq")) {
-        node->addChild(new Node (ts.current()));
-        ts.advance();
+        // node->addChild(new Node (ts.current()));
+        // ts.advance();
+        node->addChild (parseRelationalOperator(ts));
 
         node->addChild(parseSimpleExpression(ts));
     }
@@ -45,8 +46,9 @@ Node* parseTerm(TokenStream& ts){
     node->addChild(parseFactor(ts));
 
     while (ts.check("times") || ts.check("rdiv") || ts.check("idiv") || ts.check("imod") || ts.check("andsy")) {
-        node->addChild(new Node(ts.current())); // operator
-        ts.advance();
+        // node->addChild(new Node(ts.current())); // operator
+        // ts.advance();
+        node->addChild(parseMultiplicativeOperator(ts));
 
         node->addChild(parseFactor(ts));
     }

@@ -6,6 +6,7 @@
 #include <sstream>
 #include <vector>
 #include "tree/node.hpp"
+// #include "tree/ast_node.hpp"
 #include "semantic/symbol_table.hpp"
 
 using namespace std;
@@ -51,5 +52,10 @@ void PRINT_AST(Node* root, int depth, const SymbolTable& st);
 void SAVE_AST(Node* root, int depth, const SymbolTable& st);
 
 void SAVE_AST_RECURSIVE(Node* root, int depth, ofstream& os, const SymbolTable& st);
+
+// New AST functions with better formatting (uses global g_astRoot)
+// void PRINT_AST_NEW();
+
+// void SAVE_AST_NEW();
 
 #endif
