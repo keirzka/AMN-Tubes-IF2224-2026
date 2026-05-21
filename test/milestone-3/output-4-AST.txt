@@ -1,418 +1,129 @@
-<program> [type=NOTYPE, ref=-1, lev=0]
-    <program-header> [type=NOTYPE, ref=-1, lev=0]
-        programsy
-        ident (CommentTest) [type=NOTYPE, ref=43, lev=0]
-        semicolon
-    <declaration-part>
-        <var-declaration>
-            varsy
-            <identifier-list>
-                ident (x) [type=INTEGER, ref=44, lev=0]
-            colon
-            <type> [type=INTEGER, ref=32, lev=0]
-                ident (integer) [type=INTEGER, ref=32, lev=0]
-            semicolon
-            <identifier-list>
-                ident (y) [type=INTEGER, ref=45, lev=0]
-            colon
-            <type> [type=INTEGER, ref=32, lev=0]
-                ident (integer) [type=INTEGER, ref=32, lev=0]
-            semicolon
-            <identifier-list>
-                ident (i) [type=INTEGER, ref=46, lev=0]
-            colon
-            <type> [type=INTEGER, ref=32, lev=0]
-                ident (integer) [type=INTEGER, ref=32, lev=0]
-            semicolon
-    <compound-statement> [type=NOTYPE, ref=-1, lev=0]
-        beginsy
-        <statement-list> [type=NOTYPE, ref=-1, lev=0]
-            <statement> [type=NOTYPE, ref=-1, lev=0]
-                <assignment-statement> [type=NOTYPE, ref=-1, lev=0]
-                    <variable> [type=INTEGER, ref=44, lev=0]
-                        ident (x) [type=INTEGER, ref=44, lev=0]
-                    becomes
-                    <expression> [type=INTEGER, ref=0, lev=0]
-                        <simple-expression> [type=INTEGER, ref=0, lev=0]
-                            <term> [type=INTEGER, ref=0, lev=0]
-                                <factor> [type=INTEGER, ref=-1, lev=0]
-                                    intcon (5) [type=INTEGER, ref=-1, lev=0]
-            semicolon
-            <statement> [type=NOTYPE, ref=-1, lev=0]
-                <assignment-statement> [type=NOTYPE, ref=-1, lev=0]
-                    <variable> [type=INTEGER, ref=45, lev=0]
-                        ident (y) [type=INTEGER, ref=45, lev=0]
-                    becomes
-                    <expression> [type=INTEGER, ref=0, lev=0]
-                        <simple-expression> [type=INTEGER, ref=0, lev=0]
-                            <term> [type=INTEGER, ref=0, lev=0]
-                                <factor> [type=INTEGER, ref=-1, lev=0]
-                                    intcon (90) [type=INTEGER, ref=-1, lev=0]
-            semicolon
-            <statement> [type=NOTYPE, ref=-1, lev=0]
-                <assignment-statement> [type=NOTYPE, ref=-1, lev=0]
-                    <variable> [type=INTEGER, ref=44, lev=0]
-                        ident (x) [type=INTEGER, ref=44, lev=0]
-                    becomes
-                    <expression> [type=INTEGER, ref=0, lev=0]
-                        <simple-expression> [type=INTEGER, ref=0, lev=0]
-                            <term> [type=INTEGER, ref=0, lev=0]
-                                <factor> [type=INTEGER, ref=44, lev=0]
-                                    ident (x) [type=INTEGER, ref=44, lev=0]
-                            <additive-operator>
-                                plus
-                            <term> [type=INTEGER, ref=0, lev=0]
-                                <factor> [type=INTEGER, ref=-1, lev=0]
-                                    intcon (10) [type=INTEGER, ref=-1, lev=0]
-            semicolon
-            <statement> [type=NOTYPE, ref=-1, lev=0]
-                <if-statement> [type=NOTYPE, ref=-1, lev=0]
-                    ifsy
-                    <expression> [type=BOOLEAN, ref=-1, lev=0]
-                        <simple-expression> [type=INTEGER, ref=0, lev=0]
-                            <term> [type=INTEGER, ref=0, lev=0]
-                                <factor> [type=INTEGER, ref=44, lev=0]
-                                    ident (x) [type=INTEGER, ref=44, lev=0]
-                        <relational-operator>
-                            eql
-                        <simple-expression> [type=INTEGER, ref=0, lev=0]
-                            <term> [type=INTEGER, ref=0, lev=0]
-                                <factor> [type=INTEGER, ref=45, lev=0]
-                                    ident (y) [type=INTEGER, ref=45, lev=0]
-                    thensy
-                    <statement> [type=NOTYPE, ref=-1, lev=0]
-                        <assignment-statement> [type=NOTYPE, ref=-1, lev=0]
-                            <variable> [type=INTEGER, ref=44, lev=0]
-                                ident (x) [type=INTEGER, ref=44, lev=0]
-                            becomes
-                            <expression> [type=INTEGER, ref=0, lev=0]
-                                <simple-expression> [type=INTEGER, ref=0, lev=0]
-                                    <term> [type=INTEGER, ref=0, lev=0]
-                                        <factor> [type=INTEGER, ref=44, lev=0]
-                                            ident (x) [type=INTEGER, ref=44, lev=0]
-                                    <additive-operator>
-                                        plus
-                                    <term> [type=INTEGER, ref=0, lev=0]
-                                        <factor> [type=INTEGER, ref=45, lev=0]
-                                            ident (y) [type=INTEGER, ref=45, lev=0]
-            semicolon
-            <statement> [type=NOTYPE, ref=-1, lev=0]
-                <if-statement> [type=NOTYPE, ref=-1, lev=0]
-                    ifsy
-                    <expression> [type=BOOLEAN, ref=-1, lev=0]
-                        <simple-expression> [type=INTEGER, ref=0, lev=0]
-                            <term> [type=INTEGER, ref=0, lev=0]
-                                <factor> [type=INTEGER, ref=44, lev=0]
-                                    ident (x) [type=INTEGER, ref=44, lev=0]
-                        <relational-operator>
-                            neq
-                        <simple-expression> [type=INTEGER, ref=0, lev=0]
-                            <term> [type=INTEGER, ref=0, lev=0]
-                                <factor> [type=INTEGER, ref=45, lev=0]
-                                    ident (y) [type=INTEGER, ref=45, lev=0]
-                    thensy
-                    <statement> [type=NOTYPE, ref=-1, lev=0]
-                        <assignment-statement> [type=NOTYPE, ref=-1, lev=0]
-                            <variable> [type=INTEGER, ref=44, lev=0]
-                                ident (x) [type=INTEGER, ref=44, lev=0]
-                            becomes
-                            <expression> [type=INTEGER, ref=0, lev=0]
-                                <simple-expression> [type=INTEGER, ref=0, lev=0]
-                                    <term> [type=INTEGER, ref=0, lev=0]
-                                        <factor> [type=INTEGER, ref=44, lev=0]
-                                            ident (x) [type=INTEGER, ref=44, lev=0]
-                                    <additive-operator>
-                                        minus
-                                    <term> [type=INTEGER, ref=0, lev=0]
-                                        <factor> [type=INTEGER, ref=45, lev=0]
-                                            ident (y) [type=INTEGER, ref=45, lev=0]
-            semicolon
-            <statement> [type=NOTYPE, ref=-1, lev=0]
-                <if-statement> [type=NOTYPE, ref=-1, lev=0]
-                    ifsy
-                    <expression> [type=BOOLEAN, ref=-1, lev=0]
-                        <simple-expression> [type=INTEGER, ref=0, lev=0]
-                            <term> [type=INTEGER, ref=0, lev=0]
-                                <factor> [type=INTEGER, ref=44, lev=0]
-                                    ident (x) [type=INTEGER, ref=44, lev=0]
-                        <relational-operator>
-                            gtr
-                        <simple-expression> [type=INTEGER, ref=0, lev=0]
-                            <term> [type=INTEGER, ref=0, lev=0]
-                                <factor> [type=INTEGER, ref=45, lev=0]
-                                    ident (y) [type=INTEGER, ref=45, lev=0]
-                    thensy
-                    <statement> [type=NOTYPE, ref=-1, lev=0]
-                        <assignment-statement> [type=NOTYPE, ref=-1, lev=0]
-                            <variable> [type=INTEGER, ref=44, lev=0]
-                                ident (x) [type=INTEGER, ref=44, lev=0]
-                            becomes
-                            <expression> [type=INTEGER, ref=0, lev=0]
-                                <simple-expression> [type=INTEGER, ref=0, lev=0]
-                                    <term> [type=INTEGER, ref=0, lev=0]
-                                        <factor> [type=INTEGER, ref=44, lev=0]
-                                            ident (x) [type=INTEGER, ref=44, lev=0]
-                                        <multiplicative-operator>
-                                            times
-                                        <factor> [type=INTEGER, ref=45, lev=0]
-                                            ident (y) [type=INTEGER, ref=45, lev=0]
-            semicolon
-            <statement> [type=NOTYPE, ref=-1, lev=0]
-                <if-statement> [type=NOTYPE, ref=-1, lev=0]
-                    ifsy
-                    <expression> [type=BOOLEAN, ref=-1, lev=0]
-                        <simple-expression> [type=INTEGER, ref=0, lev=0]
-                            <term> [type=INTEGER, ref=0, lev=0]
-                                <factor> [type=INTEGER, ref=44, lev=0]
-                                    ident (x) [type=INTEGER, ref=44, lev=0]
-                        <relational-operator>
-                            geq
-                        <simple-expression> [type=INTEGER, ref=0, lev=0]
-                            <term> [type=INTEGER, ref=0, lev=0]
-                                <factor> [type=INTEGER, ref=45, lev=0]
-                                    ident (y) [type=INTEGER, ref=45, lev=0]
-                    thensy
-                    <statement> [type=NOTYPE, ref=-1, lev=0]
-                        <assignment-statement> [type=NOTYPE, ref=-1, lev=0]
-                            <variable> [type=INTEGER, ref=44, lev=0]
-                                ident (x) [type=INTEGER, ref=44, lev=0]
-                            becomes
-                            <expression> [type=INTEGER, ref=0, lev=0]
-                                <simple-expression> [type=INTEGER, ref=0, lev=0]
-                                    <term> [type=INTEGER, ref=0, lev=0]
-                                        <factor> [type=INTEGER, ref=44, lev=0]
-                                            ident (x) [type=INTEGER, ref=44, lev=0]
-                                        <multiplicative-operator>
-                                            idiv
-                                        <factor> [type=INTEGER, ref=45, lev=0]
-                                            ident (y) [type=INTEGER, ref=45, lev=0]
-            semicolon
-            <statement> [type=NOTYPE, ref=-1, lev=0]
-                <if-statement> [type=NOTYPE, ref=-1, lev=0]
-                    ifsy
-                    <expression> [type=BOOLEAN, ref=-1, lev=0]
-                        <simple-expression> [type=INTEGER, ref=0, lev=0]
-                            <term> [type=INTEGER, ref=0, lev=0]
-                                <factor> [type=INTEGER, ref=44, lev=0]
-                                    ident (x) [type=INTEGER, ref=44, lev=0]
-                        <relational-operator>
-                            leq
-                        <simple-expression> [type=INTEGER, ref=0, lev=0]
-                            <term> [type=INTEGER, ref=0, lev=0]
-                                <factor> [type=INTEGER, ref=45, lev=0]
-                                    ident (y) [type=INTEGER, ref=45, lev=0]
-                    thensy
-                    <statement> [type=NOTYPE, ref=-1, lev=0]
-                        <assignment-statement> [type=NOTYPE, ref=-1, lev=0]
-                            <variable> [type=INTEGER, ref=44, lev=0]
-                                ident (x) [type=INTEGER, ref=44, lev=0]
-                            becomes
-                            <expression> [type=INTEGER, ref=0, lev=0]
-                                <simple-expression> [type=INTEGER, ref=0, lev=0]
-                                    <term> [type=INTEGER, ref=0, lev=0]
-                                        <factor> [type=INTEGER, ref=44, lev=0]
-                                            ident (x) [type=INTEGER, ref=44, lev=0]
-                                        <multiplicative-operator>
-                                            imod
-                                        <factor> [type=INTEGER, ref=45, lev=0]
-                                            ident (y) [type=INTEGER, ref=45, lev=0]
-            semicolon
-            <statement> [type=NOTYPE, ref=-1, lev=0]
-                <for-statement> [type=NOTYPE, ref=-1, lev=0]
-                    forsy
-                    ident (i)
-                    becomes
-                    <expression> [type=INTEGER, ref=0, lev=0]
-                        <simple-expression> [type=INTEGER, ref=0, lev=0]
-                            <term> [type=INTEGER, ref=0, lev=0]
-                                <factor> [type=INTEGER, ref=-1, lev=0]
-                                    intcon (1) [type=INTEGER, ref=-1, lev=0]
-                    tosy
-                    <expression> [type=INTEGER, ref=0, lev=0]
-                        <simple-expression> [type=INTEGER, ref=0, lev=0]
-                            <term> [type=INTEGER, ref=0, lev=0]
-                                <factor> [type=INTEGER, ref=-1, lev=0]
-                                    intcon (10) [type=INTEGER, ref=-1, lev=0]
-                    dosy
-                    <compound-statement> [type=NOTYPE, ref=-1, lev=0]
-                        beginsy
-                        <statement-list> [type=NOTYPE, ref=-1, lev=0]
-                            <statement> [type=NOTYPE, ref=-1, lev=0]
-                                <assignment-statement> [type=NOTYPE, ref=-1, lev=0]
-                                    <variable> [type=INTEGER, ref=46, lev=0]
-                                        ident (i) [type=INTEGER, ref=46, lev=0]
-                                    becomes
-                                    <expression> [type=INTEGER, ref=0, lev=0]
-                                        <simple-expression> [type=INTEGER, ref=0, lev=0]
-                                            <term> [type=INTEGER, ref=0, lev=0]
-                                                <factor> [type=INTEGER, ref=46, lev=0]
-                                                    ident (i) [type=INTEGER, ref=46, lev=0]
-                                            <additive-operator>
-                                                plus
-                                            <term> [type=INTEGER, ref=0, lev=0]
-                                                <factor> [type=INTEGER, ref=-1, lev=0]
-                                                    intcon (1) [type=INTEGER, ref=-1, lev=0]
-                            semicolon
-                        endsy
-            semicolon
-            <statement> [type=NOTYPE, ref=-1, lev=0]
-                <for-statement> [type=NOTYPE, ref=-1, lev=0]
-                    forsy
-                    ident (i)
-                    becomes
-                    <expression> [type=INTEGER, ref=0, lev=0]
-                        <simple-expression> [type=INTEGER, ref=0, lev=0]
-                            <term> [type=INTEGER, ref=0, lev=0]
-                                <factor> [type=INTEGER, ref=-1, lev=0]
-                                    intcon (10) [type=INTEGER, ref=-1, lev=0]
-                    downtosy
-                    <expression> [type=INTEGER, ref=0, lev=0]
-                        <simple-expression> [type=INTEGER, ref=0, lev=0]
-                            <term> [type=INTEGER, ref=0, lev=0]
-                                <factor> [type=INTEGER, ref=-1, lev=0]
-                                    intcon (1) [type=INTEGER, ref=-1, lev=0]
-                    dosy
-                    <compound-statement> [type=NOTYPE, ref=-1, lev=0]
-                        beginsy
-                        <statement-list> [type=NOTYPE, ref=-1, lev=0]
-                            <statement> [type=NOTYPE, ref=-1, lev=0]
-                                <assignment-statement> [type=NOTYPE, ref=-1, lev=0]
-                                    <variable> [type=INTEGER, ref=46, lev=0]
-                                        ident (i) [type=INTEGER, ref=46, lev=0]
-                                    becomes
-                                    <expression> [type=INTEGER, ref=0, lev=0]
-                                        <simple-expression> [type=INTEGER, ref=0, lev=0]
-                                            <term> [type=INTEGER, ref=0, lev=0]
-                                                <factor> [type=INTEGER, ref=46, lev=0]
-                                                    ident (i) [type=INTEGER, ref=46, lev=0]
-                                            <additive-operator>
-                                                minus
-                                            <term> [type=INTEGER, ref=0, lev=0]
-                                                <factor> [type=INTEGER, ref=-1, lev=0]
-                                                    intcon (1) [type=INTEGER, ref=-1, lev=0]
-                            semicolon
-                        endsy
-            semicolon
-            <statement> [type=NOTYPE, ref=-1, lev=0]
-                <while-statement> [type=NOTYPE, ref=-1, lev=0]
-                    whilesy
-                    <expression> [type=BOOLEAN, ref=-1, lev=0]
-                        <simple-expression> [type=INTEGER, ref=0, lev=0]
-                            <term> [type=INTEGER, ref=0, lev=0]
-                                <factor> [type=INTEGER, ref=46, lev=0]
-                                    ident (i) [type=INTEGER, ref=46, lev=0]
-                        <relational-operator>
-                            gtr
-                        <simple-expression> [type=INTEGER, ref=0, lev=0]
-                            <term> [type=INTEGER, ref=0, lev=0]
-                                <factor> [type=INTEGER, ref=-1, lev=0]
-                                    intcon (0) [type=INTEGER, ref=-1, lev=0]
-                    dosy
-                    <compound-statement> [type=NOTYPE, ref=-1, lev=0]
-                        beginsy
-                        <statement-list> [type=NOTYPE, ref=-1, lev=0]
-                            <statement> [type=NOTYPE, ref=-1, lev=0]
-                                <assignment-statement> [type=NOTYPE, ref=-1, lev=0]
-                                    <variable> [type=INTEGER, ref=46, lev=0]
-                                        ident (i) [type=INTEGER, ref=46, lev=0]
-                                    becomes
-                                    <expression> [type=INTEGER, ref=0, lev=0]
-                                        <simple-expression> [type=INTEGER, ref=0, lev=0]
-                                            <term> [type=INTEGER, ref=0, lev=0]
-                                                <factor> [type=INTEGER, ref=46, lev=0]
-                                                    ident (i) [type=INTEGER, ref=46, lev=0]
-                                            <additive-operator>
-                                                minus
-                                            <term> [type=INTEGER, ref=0, lev=0]
-                                                <factor> [type=INTEGER, ref=-1, lev=0]
-                                                    intcon (1) [type=INTEGER, ref=-1, lev=0]
-                            semicolon
-                        endsy
-            semicolon
-            <statement> [type=NOTYPE, ref=-1, lev=0]
-                <repeat-statement> [type=NOTYPE, ref=-1, lev=0]
-                    repeatsy
-                    <statement-list> [type=NOTYPE, ref=-1, lev=0]
-                        <statement> [type=NOTYPE, ref=-1, lev=0]
-                            <assignment-statement> [type=NOTYPE, ref=-1, lev=0]
-                                <variable> [type=INTEGER, ref=46, lev=0]
-                                    ident (i) [type=INTEGER, ref=46, lev=0]
-                                becomes
-                                <expression> [type=INTEGER, ref=0, lev=0]
-                                    <simple-expression> [type=INTEGER, ref=0, lev=0]
-                                        <term> [type=INTEGER, ref=0, lev=0]
-                                            <factor> [type=INTEGER, ref=46, lev=0]
-                                                ident (i) [type=INTEGER, ref=46, lev=0]
-                                        <additive-operator>
-                                            plus
-                                        <term> [type=INTEGER, ref=0, lev=0]
-                                            <factor> [type=INTEGER, ref=-1, lev=0]
-                                                intcon (1) [type=INTEGER, ref=-1, lev=0]
-                        semicolon
-                    untilsy
-                    <expression> [type=BOOLEAN, ref=-1, lev=0]
-                        <simple-expression> [type=INTEGER, ref=0, lev=0]
-                            <term> [type=INTEGER, ref=0, lev=0]
-                                <factor> [type=INTEGER, ref=46, lev=0]
-                                    ident (i) [type=INTEGER, ref=46, lev=0]
-                        <relational-operator>
-                            eql
-                        <simple-expression> [type=INTEGER, ref=0, lev=0]
-                            <term> [type=INTEGER, ref=0, lev=0]
-                                <factor> [type=INTEGER, ref=-1, lev=0]
-                                    intcon (10) [type=INTEGER, ref=-1, lev=0]
-            semicolon
-            <statement> [type=NOTYPE, ref=-1, lev=0]
-                <case-statement> [type=NOTYPE, ref=-1, lev=0]
-                    casesy
-                    <expression> [type=INTEGER, ref=0, lev=0]
-                        <simple-expression> [type=INTEGER, ref=0, lev=0]
-                            <term> [type=INTEGER, ref=0, lev=0]
-                                <factor> [type=INTEGER, ref=46, lev=0]
-                                    ident (i) [type=INTEGER, ref=46, lev=0]
-                    ofsy
-                    <case-list> [type=NOTYPE, ref=-1, lev=0]
-                        <case-branch> [type=NOTYPE, ref=-1, lev=0]
-                            <constant-list>
-                                <expression>
-                                    <simple-expression>
-                                        <term>
-                                            <factor>
-                                                intcon (1)
-                            colon
-                            <statement> [type=NOTYPE, ref=-1, lev=0]
-                                <assignment-statement> [type=NOTYPE, ref=-1, lev=0]
-                                    <variable> [type=INTEGER, ref=46, lev=0]
-                                        ident (i) [type=INTEGER, ref=46, lev=0]
-                                    becomes
-                                    <expression> [type=INTEGER, ref=0, lev=0]
-                                        <simple-expression> [type=INTEGER, ref=0, lev=0]
-                                            <term> [type=INTEGER, ref=0, lev=0]
-                                                <factor> [type=INTEGER, ref=-1, lev=0]
-                                                    intcon (100) [type=INTEGER, ref=-1, lev=0]
-                        semicolon
-                        <case-branch> [type=NOTYPE, ref=-1, lev=0]
-                            <constant-list>
-                                <expression>
-                                    <simple-expression>
-                                        <term>
-                                            <factor>
-                                                intcon (2)
-                            colon
-                            <statement> [type=NOTYPE, ref=-1, lev=0]
-                                <assignment-statement> [type=NOTYPE, ref=-1, lev=0]
-                                    <variable> [type=INTEGER, ref=46, lev=0]
-                                        ident (i) [type=INTEGER, ref=46, lev=0]
-                                    becomes
-                                    <expression> [type=INTEGER, ref=0, lev=0]
-                                        <simple-expression> [type=INTEGER, ref=0, lev=0]
-                                            <term> [type=INTEGER, ref=0, lev=0]
-                                                <factor> [type=INTEGER, ref=-1, lev=0]
-                                                    intcon (200) [type=INTEGER, ref=-1, lev=0]
-                        semicolon
-                    endsy
-            semicolon
-        endsy
-    period
-
-================================================================================
+ProgramNode(name: 'CommentTest') -> tab_index:43, type:NOTYPE, lev:0
+    Declarations
+        VarDecl(name: 'x') -> tab_index:44, type:INTEGER, lev:0
+        VarDecl(name: 'y') -> tab_index:45, type:INTEGER, lev:0
+        VarDecl(name: 'i') -> tab_index:46, type:INTEGER, lev:0
+    Block -> block_index:0, lev:0
+        Assign('x' := ...)
+            Var('x') -> tab_index:44, type:INTEGER, lev:0
+            Literal(5) -> type:INTEGER, lev:0
+        Assign('y' := ...)
+            Var('y') -> tab_index:45, type:INTEGER, lev:0
+            Literal(90) -> type:INTEGER, lev:0
+        Assign('x' := ...)
+            Var('x') -> tab_index:44, type:INTEGER, lev:0
+            BinOp '+' -> tab_index:0, type:INTEGER, lev:0
+                Var('x') -> tab_index:44, type:INTEGER, lev:0
+                Literal(10) -> type:INTEGER, lev:0
+        If
+            Condition
+                BinOp '=' -> type:BOOLEAN, lev:0
+                    Var('x') -> tab_index:44, type:INTEGER, lev:0
+                    Var('y') -> tab_index:45, type:INTEGER, lev:0
+            Then
+                Assign('x' := ...)
+                    Var('x') -> tab_index:44, type:INTEGER, lev:0
+                    BinOp '+' -> tab_index:0, type:INTEGER, lev:0
+                        Var('x') -> tab_index:44, type:INTEGER, lev:0
+                        Var('y') -> tab_index:45, type:INTEGER, lev:0
+        If
+            Condition
+                BinOp '<>' -> type:BOOLEAN, lev:0
+                    Var('x') -> tab_index:44, type:INTEGER, lev:0
+                    Var('y') -> tab_index:45, type:INTEGER, lev:0
+            Then
+                Assign('x' := ...)
+                    Var('x') -> tab_index:44, type:INTEGER, lev:0
+                    BinOp '-' -> tab_index:0, type:INTEGER, lev:0
+                        Var('x') -> tab_index:44, type:INTEGER, lev:0
+                        Var('y') -> tab_index:45, type:INTEGER, lev:0
+        If
+            Condition
+                BinOp '>' -> type:BOOLEAN, lev:0
+                    Var('x') -> tab_index:44, type:INTEGER, lev:0
+                    Var('y') -> tab_index:45, type:INTEGER, lev:0
+            Then
+                Assign('x' := ...)
+                    Var('x') -> tab_index:44, type:INTEGER, lev:0
+                    BinOp '*' -> tab_index:0, type:INTEGER, lev:0
+                        Var('x') -> tab_index:44, type:INTEGER, lev:0
+                        Var('y') -> tab_index:45, type:INTEGER, lev:0
+        If
+            Condition
+                BinOp '>=' -> type:BOOLEAN, lev:0
+                    Var('x') -> tab_index:44, type:INTEGER, lev:0
+                    Var('y') -> tab_index:45, type:INTEGER, lev:0
+            Then
+                Assign('x' := ...)
+                    Var('x') -> tab_index:44, type:INTEGER, lev:0
+                    BinOp 'div' -> tab_index:0, type:INTEGER, lev:0
+                        Var('x') -> tab_index:44, type:INTEGER, lev:0
+                        Var('y') -> tab_index:45, type:INTEGER, lev:0
+        If
+            Condition
+                BinOp '<=' -> type:BOOLEAN, lev:0
+                    Var('x') -> tab_index:44, type:INTEGER, lev:0
+                    Var('y') -> tab_index:45, type:INTEGER, lev:0
+            Then
+                Assign('x' := ...)
+                    Var('x') -> tab_index:44, type:INTEGER, lev:0
+                    BinOp 'mod' -> tab_index:0, type:INTEGER, lev:0
+                        Var('x') -> tab_index:44, type:INTEGER, lev:0
+                        Var('y') -> tab_index:45, type:INTEGER, lev:0
+        For
+            Assign('i' := ...)
+                Var('i')
+                Literal(1) -> type:INTEGER, lev:0
+            Limit(to)
+                Literal(10) -> type:INTEGER, lev:0
+            Block -> block_index:0, lev:0
+                Assign('i' := ...)
+                    Var('i') -> tab_index:46, type:INTEGER, lev:0
+                    BinOp '+' -> tab_index:0, type:INTEGER, lev:0
+                        Var('i') -> tab_index:46, type:INTEGER, lev:0
+                        Literal(1) -> type:INTEGER, lev:0
+        For
+            Assign('i' := ...)
+                Var('i')
+                Literal(10) -> type:INTEGER, lev:0
+            Limit(downto)
+                Literal(1) -> type:INTEGER, lev:0
+            Block -> block_index:0, lev:0
+                Assign('i' := ...)
+                    Var('i') -> tab_index:46, type:INTEGER, lev:0
+                    BinOp '-' -> tab_index:0, type:INTEGER, lev:0
+                        Var('i') -> tab_index:46, type:INTEGER, lev:0
+                        Literal(1) -> type:INTEGER, lev:0
+        While
+            Condition
+                BinOp '>' -> type:BOOLEAN, lev:0
+                    Var('i') -> tab_index:46, type:INTEGER, lev:0
+                    Literal(0) -> type:INTEGER, lev:0
+            Block -> block_index:0, lev:0
+                Assign('i' := ...)
+                    Var('i') -> tab_index:46, type:INTEGER, lev:0
+                    BinOp '-' -> tab_index:0, type:INTEGER, lev:0
+                        Var('i') -> tab_index:46, type:INTEGER, lev:0
+                        Literal(1) -> type:INTEGER, lev:0
+        Repeat
+            Block -> block_index:0, lev:0
+                Assign('i' := ...)
+                    Var('i') -> tab_index:46, type:INTEGER, lev:0
+                    BinOp '+' -> tab_index:0, type:INTEGER, lev:0
+                        Var('i') -> tab_index:46, type:INTEGER, lev:0
+                        Literal(1) -> type:INTEGER, lev:0
+            Condition
+                BinOp '=' -> type:BOOLEAN, lev:0
+                    Var('i') -> tab_index:46, type:INTEGER, lev:0
+                    Literal(10) -> type:INTEGER, lev:0
+        Case
+            Expression
+                Var('i') -> tab_index:46, type:INTEGER, lev:0
+            CaseBlock
+                Assign('i' := ...)
+                    Var('i') -> tab_index:46, type:INTEGER, lev:0
+                    Literal(100) -> type:INTEGER, lev:0
+            CaseBlock
+                Assign('i' := ...)
+                    Var('i') -> tab_index:46, type:INTEGER, lev:0
+                    Literal(200) -> type:INTEGER, lev:0

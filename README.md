@@ -11,8 +11,10 @@ Pada milestone 1, program ini adalah **Lexical Analyzer (Lexer)** untuk bahasa p
 
 Kemudian pada milestone 2, program dilanjutkan dengan implementasi **Syntax Analyzer (Parser)**. Pada bagian ini, program akan menerima hasil list token yang didapat dari lexer. Token-token tersebut kemudian akan dibangun menjadi sebuah parse tree. Pada bagian ini juga, program sudah bisa menganalisi beberapa error syntaxis, seperti penulisan nama variabel yang menggunakan simbol aneh ('*', '&', dan lain lain).
 
+Selanjutnya, pada milestone 3, implementasi dilanjutkan dengan **Semantic Analyzer** dan **Decorated AST Builder**. Melanjutkan dari bagian sebelumnya, program menerima hasil parse tree yang didapat dari Parser kemudian dilakukan analisis semantic, seperti pengecekan kecocokan tipe data, dan lain lain. Output dari bagian ini ada dua, pertama adalah *Symbol Table* dan kedua adalah *Decorated AST*. *Symbol table* menyimpan informasi semua identifier yang didefinisikan dan digunakan dan *Decorated AST* menyimpan informasi seperti parse tree namun dalam bentuk yang lebih praktikal dan sederhana. 
+
 ### Fitur Utama:
-- **Pembacaan File**: Membaca file input dari folder `test/milestone-1/`
+- **Pembacaan File**: Membaca file input dari folder `test/milestone-x/`
 - **Tokenisasi**: Mengidentifikasi dan mengklasifikasikan token termasuk:
   - **Keywords**: `program`, `var`, `const`, `begin`, `end`, `if`, `while`, `for`, dll
   - **Identifiers**: Nama variabel dan fungsi (format: `ident (nama)`)
@@ -80,7 +82,7 @@ begin
 end.
 ```
 
-**Output yang hasil lexer ditampilkan di terminal:**
+**Output hasil lexer yang ditampilkan di terminal:**
 ```
 programsy
 ident (Hello)
@@ -114,7 +116,7 @@ endsy
 period
 ```
 
-**Output yang hasil parser ditampilkan di terminal:**
+**Output hasil parser yang ditampilkan di terminal:**
 ```
 <program>
     <program-header>
@@ -179,6 +181,87 @@ period
             semicolon
         endsy
     period
+```
+
+**Output hasil symbol table yang ditampilkan di terminal:**
+
+```
+[tab]
+ Index          Identifier         Object           Type       Ref     Nrm     Lev   Address
+     0                 and           TYPE         NOTYPE         0       1       0         0
+     1               array           TYPE         NOTYPE         0       1       0         0
+     2               begin           TYPE         NOTYPE         0       1       0         0
+     3                case           TYPE         NOTYPE         0       1       0         0
+     4               const           TYPE         NOTYPE         0       1       0         0
+     5                 div           TYPE         NOTYPE         0       1       0         0
+     6              downto           TYPE         NOTYPE         0       1       0         0
+     7                  do           TYPE         NOTYPE         0       1       0         0
+     8                else           TYPE         NOTYPE         0       1       0         0
+     9                 end           TYPE         NOTYPE         0       1       0         0
+    10                 for           TYPE         NOTYPE         0       1       0         0
+    11            function           TYPE         NOTYPE         0       1       0         0
+    12                  if           TYPE         NOTYPE         0       1       0         0
+    13                 mod           TYPE         NOTYPE         0       1       0         0
+    14                 not           TYPE         NOTYPE         0       1       0         0
+    15                  of           TYPE         NOTYPE         0       1       0         0
+    16                  or           TYPE         NOTYPE         0       1       0         0
+    17           procedure           TYPE         NOTYPE         0       1       0         0
+    18             program           TYPE         NOTYPE         0       1       0         0
+    19              record           TYPE         NOTYPE         0       1       0         0
+    20              repeat           TYPE         NOTYPE         0       1       0         0
+    21             integer           TYPE         NOTYPE         0       1       0         0
+    22                real           TYPE         NOTYPE         0       1       0         0
+    23             boolean           TYPE         NOTYPE         0       1       0         0
+    24                char           TYPE         NOTYPE         0       1       0         0
+    25              string           TYPE         NOTYPE         0       1       0         0
+    26                then           TYPE         NOTYPE         0       1       0         0
+    27                  to           TYPE         NOTYPE         0       1       0         0
+    28                type           TYPE         NOTYPE         0       1       0         0
+    29               until           TYPE         NOTYPE         0       1       0         0
+    30                 var           TYPE         NOTYPE         0       1       0         0
+    31               while           TYPE         NOTYPE         0       1       0         0
+    32             Integer           TYPE        INTEGER         0       1       0         0
+    33                Real           TYPE           REAL         0       1       0         0
+    34                Char           TYPE           CHAR         0       1       0         0
+    35             Boolean           TYPE        BOOLEAN         0       1       0         0
+    36              String           TYPE         STRING         0       1       0         0
+    37                True       CONSTANT        BOOLEAN         0       1       0         1
+    38               False       CONSTANT        BOOLEAN         0       1       0         0
+    39             writeln      PROCEDURE         NOTYPE         0       1       0         0
+    40              readln      PROCEDURE         NOTYPE         0       1       0         0
+    41               write      PROCEDURE         NOTYPE         0       1       0         0
+    42                read      PROCEDURE         NOTYPE         0       1       0         0
+    43               Hello        PROGRAM         NOTYPE         0       1       0         0
+    44                   a       VARIABLE        INTEGER         0       1       0         0
+    45                   b       VARIABLE        INTEGER         0       1       0         0
+[atab]
+ Index     Index Type   Element Type      ERef     Low    High    ElSize      Size
+     0         NOTYPE         NOTYPE         0       0       0         1         0
+[btab]
+ Index           Last     Last Param     Param Size       Var Size
+     0             45              0              0              2
+```
+
+**Output hasil AST yang ditampilkan di terminal:**
+
+```
+ProgramNode(name: 'Hello') -> tab_index:43, type:NOTYPE, lev:0
+    Declarations
+        VarDecl(name: 'a') -> tab_index:44, type:INTEGER, lev:0
+        VarDecl(name: 'b') -> tab_index:45, type:INTEGER, lev:0
+    Block -> block_index:0, lev:0
+        Assign('a' := ...)
+            Var('a') -> tab_index:44, type:INTEGER, lev:0
+            Literal(5) -> type:INTEGER, lev:0
+        Assign('b' := ...)
+            Var('b') -> tab_index:45, type:INTEGER, lev:0
+            BinOp '+' -> tab_index:0, type:INTEGER, lev:0
+                Var('a') -> tab_index:44, type:INTEGER, lev:0
+                Literal(10) -> type:INTEGER, lev:0
+        procedure/function-call-statement name: writeln -> tab_index:39, type:NOTYPE, lev:0
+            Args
+                Literal('Result = ') -> type:STRING, lev:0
+                Var('b') -> tab_index:45, type:INTEGER, lev:0
 ```
 
 ### 6. Target Make Lainnya

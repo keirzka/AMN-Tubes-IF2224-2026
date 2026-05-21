@@ -1,68 +1,17 @@
-<program> [type=NOTYPE, ref=-1, lev=0]
-    <program-header> [type=NOTYPE, ref=-1, lev=0]
-        programsy
-        ident (Hello) [type=NOTYPE, ref=43, lev=0]
-        semicolon
-    <declaration-part>
-        <var-declaration>
-            varsy
-            <identifier-list>
-                ident (a) [type=INTEGER, ref=44, lev=0]
-                comma
-                ident (b) [type=INTEGER, ref=45, lev=0]
-            colon
-            <type> [type=INTEGER, ref=32, lev=0]
-                ident (integer) [type=INTEGER, ref=32, lev=0]
-            semicolon
-    <compound-statement> [type=NOTYPE, ref=-1, lev=0]
-        beginsy
-        <statement-list> [type=NOTYPE, ref=-1, lev=0]
-            <statement> [type=NOTYPE, ref=-1, lev=0]
-                <assignment-statement> [type=NOTYPE, ref=-1, lev=0]
-                    <variable> [type=INTEGER, ref=44, lev=0]
-                        ident (a) [type=INTEGER, ref=44, lev=0]
-                    becomes
-                    <expression> [type=INTEGER, ref=0, lev=0]
-                        <simple-expression> [type=INTEGER, ref=0, lev=0]
-                            <term> [type=INTEGER, ref=0, lev=0]
-                                <factor> [type=INTEGER, ref=-1, lev=0]
-                                    intcon (5) [type=INTEGER, ref=-1, lev=0]
-            semicolon
-            <statement> [type=NOTYPE, ref=-1, lev=0]
-                <assignment-statement> [type=NOTYPE, ref=-1, lev=0]
-                    <variable> [type=INTEGER, ref=45, lev=0]
-                        ident (b) [type=INTEGER, ref=45, lev=0]
-                    becomes
-                    <expression> [type=INTEGER, ref=0, lev=0]
-                        <simple-expression> [type=INTEGER, ref=0, lev=0]
-                            <term> [type=INTEGER, ref=0, lev=0]
-                                <factor> [type=INTEGER, ref=44, lev=0]
-                                    ident (a) [type=INTEGER, ref=44, lev=0]
-                            <additive-operator>
-                                plus
-                            <term> [type=INTEGER, ref=0, lev=0]
-                                <factor> [type=INTEGER, ref=-1, lev=0]
-                                    intcon (10) [type=INTEGER, ref=-1, lev=0]
-            semicolon
-            <statement> [type=NOTYPE, ref=-1, lev=0]
-                <procedure/function-call> [type=NOTYPE, ref=39, lev=0]
-                    ident (writeln) [type=NOTYPE, ref=39, lev=0]
-                    lparent
-                    <parameter-list>
-                        <expression> [type=STRING, ref=0, lev=0]
-                            <simple-expression> [type=STRING, ref=0, lev=0]
-                                <term> [type=STRING, ref=0, lev=0]
-                                    <factor> [type=STRING, ref=-1, lev=0]
-                                        string (Result = ) [type=STRING, ref=-1, lev=0]
-                        comma
-                        <expression> [type=INTEGER, ref=0, lev=0]
-                            <simple-expression> [type=INTEGER, ref=0, lev=0]
-                                <term> [type=INTEGER, ref=0, lev=0]
-                                    <factor> [type=INTEGER, ref=45, lev=0]
-                                        ident (b) [type=INTEGER, ref=45, lev=0]
-                    rparent
-            semicolon
-        endsy
-    period
-
-================================================================================
+ProgramNode(name: 'Hello') -> tab_index:43, type:NOTYPE, lev:0
+    Declarations
+        VarDecl(name: 'a') -> tab_index:44, type:INTEGER, lev:0
+        VarDecl(name: 'b') -> tab_index:45, type:INTEGER, lev:0
+    Block -> block_index:0, lev:0
+        Assign('a' := ...)
+            Var('a') -> tab_index:44, type:INTEGER, lev:0
+            Literal(5) -> type:INTEGER, lev:0
+        Assign('b' := ...)
+            Var('b') -> tab_index:45, type:INTEGER, lev:0
+            BinOp '+' -> tab_index:0, type:INTEGER, lev:0
+                Var('a') -> tab_index:44, type:INTEGER, lev:0
+                Literal(10) -> type:INTEGER, lev:0
+        procedure/function-call-statement name: writeln -> tab_index:39, type:NOTYPE, lev:0
+            Args
+                Literal('Result = ') -> type:STRING, lev:0
+                Var('b') -> tab_index:45, type:INTEGER, lev:0

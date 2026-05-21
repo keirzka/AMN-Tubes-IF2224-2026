@@ -46,8 +46,575 @@ Node* findChildByTokenType(Node* node, const std::string& tokenType) {
     return nullptr;
 }
 
+struct AstBuildContext {
+    std::shared_ptr<ASTNode> declarations;
+    std::vector<std::shared_ptr<ASTNode>> blockStack;
+    std::shared_ptr<ASTNode> attachOverride;
+    std::shared_ptr<ASTNode> pendingBlockParent;
+};
+
+static AstBuildContext g_astCtx;
+
+static void resetAstContext() {
+    g_astRoot = nullptr;
+    g_astCtx.declarations.reset();
+    g_astCtx.blockStack.clear();
+    g_astCtx.attachOverride.reset();
+    g_astCtx.pendingBlockParent.reset();
+}
+
+static void annotateFromParse(const std::shared_ptr<ASTNode>& ast, const Node* parseNode) {
+    if (!ast || !parseNode) return;
+    if (parseNode->sem_type >= 0) ast->type = parseNode->sem_type;
+    if (parseNode->sem_tab_index >= 0) ast->tab_index = parseNode->sem_tab_index;
+    if (parseNode->sem_lev >= 0) ast->lev = parseNode->sem_lev;
+}
+
+static std::shared_ptr<ASTNode> currentBlockAst() {
+    if (!g_astCtx.blockStack.empty()) {
+        return g_astCtx.blockStack.back();
+    }
+    return nullptr;
+}
+
+static std::shared_ptr<ASTNode> selectAttachParent() {
+    if (g_astCtx.attachOverride) return g_astCtx.attachOverride;
+    if (g_astCtx.pendingBlockParent) return g_astCtx.pendingBlockParent;
+    if (!g_astCtx.blockStack.empty()) return g_astCtx.blockStack.back();
+    return g_astRoot;
+}
+
+static void attachAstNode(const std::shared_ptr<ASTNode>& node) {
+    auto parent = selectAttachParent();
+    if (parent) {
+        parent->addChild(node);
+    }
+}
+
+static std::string opToText(const std::string& tt) {
+    if (tt == "plus") return "+";
+    if (tt == "minus") return "-";
+    if (tt == "times") return "*";
+    if (tt == "rdiv") return "/";
+    if (tt == "idiv") return "div";
+    if (tt == "imod") return "mod";
+    if (tt == "orsy") return "or";
+    if (tt == "andsy") return "and";
+    if (tt == "eql") return "=";
+    if (tt == "neq") return "<>";
+    if (tt == "lss") return "<";
+    if (tt == "leq") return "<=";
+    if (tt == "gtr") return ">";
+    if (tt == "geq") return ">=";
+    return tt;
+}
+
+static std::shared_ptr<ASTNode> build_expression_ast(Node* node);
+static std::shared_ptr<ASTNode> build_simple_expression_ast(Node* node);
+static std::shared_ptr<ASTNode> build_term_ast(Node* node);
+static std::shared_ptr<ASTNode> build_factor_ast(Node* node);
+static std::shared_ptr<ASTNode> build_constant_ast(Node* node);
+static std::shared_ptr<ASTNode> build_variable_ast(Node* node);
+static std::shared_ptr<ASTNode> build_proc_call_ast(Node* node);
+static std::shared_ptr<ASTNode> build_statement_ast(Node* node, const SymbolTable& st);
+static std::shared_ptr<ASTNode> build_compound_statement_ast(Node* node, const SymbolTable& st);
+
+static std::shared_ptr<ASTNode> build_variable_ast(Node* node) {
+    if (!node) return nullptr;
+    Node* identNode = nullptr;
+    Node* componentNode = nullptr;
+    for (Node* c : node->children) {
+        if (nodeTokenType(c) == "ident" && !identNode) identNode = c;
+        if (c->label == "<component-variable>") componentNode = c;
+    }
+
+    std::string name = identNode ? nodeTokenValue(identNode) : "";
+    auto varNode = makeAstNode("Var", name);
+    annotateFromParse(varNode, identNode ? identNode : node);
+
+    if (componentNode) {
+        for (int i = 0; i < (int)componentNode->children.size(); i++) {
+            Node* c = componentNode->children[i];
+            if (nodeTokenType(c) == "lbrack") {
+                for (int j = i + 1; j < (int)componentNode->children.size(); j++) {
+                    Node* sub = componentNode->children[j];
+                    if (sub->label == "<expression>") {
+                        auto idxAst = makeAstNode("Index");
+                        idxAst->addChild(build_expression_ast(sub));
+                        varNode->addChild(idxAst);
+                        i = j;
+                        break;
+                    }
+                    if (nodeTokenType(sub) == "rbrack") { i = j; break; }
+                }
+            } else if (nodeTokenType(c) == "period") {
+                if (i + 1 < (int)componentNode->children.size() &&
+                    nodeTokenType(componentNode->children[i + 1]) == "ident") {
+                    Node* fieldNode = componentNode->children[i + 1];
+                    auto fieldAst = makeAstNode("Field", nodeTokenValue(fieldNode));
+                    annotateFromParse(fieldAst, fieldNode);
+                    varNode->addChild(fieldAst);
+                }
+            }
+        }
+    }
+
+    return varNode;
+}
+
+static std::shared_ptr<ASTNode> build_factor_ast(Node* node) {
+    if (!node) return nullptr;
+
+    if (node->label == "<factor>") {
+        if (node->children.empty()) return nullptr;
+        Node* first = node->children[0];
+        std::string tt = nodeTokenType(first);
+
+        if (tt == "notsy") {
+            if (node->children.size() < 2) return nullptr;
+            auto un = makeAstNode("UnaryOp", "not");
+            un->addChild(build_factor_ast(node->children[1]));
+            annotateFromParse(un, node);
+            return un;
+        }
+
+        if (tt == "lparent") {
+            for (Node* c : node->children) {
+                if (c->label == "<expression>") {
+                    return build_expression_ast(c);
+                }
+            }
+        }
+
+        if (first->label == "<variable>") {
+            return build_variable_ast(first);
+        }
+
+        if (first->label == "<procedure/function-call>") {
+            return build_proc_call_ast(first);
+        }
+
+        if (tt == "intcon" || tt == "realcon" || tt == "charcon" || tt == "string") {
+            std::string lit = nodeTokenValue(first);
+            if (tt == "string" || tt == "charcon") {
+                lit = "'" + lit + "'";
+            }
+            auto litNode = makeAstNode("Literal", lit);
+            annotateFromParse(litNode, first);
+            return litNode;
+        }
+
+        if (tt == "ident") {
+            auto v = makeAstNode("Var", nodeTokenValue(first));
+            annotateFromParse(v, first);
+            return v;
+        }
+
+        return build_factor_ast(first);
+    }
+
+    std::string tt = nodeTokenType(node);
+    if (tt == "intcon" || tt == "realcon" || tt == "charcon" || tt == "string") {
+        std::string lit = nodeTokenValue(node);
+        if (tt == "string" || tt == "charcon") {
+            lit = "'" + lit + "'";
+        }
+        auto litNode = makeAstNode("Literal", lit);
+        annotateFromParse(litNode, node);
+        return litNode;
+    }
+    if (tt == "ident") {
+        auto v = makeAstNode("Var", nodeTokenValue(node));
+        annotateFromParse(v, node);
+        return v;
+    }
+
+    return nullptr;
+}
+
+static std::shared_ptr<ASTNode> build_constant_ast(Node* node) {
+    if (!node) return nullptr;
+    if (node->label != "<constant>") return build_factor_ast(node);
+
+    if (node->children.empty()) return nullptr;
+    bool negative = false;
+    int ci = 0;
+    std::string firstType = nodeTokenType(node->children[ci]);
+    if (firstType == "plus") {
+        ci++;
+    } else if (firstType == "minus") {
+        negative = true;
+        ci++;
+    }
+    if (ci >= (int)node->children.size()) return nullptr;
+
+    Node* valNode = node->children[ci];
+    auto base = build_factor_ast(valNode);
+    if (!base) return nullptr;
+
+    if (negative) {
+        auto un = makeAstNode("UnaryOp", "-");
+        un->addChild(base);
+        return un;
+    }
+    return base;
+}
+
+static std::shared_ptr<ASTNode> build_term_ast(Node* node) {
+    if (!node) return nullptr;
+    if (node->label != "<term>") return build_factor_ast(node);
+
+    std::shared_ptr<ASTNode> current = nullptr;
+    std::string pendingOp;
+
+    for (Node* c : node->children) {
+        std::string tt;
+        if (c->getLabel() == "<multiplicative-operator>" && !c->children.empty()) {
+            tt = nodeTokenType(c->children[0]);
+        }
+
+        if (tt == "times" || tt == "rdiv" || tt == "idiv" || tt == "imod" || tt == "andsy") {
+            pendingOp = tt;
+            continue;
+        }
+
+        if (c->label == "<factor>") {
+            auto operand = build_factor_ast(c);
+            if (!current) {
+                current = operand;
+            } else if (!pendingOp.empty()) {
+                auto bin = makeAstNode("BinOp", opToText(pendingOp));
+                bin->addChild(current);
+                bin->addChild(operand);
+                annotateFromParse(bin, node);
+                current = bin;
+                pendingOp.clear();
+            }
+        }
+    }
+
+    return current;
+}
+
+static std::shared_ptr<ASTNode> build_simple_expression_ast(Node* node) {
+    if (!node) return nullptr;
+    if (node->label != "<simple-expression>") return build_term_ast(node);
+
+    std::shared_ptr<ASTNode> current = nullptr;
+    std::string pendingOp;
+    bool firstOperand = true;
+    bool unaryMinus = false;
+    bool unaryPlus = false;
+
+    for (Node* c : node->children) {
+        std::string tt;
+        if (c->getLabel() == "<additive-operator>" && !c->children.empty()) {
+            tt = nodeTokenType(c->children[0]);
+        }
+
+        if (tt == "plus" || tt == "minus" || tt == "orsy") {
+            if (firstOperand && !current) {
+                if (tt == "minus") unaryMinus = true;
+                if (tt == "plus") unaryPlus = true;
+            } else {
+                pendingOp = tt;
+            }
+            continue;
+        }
+
+        if (c->label == "<term>") {
+            auto operand = build_term_ast(c);
+            if (firstOperand) {
+                if (unaryMinus || unaryPlus) {
+                    auto un = makeAstNode("UnaryOp", unaryMinus ? "-" : "+");
+                    un->addChild(operand);
+                    current = un;
+                } else {
+                    current = operand;
+                }
+                firstOperand = false;
+            } else if (!pendingOp.empty()) {
+                auto bin = makeAstNode("BinOp", opToText(pendingOp));
+                bin->addChild(current);
+                bin->addChild(operand);
+                annotateFromParse(bin, node);
+                current = bin;
+                pendingOp.clear();
+            }
+        }
+    }
+
+    return current;
+}
+
+static std::shared_ptr<ASTNode> build_expression_ast(Node* node) {
+    if (!node) return nullptr;
+
+    if (node->label != "<expression>") return build_simple_expression_ast(node);
+
+    std::vector<Node*> simpleExprs;
+    std::string relOp;
+
+    for (Node* c : node->children) {
+        if (c->label == "<simple-expression>") {
+            simpleExprs.push_back(c);
+        } else if (c->label == "<relational-operator>") {
+            for (Node* rc : c->children) {
+                std::string rtt = nodeTokenType(rc);
+                if (rtt == "eql" || rtt == "neq" || rtt == "lss" || rtt == "leq" ||
+                    rtt == "gtr" || rtt == "geq") {
+                    relOp = rtt;
+                    break;
+                }
+            }
+        } else {
+            std::string tt = nodeTokenType(c);
+            if (tt == "eql" || tt == "neq" || tt == "lss" || tt == "leq" ||
+                tt == "gtr" || tt == "geq") {
+                relOp = tt;
+            }
+        }
+    }
+
+    if (simpleExprs.size() == 1) {
+        return build_simple_expression_ast(simpleExprs[0]);
+    }
+
+    if (simpleExprs.size() == 2 && !relOp.empty()) {
+        auto left = build_simple_expression_ast(simpleExprs[0]);
+        auto right = build_simple_expression_ast(simpleExprs[1]);
+        auto bin = makeAstNode("BinOp", opToText(relOp));
+        bin->addChild(left);
+        bin->addChild(right);
+        annotateFromParse(bin, node);
+        return bin;
+    }
+
+    if (!simpleExprs.empty()) return build_simple_expression_ast(simpleExprs[0]);
+    return nullptr;
+}
+
+static std::shared_ptr<ASTNode> build_proc_call_ast(Node* node) {
+    if (!node) return nullptr;
+    Node* identNode = findChildByTokenType(node, "ident");
+    std::string name = identNode ? nodeTokenValue(identNode) : "";
+    auto call = makeAstNode("ProcCall", name);
+    annotateFromParse(call, identNode ? identNode : node);
+
+    std::vector<Node*> args;
+    for (Node* c : node->children) {
+        if (c->label == "<parameter-list>" || c->label == "<actual-parameter-list>") {
+            for (Node* pc : c->children) {
+                if (pc->label == "<expression>" || pc->label == "<actual-parameter>") {
+                    args.push_back(pc);
+                }
+            }
+        }
+        if (c->label == "<expression>") args.push_back(c);
+    }
+
+    auto argsNode = makeAstNode("Args");
+    for (Node* arg : args) {
+        if (arg->label == "<actual-parameter>") {
+            for (Node* ac : arg->children) {
+                if (ac->label == "<expression>") {
+                    argsNode->addChild(build_expression_ast(ac));
+                }
+            }
+        } else {
+            argsNode->addChild(build_expression_ast(arg));
+        }
+    }
+    call->addChild(argsNode);
+    return call;
+}
+
+static std::shared_ptr<ASTNode> build_compound_statement_ast(Node* node, const SymbolTable& st) {
+    if (!node) return nullptr;
+    auto block = makeAstNode("Block");
+    block->block_index = st.currentBlock();
+    block->lev = st.currentLev();
+
+    for (Node* c : node->children) {
+        if (c->label == "<statement-list>") {
+            for (Node* sc : c->children) {
+                if (sc->label == "<statement>") {
+                    auto stmt = build_statement_ast(sc, st);
+                    if (stmt) block->addChild(stmt);
+                }
+            }
+        }
+    }
+
+    return block;
+}
+
+static std::shared_ptr<ASTNode> build_statement_ast(Node* node, const SymbolTable& st) {
+    if (!node || node->children.empty()) return nullptr;
+    Node* child = node->children[0];
+
+    if (child->label == "<assignment-statement>") {
+        Node* varNode = nullptr;
+        Node* exprNode = nullptr;
+        for (Node* c : child->children) {
+            if (c->label == "<variable>" && !varNode) varNode = c;
+            else if (c->label == "<expression>" && !exprNode) exprNode = c;
+        }
+        if (!varNode || !exprNode) return nullptr;
+        Node* nameNode = findChildByTokenType(varNode, "ident");
+        auto assign = makeAstNode("Assign", nameNode ? nodeTokenValue(nameNode) : "");
+        assign->addChild(build_variable_ast(varNode));
+        assign->addChild(build_expression_ast(exprNode));
+        return assign;
+    }
+
+    if (child->label == "<procedure/function-call>") {
+        return build_proc_call_ast(child);
+    }
+
+    if (child->label == "<compound-statement>") {
+        return build_compound_statement_ast(child, st);
+    }
+
+    if (child->label == "<if-statement>") {
+        auto ifNode = makeAstNode("If");
+        Node* condNode = nullptr;
+        Node* thenStmt = nullptr;
+        Node* elseStmt = nullptr;
+        for (Node* c : child->children) {
+            if (c->label == "<expression>" && !condNode) condNode = c;
+            else if (c->label == "<statement>" && !thenStmt) thenStmt = c;
+            else if (c->label == "<statement>" && thenStmt && !elseStmt) elseStmt = c;
+        }
+        auto cond = makeAstNode("Condition");
+        cond->addChild(build_expression_ast(condNode));
+        ifNode->addChild(cond);
+        auto thenNode = makeAstNode("Then");
+        thenNode->addChild(build_statement_ast(thenStmt, st));
+        ifNode->addChild(thenNode);
+        if (elseStmt) {
+            auto elseNode = makeAstNode("Else");
+            elseNode->addChild(build_statement_ast(elseStmt, st));
+            ifNode->addChild(elseNode);
+        }
+        return ifNode;
+    }
+
+    if (child->label == "<while-statement>") {
+        auto whileNode = makeAstNode("While");
+        Node* condNode = nullptr;
+        Node* bodyNode = nullptr;
+        for (Node* c : child->children) {
+            if (c->label == "<expression>" && !condNode) condNode = c;
+            else if (c->label == "<compound-statement>" && !bodyNode) bodyNode = c;
+        }
+        auto cond = makeAstNode("Condition");
+        cond->addChild(build_expression_ast(condNode));
+        whileNode->addChild(cond);
+        whileNode->addChild(build_compound_statement_ast(bodyNode, st));
+        return whileNode;
+    }
+
+    if (child->label == "<repeat-statement>") {
+        auto repeatNode = makeAstNode("Repeat");
+        Node* stmtListNode = nullptr;
+        Node* condNode = nullptr;
+        for (Node* c : child->children) {
+            if (c->label == "<statement-list>" && !stmtListNode) stmtListNode = c;
+            else if (c->label == "<expression>" && !condNode) condNode = c;
+        }
+        auto body = makeAstNode("Block");
+        if (stmtListNode) {
+            for (Node* sc : stmtListNode->children) {
+                if (sc->label == "<statement>") {
+                    body->addChild(build_statement_ast(sc, st));
+                }
+            }
+        }
+        repeatNode->addChild(body);
+        auto cond = makeAstNode("Condition");
+        cond->addChild(build_expression_ast(condNode));
+        repeatNode->addChild(cond);
+        return repeatNode;
+    }
+
+    if (child->label == "<for-statement>") {
+        auto forNode = makeAstNode("For");
+        Node* loopVarNode = nullptr;
+        Node* initExprNode = nullptr;
+        Node* finalExprNode = nullptr;
+        Node* compoundStmt = nullptr;
+        std::string direction;
+        int exprCount = 0;
+        for (Node* c : child->children) {
+            if (nodeTokenType(c) == "ident" && !loopVarNode) loopVarNode = c;
+            else if (c->label == "<expression>" && exprCount == 0) { initExprNode = c; exprCount++; }
+            else if (c->label == "<expression>" && exprCount == 1) { finalExprNode = c; exprCount++; }
+            else if (c->label == "<compound-statement>" && !compoundStmt) compoundStmt = c;
+            else if (nodeTokenType(c) == "tosy") direction = "to";
+            else if (nodeTokenType(c) == "downtosy") direction = "downto";
+        }
+        if (loopVarNode && initExprNode) {
+            auto assign = makeAstNode("Assign", nodeTokenValue(loopVarNode));
+            auto target = makeAstNode("Var", nodeTokenValue(loopVarNode));
+            annotateFromParse(target, loopVarNode);
+            assign->addChild(target);
+            assign->addChild(build_expression_ast(initExprNode));
+            forNode->addChild(assign);
+        }
+        if (finalExprNode) {
+            auto limit = makeAstNode("Limit", direction);
+            limit->addChild(build_expression_ast(finalExprNode));
+            forNode->addChild(limit);
+        }
+        forNode->addChild(build_compound_statement_ast(compoundStmt, st));
+        return forNode;
+    }
+
+    if (child->label == "<case-statement>") {
+        auto caseNode = makeAstNode("Case");
+        Node* exprNode = nullptr;
+        Node* caseListNode = nullptr;
+        for (Node* c : child->children) {
+            if (c->label == "<expression>" && !exprNode) exprNode = c;
+            else if (c->label == "<case-list>" && !caseListNode) caseListNode = c;
+        }
+        auto exprAst = makeAstNode("Expression");
+        exprAst->addChild(build_expression_ast(exprNode));
+        caseNode->addChild(exprAst);
+        if (caseListNode) {
+            for (Node* cb : caseListNode->children) {
+                if (cb->label != "<case-branch>") continue;
+                auto block = makeAstNode("CaseBlock");
+                Node* constListNode = nullptr;
+                Node* stmtNode = nullptr;
+                for (Node* c : cb->children) {
+                    if (c->label == "<constant-list>" && !constListNode) constListNode = c;
+                    else if (c->label == "<statement>" && !stmtNode) stmtNode = c;
+                }
+                if (constListNode) {
+                    for (Node* cc : constListNode->children) {
+                        if (cc->label == "<constant>") {
+                            auto lit = build_constant_ast(cc);
+                            block->addChild(lit);
+                        }
+                    }
+                }
+                if (stmtNode) {
+                    block->addChild(build_statement_ast(stmtNode, st));
+                }
+                caseNode->addChild(block);
+            }
+        }
+        return caseNode;
+    }
+
+    return nullptr;
+}
+
 void analyze(Node* root, SemanticContext& ctx) {
     if (!root) return;
+    resetAstContext();
     visit_program(root, ctx);
 }
 
@@ -396,7 +963,8 @@ void visit_const_declaration(Node* node, SemanticContext& ctx) {
 
         if (i >= n) break;
 
-        TypeInfo ti = visit_constant_value(node->children[i], ctx);
+        Node* valueNode = node->children[i];
+        TypeInfo ti = visit_constant_value(valueNode, ctx);
         i++;
 
         if (i < n && nodeTokenType(node->children[i]) == "semicolon") i++;
@@ -409,6 +977,14 @@ void visit_const_declaration(Node* node, SemanticContext& ctx) {
         int adr = (ti.baseType == TypeCode::INTEGER) ? ti.low : 0;
         int idx = ctx.st.insert(name, ObjClass::CONSTANT, ti.baseType, ti.ref, 1, adr);
         identNode->annotate((int)ti.baseType, idx, ctx.st.currentLev());
+
+        if (g_astCtx.declarations) {
+            auto decl = makeAstNode("ConstDecl", name);
+            annotateFromParse(decl, identNode);
+            auto valAst = build_constant_ast(valueNode);
+            if (valAst) decl->addChild(valAst);
+            g_astCtx.declarations->addChild(decl);
+        }
     }
 
     node->annotate((int)TypeCode::NOTYPE, -1, ctx.st.currentLev());
@@ -460,6 +1036,12 @@ void visit_type_declaration(Node* node, SemanticContext& ctx) {
 
         int idx = ctx.st.insert(name, ObjClass::TYPE, ti.baseType, ti.ref);
         identNode->annotate((int)ti.baseType, idx, ctx.st.currentLev());
+
+        if (g_astCtx.declarations) {
+            auto decl = makeAstNode("TypeDecl", name);
+            annotateFromParse(decl, identNode);
+            g_astCtx.declarations->addChild(decl);
+        }
     }
 }
 
@@ -515,6 +1097,12 @@ void visit_var_declaration(Node* node, SemanticContext& ctx) {
             } else {
                 int idx = ctx.st.insert(names[ni], ObjClass::VARIABLE, ti.baseType, ti.ref);
                 identNodes[ni]->annotate((int)ti.baseType, idx, ctx.st.currentLev());
+
+                if (g_astCtx.declarations) {
+                    auto decl = makeAstNode("VarDecl", names[ni]);
+                    annotateFromParse(decl, identNodes[ni]);
+                    g_astCtx.declarations->addChild(decl);
+                }
             }
         }
     }
@@ -571,6 +1159,7 @@ void visit_procedure_declaration(Node* node, SemanticContext& ctx) {
     std::string procName = "";
     Node* fplNode = nullptr, *blockNode = nullptr;
     bool foundFirst = false;
+    std::shared_ptr<ASTNode> procAst;
     for (Node* c : node->children) {
         if (nodeTokenType(c) == "ident" && !foundFirst) { procName = nodeTokenValue(c); foundFirst = true; }
         else if (c->label == "<formal-parameter-list>") fplNode = c;
@@ -580,13 +1169,25 @@ void visit_procedure_declaration(Node* node, SemanticContext& ctx) {
     if (ctx.st.lookupCurrentBlock(procName) >= 0)
         ctx.errors.add("Prosedur '" + procName + "' sudah dideklarasikan dalam scope ini");
     int procIdx = ctx.st.insert(procName, ObjClass::PROCEDURE, TypeCode::NOTYPE);
+
+    if (g_astCtx.declarations) {
+        procAst = makeAstNode("ProcedureDecl", procName);
+        g_astCtx.declarations->addChild(procAst);
+    }
+
     int btabIdx = ctx.st.enter_block();
     ctx.st.tab[procIdx].ref = btabIdx;
     if (fplNode)   visit_formal_parameter_list(fplNode, ctx, btabIdx);
-    if (blockNode) visit_block(blockNode, ctx);
+    if (blockNode) {
+        if (procAst) g_astCtx.pendingBlockParent = procAst;
+        visit_block(blockNode, ctx);
+    }
     ctx.st.exit_block();
     Node* identNode = findChildByTokenType(node, "ident");
-    if (identNode) identNode->annotate((int)TypeCode::NOTYPE, procIdx, ctx.st.currentLev());
+    if (identNode) {
+        identNode->annotate((int)TypeCode::NOTYPE, procIdx, ctx.st.currentLev());
+        if (procAst) annotateFromParse(procAst, identNode);
+    }
 }
 
 void visit_function_declaration(Node* node, SemanticContext& ctx) {
@@ -594,6 +1195,7 @@ void visit_function_declaration(Node* node, SemanticContext& ctx) {
     std::string funcName = "", retTypeName = "";
     Node* fplNode = nullptr, *blockNode = nullptr, *retTypeNode = nullptr;
     bool foundFirst = false;
+    std::shared_ptr<ASTNode> funcAst;
     for (Node* c : node->children) {
         if (nodeTokenType(c) == "ident") {
             if (!foundFirst) { funcName = nodeTokenValue(c); foundFirst = true; }
@@ -615,13 +1217,25 @@ void visit_function_declaration(Node* node, SemanticContext& ctx) {
     if (ctx.st.lookupCurrentBlock(funcName) >= 0)
         ctx.errors.add("Fungsi '" + funcName + "' sudah dideklarasikan dalam scope ini");
     int funcIdx = ctx.st.insert(funcName, ObjClass::FUNCTION, retType.baseType, retType.ref);
+
+    if (g_astCtx.declarations) {
+        funcAst = makeAstNode("FunctionDecl", funcName);
+        g_astCtx.declarations->addChild(funcAst);
+    }
+
     int btabIdx = ctx.st.enter_block();
     ctx.st.tab[funcIdx].ref = btabIdx;
     if (fplNode)   visit_formal_parameter_list(fplNode, ctx, btabIdx);
-    if (blockNode) visit_block(blockNode, ctx);
+    if (blockNode) {
+        if (funcAst) g_astCtx.pendingBlockParent = funcAst;
+        visit_block(blockNode, ctx);
+    }
     ctx.st.exit_block();
     Node* identNode = findChildByTokenType(node, "ident");
-    if (identNode) identNode->annotate((int)retType.baseType, funcIdx, ctx.st.currentLev());
+    if (identNode) {
+        identNode->annotate((int)retType.baseType, funcIdx, ctx.st.currentLev());
+        if (funcAst) annotateFromParse(funcAst, identNode);
+    }
 }
 
 void visit_subprogram_declaration(Node* node, SemanticContext& ctx) {
@@ -646,7 +1260,14 @@ void visit_block(Node* node, SemanticContext& ctx) {
     if (!node) return;
     for (Node* c : node->children) {
         if (c->label == "<declaration-part>")        visit_declaration_part(c, ctx);
-        else if (c->label == "<compound-statement>") visit_compound_statement(c, ctx);
+        else if (c->label == "<compound-statement>") {
+            auto prevPending = g_astCtx.pendingBlockParent;
+            if (!g_astCtx.pendingBlockParent) {
+                g_astCtx.pendingBlockParent = selectAttachParent();
+            }
+            visit_compound_statement(c, ctx);
+            g_astCtx.pendingBlockParent = prevPending;
+        }
     }
 }
 
@@ -657,6 +1278,7 @@ void visit_program_header(Node* node, SemanticContext& ctx) {
             std::string name = nodeTokenValue(c);
             int idx = ctx.st.insert(name, ObjClass::PROGRAM, TypeCode::NOTYPE);
             c->annotate((int)TypeCode::NOTYPE, idx, ctx.st.currentLev());
+            if (g_astRoot) annotateFromParse(g_astRoot, c);
             break;
         }
     }
@@ -666,14 +1288,30 @@ void visit_program_header(Node* node, SemanticContext& ctx) {
 void visit_program(Node* node, SemanticContext& ctx) {
     if (!node) return;
 
-    // std::string programName = "program";
-    // Node* declPartNode = nullptr;
-    // Node* compoundStmtNode = nullptr;
+    std::string programName = "program";
+    for (Node* c : node->children) {
+        if (c->label == "<program-header>") {
+            Node* idNode = findChildByTokenType(c, "ident");
+            if (idNode) programName = nodeTokenValue(idNode);
+            break;
+        }
+    }
+
+    auto programAst = makeAstNode("Program", programName);
+    g_astRoot = programAst;
+
+    g_astCtx.declarations = makeAstNode("Declarations");
+    programAst->addChild(g_astCtx.declarations);
 
     for (Node* c : node->children) {
         if (c->label == "<program-header>")          visit_program_header(c, ctx);
         else if (c->label == "<declaration-part>")   visit_declaration_part(c, ctx);
-        else if (c->label == "<compound-statement>") visit_compound_statement(c, ctx);
+        else if (c->label == "<compound-statement>") {
+            auto prevPending = g_astCtx.pendingBlockParent;
+            g_astCtx.pendingBlockParent = programAst;
+            visit_compound_statement(c, ctx);
+            g_astCtx.pendingBlockParent = prevPending;
+        }
     }
     node->annotate((int)TypeCode::NOTYPE, -1, 0);
 }
@@ -1398,12 +2036,24 @@ void visit_compound_statement(Node* node, SemanticContext& ctx) {
     // std::cout << "masuk compound statement" << std::endl;
     if (!node) return;
 
+    auto blockAst = makeAstNode("Block");
+    blockAst->block_index = ctx.st.currentBlock();
+    blockAst->lev = ctx.st.currentLev();
+    attachAstNode(blockAst);
+
+    auto prevPending = g_astCtx.pendingBlockParent;
+    g_astCtx.pendingBlockParent.reset();
+    g_astCtx.blockStack.push_back(blockAst);
+
     // anak: beginsy <statement-list> endsy
     for (Node* c : node->children) {
         if (c->label == "<statement-list>") {
             visit_statement_list(c, ctx);
         }
     }
+
+    if (!g_astCtx.blockStack.empty()) g_astCtx.blockStack.pop_back();
+    g_astCtx.pendingBlockParent = prevPending;
 
     node->annotate((int)TypeCode::NOTYPE, -1, ctx.st.currentLev());
 }
@@ -1450,8 +2100,13 @@ void visit_statement(Node* node, SemanticContext& ctx) {
         visit_case_statement(child, ctx);
     } else if (child->label == "<procedure/function-call>") {
         visit_procedure_function_call(child, ctx);
+        auto callAst = build_proc_call_ast(child);
+        if (callAst) attachAstNode(callAst);
     } else if (child->label == "<compound-statement>") {
+        auto prevPending = g_astCtx.pendingBlockParent;
+        g_astCtx.pendingBlockParent = g_astCtx.attachOverride ? g_astCtx.attachOverride : currentBlockAst();
         visit_compound_statement(child, ctx);
+        g_astCtx.pendingBlockParent = prevPending;
     }
 
     node->annotate((int)TypeCode::NOTYPE, -1, ctx.st.currentLev());
@@ -1486,6 +2141,12 @@ void visit_assignment_statement(Node* node, SemanticContext& ctx) {
                        ", rhs adalah " + rhsType.toString());
     }
 
+    Node* nameNode = findChildByTokenType(varNode, "ident");
+    auto assignAst = makeAstNode("Assign", nameNode ? nodeTokenValue(nameNode) : "");
+    assignAst->addChild(build_variable_ast(varNode));
+    assignAst->addChild(build_expression_ast(exprNode));
+    attachAstNode(assignAst);
+
     node->annotate((int)TypeCode::NOTYPE, -1, ctx.st.currentLev());
 }
 
@@ -1518,11 +2179,28 @@ void visit_if_statement(Node* node, SemanticContext& ctx) {
         ctx.errors.add("Kondisi if harus bertipe Boolean, ditemukan: " + condType.toString());
     }
 
+    auto ifAst = makeAstNode("If");
+    auto condAst = makeAstNode("Condition");
+    condAst->addChild(build_expression_ast(condNode));
+    ifAst->addChild(condAst);
+
+    auto thenAst = makeAstNode("Then");
+    ifAst->addChild(thenAst);
+
+    auto prevOverride = g_astCtx.attachOverride;
+    g_astCtx.attachOverride = thenAst;
     visit_statement(thenStmt, ctx);
+    g_astCtx.attachOverride = prevOverride;
 
     if (elseStmt) {
+        auto elseAst = makeAstNode("Else");
+        ifAst->addChild(elseAst);
+        g_astCtx.attachOverride = elseAst;
         visit_statement(elseStmt, ctx);
+        g_astCtx.attachOverride = prevOverride;
     }
+
+    attachAstNode(ifAst);
 
     node->annotate((int)TypeCode::NOTYPE, -1, ctx.st.currentLev());
 }
@@ -1553,7 +2231,17 @@ void visit_while_statement(Node* node, SemanticContext& ctx) {
         ctx.errors.add("Kondisi while harus bertipe Boolean, ditemukan: " + condType.toString());
     }
 
+    auto whileAst = makeAstNode("While");
+    auto condAst = makeAstNode("Condition");
+    condAst->addChild(build_expression_ast(condNode));
+    whileAst->addChild(condAst);
+
+    auto prevPending = g_astCtx.pendingBlockParent;
+    g_astCtx.pendingBlockParent = whileAst;
     visit_compound_statement(compoundStmt, ctx);
+    g_astCtx.pendingBlockParent = prevPending;
+
+    attachAstNode(whileAst);
 
     node->annotate((int)TypeCode::NOTYPE, -1, ctx.st.currentLev());
 }
@@ -1578,13 +2266,28 @@ void visit_repeat_statement(Node* node, SemanticContext& ctx) {
         return;
     }
 
+    auto repeatAst = makeAstNode("Repeat");
+    auto bodyAst = makeAstNode("Block");
+    bodyAst->block_index = ctx.st.currentBlock();
+    bodyAst->lev = ctx.st.currentLev();
+    repeatAst->addChild(bodyAst);
+
+    auto prevOverride = g_astCtx.attachOverride;
+    g_astCtx.attachOverride = bodyAst;
     visit_statement_list(stmtListNode, ctx);
+    g_astCtx.attachOverride = prevOverride;
 
     TypeInfo condType = visit_expression(condNode, ctx);
 
     if (condType.baseType != TypeCode::BOOLEAN) {
         ctx.errors.add("Kondisi until harus bertipe Boolean, ditemukan: " + condType.toString());
     }
+
+    auto condAst = makeAstNode("Condition");
+    condAst->addChild(build_expression_ast(condNode));
+    repeatAst->addChild(condAst);
+
+    attachAstNode(repeatAst);
 
     node->annotate((int)TypeCode::NOTYPE, -1, ctx.st.currentLev());
 }
@@ -1654,7 +2357,25 @@ void visit_for_statement(Node* node, SemanticContext& ctx) {
                        ", final adalah " + finalType.toString());
     }
 
+    auto forAst = makeAstNode("For");
+
+    auto initAssign = makeAstNode("Assign", loopVarName);
+    auto targetVar = makeAstNode("Var", loopVarName);
+    annotateFromParse(targetVar, loopVarNode);
+    initAssign->addChild(targetVar);
+    initAssign->addChild(build_expression_ast(initExprNode));
+    forAst->addChild(initAssign);
+
+    auto limitAst = makeAstNode("Limit", direction);
+    limitAst->addChild(build_expression_ast(finalExprNode));
+    forAst->addChild(limitAst);
+
+    auto prevPending = g_astCtx.pendingBlockParent;
+    g_astCtx.pendingBlockParent = forAst;
     visit_compound_statement(compoundStmt, ctx);
+    g_astCtx.pendingBlockParent = prevPending;
+
+    attachAstNode(forAst);
 
     node->annotate((int)TypeCode::NOTYPE, -1, ctx.st.currentLev());
 }
@@ -1685,7 +2406,17 @@ void visit_case_statement(Node* node, SemanticContext& ctx) {
         ctx.errors.add("Case expression harus bertipe ordinal, ditemukan: " + exprType.toString());
     }
 
+    auto caseAst = makeAstNode("Case");
+    auto exprAst = makeAstNode("Expression");
+    exprAst->addChild(build_expression_ast(exprNode));
+    caseAst->addChild(exprAst);
+
+    auto prevOverride = g_astCtx.attachOverride;
+    g_astCtx.attachOverride = caseAst;
     visit_case_list(caseListNode, ctx, exprType);
+    g_astCtx.attachOverride = prevOverride;
+
+    attachAstNode(caseAst);
 
     node->annotate((int)TypeCode::NOTYPE, -1, ctx.st.currentLev());
 }
@@ -1736,7 +2467,21 @@ void visit_case_branch(Node* node, SemanticContext& ctx, const TypeInfo& exprTyp
         }
     }
 
+    auto blockAst = makeAstNode("CaseBlock");
+    if (constListNode) {
+        for (Node* c : constListNode->children) {
+            if (c->label == "<constant>") {
+                blockAst->addChild(build_constant_ast(c));
+            }
+        }
+    }
+
+    auto prevOverride = g_astCtx.attachOverride;
+    g_astCtx.attachOverride = blockAst;
     visit_statement(stmtNode, ctx);
+    g_astCtx.attachOverride = prevOverride;
+
+    attachAstNode(blockAst);
 
     node->annotate((int)TypeCode::NOTYPE, -1, ctx.st.currentLev());
 }

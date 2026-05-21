@@ -43,8 +43,10 @@ int main () {
             PRINT_SYMBOL_TABLE(ctx.st);
             SAVE_SYMBOL_TABLE(ctx.st);
             // Print dan save AST (format baru: indentation-based, tanpa box-drawing)
-            PRINT_AST(root, 0, ctx.st);
-            SAVE_AST(root, 0, ctx.st);
+            // PRINT_AST(root, 0, ctx.st);
+            // SAVE_AST(root, 0, ctx.st);
+            PRINT_AST_NEW();
+            SAVE_AST_NEW();
         }
 
         delete root;

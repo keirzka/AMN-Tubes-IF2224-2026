@@ -1,6 +1,7 @@
 #include "writer.hpp"
 #include <iomanip>
 #include <algorithm>
+#include <functional>
 
 static std::string toLower(const std::string& str) {
     std::string result = str;
@@ -211,60 +212,27 @@ void SAVE_SYMBOL_TABLE(const SymbolTable& st) {
     outputStream.close();
 }
 
-void PRINT_AST(Node* root, int depth, const SymbolTable& st) {
-    if (!root) return;
+// void PRINT_AST(Node* root, int depth, const SymbolTable& st) {
+//     if (!root) return;
 
-    cout << string(depth*4, ' ');
-    cout << root->getLabel();
+//     cout << string(depth*4, ' ');
+//     cout << root->getLabel();
 
-    if (root->isAnnotated()) {
-        cout << " [type=" << typeCodeToString((TypeCode)root->sem_type)
-             << ", ref=" << root->sem_tab_index
-             << ", lev=" << root->sem_lev << "]";
-    }
-
-    cout << endl;
-
-    for (auto child : root->children) {
-        PRINT_AST(child, depth + 1, st);
-    }
-}
-
-void SAVE_AST(Node* root, int depth, const SymbolTable& st) {
-    cout << "Masukkan nama file untuk menyimpan decorated AST : ";
-    string fileName;
-    getline(cin, fileName);
-
-    ofstream outputStream("test/milestone-3/" + fileName + ".txt");
-    if (!outputStream.is_open()) {
-        cerr << "Error: Tidak dapat membuka file untuk penulisan" << endl;
-        return;
-    }
-
-    SAVE_AST_RECURSIVE(root, depth, outputStream, st);
-
-    outputStream << "\n" << string(80, '=') << endl;
-    outputStream.close();
-}
-
-// New AST functions using global g_astRoot
-// extern std::shared_ptr<ProgramNode> g_astRoot;
-
-// void PRINT_AST_NEW() {
-//     if (!g_astRoot) {
-//         cout << "AST tidak tersedia" << endl;
-//         return;
+//     if (root->isAnnotated()) {
+//         cout << " [type=" << typeCodeToString((TypeCode)root->sem_type)
+//              << ", ref=" << root->sem_tab_index
+//              << ", lev=" << root->sem_lev << "]";
 //     }
-//     g_astRoot->print(0, false, false);
+
+//     cout << endl;
+
+//     for (auto child : root->children) {
+//         PRINT_AST(child, depth + 1, st);
+//     }
 // }
 
-// void SAVE_AST_NEW() {
-//     if (!g_astRoot) {
-//         cout << "AST tidak tersedia" << endl;
-//         return;
-//     }
-
-//     cout << "Masukkan nama file untuk menyimpan AST : ";
+// void SAVE_AST(Node* root, int depth, const SymbolTable& st) {
+//     cout << "Masukkan nama file untuk menyimpan decorated AST : ";
 //     string fileName;
 //     getline(cin, fileName);
 
@@ -274,30 +242,218 @@ void SAVE_AST(Node* root, int depth, const SymbolTable& st) {
 //         return;
 //     }
 
-//     // Save current cout buffer
-//     std::streambuf* old = cout.rdbuf(outputStream.rdbuf());
-//     g_astRoot->print(0, false, false);
-//     cout.rdbuf(old);
+//     SAVE_AST_RECURSIVE(root, depth, outputStream, st);
 
 //     outputStream << "\n" << string(80, '=') << endl;
 //     outputStream.close();
 // }
 
-void SAVE_AST_RECURSIVE(Node* root, int depth, ofstream& os, const SymbolTable& st) {
-    if (!root) return;
+// New AST functions 
 
-    os << string(depth*4, ' ');
-    os << root->getLabel();
-
-    if (root->isAnnotated()) {
-        os << " [type=" << typeCodeToString((TypeCode)root->sem_type)
-           << ", ref=" << root->sem_tab_index
-           << ", lev=" << root->sem_lev << "]";
+void PRINT_AST_NEW() {
+    if (!g_astRoot) {
+        cout << "AST root kosong" << endl;
+        return;
     }
 
-    os << endl;
+    auto formatNode = [](const std::shared_ptr<ASTNode>& node) -> std::string {
+        std::ostringstream oss;
+        const std::string& k = node->kind;
 
-    for (auto child : root->children) {
-        SAVE_AST_RECURSIVE(child, depth + 1, os, st);
-    }
+        if (k == "Program") {
+            oss << "ProgramNode(name: '" << node->text << "')";
+        } else if (k == "Declarations") {
+            oss << "Declarations";
+        } else if (k == "ConstDecl") {
+            oss << "ConstDecl(name: '" << node->text << "')";
+        } else if (k == "TypeDecl") {
+            oss << "TypeDecl(name: '" << node->text << "')";
+        } else if (k == "VarDecl") {
+            oss << "VarDecl(name: '" << node->text << "')";
+        } else if (k == "ProcedureDecl") {
+            oss << "ProcedureDecl(name: '" << node->text << "')";
+        } else if (k == "FunctionDecl") {
+            oss << "FunctionDecl(name: '" << node->text << "')";
+        } else if (k == "Block") {
+            oss << "Block";
+        } else if (k == "Assign") {
+            oss << "Assign('" << node->text << "' := ...)";
+        } else if (k == "BinOp") {
+            oss << "BinOp '" << node->text << "'";
+        } else if (k == "UnaryOp") {
+            oss << "UnaryOp '" << node->text << "'";
+        } else if (k == "Var") {
+            oss << "Var('" << node->text << "')";
+        } else if (k == "Literal") {
+            oss << "Literal(" << node->text << ")";
+        } else if (k == "ProcCall") {
+            oss << "procedure/function-call-statement";
+            if (!node->text.empty()) {
+                oss << " name: " << node->text;
+            }
+        } else {
+            oss << k;
+            if (!node->text.empty()) {
+                oss << "(" << node->text << ")";
+            }
+        }
+
+        bool hasAny = false;
+        std::ostringstream ann;
+        if (node->block_index >= 0) {
+            ann << "block_index:" << node->block_index;
+            hasAny = true;
+        }
+        if (node->tab_index >= 0) {
+            if (hasAny) ann << ", ";
+            ann << "tab_index:" << node->tab_index;
+            hasAny = true;
+        }
+        if (node->type >= 0) {
+            if (hasAny) ann << ", ";
+            ann << "type:" << typeCodeToString((TypeCode)node->type);
+            hasAny = true;
+        }
+        if (node->lev >= 0) {
+            if (hasAny) ann << ", ";
+            ann << "lev:" << node->lev;
+            hasAny = true;
+        }
+
+        if (hasAny) {
+            oss << " -> " << ann.str();
+        }
+
+        return oss.str();
+    };
+
+    std::function<void(const std::shared_ptr<ASTNode>&, int)> printRec;
+    printRec = [&](const std::shared_ptr<ASTNode>& node, int depth) {
+        if (!node) return;
+        cout << string(depth * 4, ' ') << formatNode(node) << endl;
+        for (const auto& child : node->children) {
+            printRec(child, depth + 1);
+        }
+    };
+
+    printRec(g_astRoot, 0);
 }
+
+void SAVE_AST_NEW() {
+    if (!g_astRoot) {
+        cout << "AST root kosong" << endl;
+        return;
+    }
+
+    cout << "Masukkan nama file untuk menyimpan AST : ";
+    string fileName;
+    getline(cin, fileName);
+
+    ofstream outputStream("test/milestone-3/" + fileName + ".txt");
+    if (!outputStream.is_open()) {
+        cerr << "Error: Tidak dapat membuka file untuk penulisan" << endl;
+        return;
+    }
+
+    auto formatNode = [](const std::shared_ptr<ASTNode>& node) -> std::string {
+        std::ostringstream oss;
+        const std::string& k = node->kind;
+
+        if (k == "Program") {
+            oss << "ProgramNode(name: '" << node->text << "')";
+        } else if (k == "Declarations") {
+            oss << "Declarations";
+        } else if (k == "ConstDecl") {
+            oss << "ConstDecl(name: '" << node->text << "')";
+        } else if (k == "TypeDecl") {
+            oss << "TypeDecl(name: '" << node->text << "')";
+        } else if (k == "VarDecl") {
+            oss << "VarDecl(name: '" << node->text << "')";
+        } else if (k == "ProcedureDecl") {
+            oss << "ProcedureDecl(name: '" << node->text << "')";
+        } else if (k == "FunctionDecl") {
+            oss << "FunctionDecl(name: '" << node->text << "')";
+        } else if (k == "Block") {
+            oss << "Block";
+        } else if (k == "Assign") {
+            oss << "Assign('" << node->text << "' := ...)";
+        } else if (k == "BinOp") {
+            oss << "BinOp '" << node->text << "'";
+        } else if (k == "UnaryOp") {
+            oss << "UnaryOp '" << node->text << "'";
+        } else if (k == "Var") {
+            oss << "Var('" << node->text << "')";
+        } else if (k == "Literal") {
+            oss << "Literal(" << node->text << ")";
+        } else if (k == "ProcCall") {
+            oss << "procedure/function-call-statement";
+            if (!node->text.empty()) {
+                oss << " name: " << node->text;
+            }
+        } else {
+            oss << k;
+            if (!node->text.empty()) {
+                oss << "(" << node->text << ")";
+            }
+        }
+
+        bool hasAny = false;
+        std::ostringstream ann;
+        if (node->block_index >= 0) {
+            ann << "block_index:" << node->block_index;
+            hasAny = true;
+        }
+        if (node->tab_index >= 0) {
+            if (hasAny) ann << ", ";
+            ann << "tab_index:" << node->tab_index;
+            hasAny = true;
+        }
+        if (node->type >= 0) {
+            if (hasAny) ann << ", ";
+            ann << "type:" << typeCodeToString((TypeCode)node->type);
+            hasAny = true;
+        }
+        if (node->lev >= 0) {
+            if (hasAny) ann << ", ";
+            ann << "lev:" << node->lev;
+            hasAny = true;
+        }
+
+        if (hasAny) {
+            oss << " -> " << ann.str();
+        }
+
+        return oss.str();
+    };
+
+    std::function<void(const std::shared_ptr<ASTNode>&, int, std::ofstream&)> saveRec;
+    saveRec = [&](const std::shared_ptr<ASTNode>& node, int depth, std::ofstream& os) {
+        if (!node) return;
+        os << string(depth * 4, ' ') << formatNode(node) << endl;
+        for (const auto& child : node->children) {
+            saveRec(child, depth + 1, os);
+        }
+    };
+
+    saveRec(g_astRoot, 0, outputStream);
+    outputStream.close();
+}
+
+// void SAVE_AST_RECURSIVE(Node* root, int depth, ofstream& os, const SymbolTable& st) {
+//     if (!root) return;
+
+//     os << string(depth*4, ' ');
+//     os << root->getLabel();
+
+//     if (root->isAnnotated()) {
+//         os << " [type=" << typeCodeToString((TypeCode)root->sem_type)
+//            << ", ref=" << root->sem_tab_index
+//            << ", lev=" << root->sem_lev << "]";
+//     }
+
+//     os << endl;
+
+//     for (auto child : root->children) {
+//         SAVE_AST_RECURSIVE(child, depth + 1, os, st);
+//     }
+// }
