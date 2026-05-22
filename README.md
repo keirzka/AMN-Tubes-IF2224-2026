@@ -11,18 +11,34 @@ Pada milestone 1, program ini adalah **Lexical Analyzer (Lexer)** untuk bahasa p
 
 Kemudian pada milestone 2, program dilanjutkan dengan implementasi **Syntax Analyzer (Parser)**. Pada bagian ini, program akan menerima hasil list token yang didapat dari lexer. Token-token tersebut kemudian akan dibangun menjadi sebuah parse tree. Pada bagian ini juga, program sudah bisa menganalisi beberapa error syntaxis, seperti penulisan nama variabel yang menggunakan simbol aneh ('*', '&', dan lain lain).
 
+Selanjutnya pada milestone 3, program dikembangkan dengan implementasi Semantic Analyzer. Pada tahap ini, parse tree yang dihasilkan parser akan dianalisis lebih lanjut untuk memastikan program benar secara semantik. Semantic analyzer melakukan traversal AST menggunakan visitor pattern dan melakukan berbagai pengecekan seperti declaration checking, scope checking, type checking, assignment compatibility, validasi parameter prosedur/fungsi, serta validasi akses array dan record. Selain itu, milestone ini juga menghasilkan Decorated AST dan Symbol Table yang berisi informasi identifier, tipe data, scope, dan anotasi semantik lainnya sebagai persiapan menuju tahap compiler berikutnya.
+
 ### Fitur Utama:
-- **Pembacaan File**: Membaca file input dari folder `test/milestone-1/`
-- **Tokenisasi**: Mengidentifikasi dan mengklasifikasikan token termasuk:
-  - **Keywords**: `program`, `var`, `const`, `begin`, `end`, `if`, `while`, `for`, dll
-  - **Identifiers**: Nama variabel dan fungsi (format: `ident (nama)`)
-  - **Konstanta Numerik**: Integer (format: `intcon (nilai)`) dan Real (format: `realcon (nilai)`)
-  - **String dan Char**: String (format: `string (nilai)`) dan karakter (format: `charcon (nilai)`)
-  - **Operator**: Aritmatika (`plus`, `minus`, `times`, `idiv`, `rdiv`, `imod`), Logika (`and`, `or`, `not`), dan Relasional (`eql`, `neq`, `lss`, `leq`, `gtr`, `geq`)
-  - **Delimiter**: Tanda kurung, kurung siku, koma, titik koma, kolon, dll
-- **Penanganan Komentar**: Mendukung komentar dengan format `{ ... }` dan `(* ... *)`
-- **Escape Sequence**: Mendukung karakter escape dalam string dengan `''`
-- **Output**: Menampilkan token ke terminal dan menyimpan hasil ke file output
+- **Lexical Analysis**
+  - Tokenisasi source code menjadi token-token bahasa Arion
+  - Mendukung keyword, identifier, operator, literal, delimiter, dan komentar
+  - Mendukung escape sequence pada string
+    
+- **Syntax Analysis**
+  - Recursive Descent Parser untuk membangun parse tree
+  - Mendukung parsing declaration, expression, statement, procedure, function, array, dan record
+  - Menampilkan parse tree hasil parsing
+  - Menangani syntax error pada source code
+    
+- **Semantic Analysis**
+  - Traversal AST menggunakan visitor pattern dan DFS
+  - Type checking dan assignment compatibility
+  - Scope checking menggunakan lexical scoping
+  - Declaration checking melalui symbol table
+  - Validasi parameter prosedur dan fungsi
+  - Mendukung array, record, subrange, dan control flow
+  - Menghasilkan Decorated AST
+  - Menghasilkan Symbol Table (tab, btab, dan atab)
+  - Semantic error handling tanpa menghentikan program
+
+- **Output**
+  - Menampilkan hasil lexer, parser, semantic analysis, symbol table, dan Decorated AST ke terminal
+  - Menyimpan hasil output ke file
 
 ## Requirements
 
@@ -59,11 +75,16 @@ atau jalankan langsung:
 ```
 
 ### 4. Alur Program
-1. Program akan meminta nama file input (file harus berada di folder `test/milestone-1/`)
-2. Program membaca dan menganalisis file karakter per karakter
-3. Token yang dikenali ditampilkan ke terminal
-4. Program meminta nama file untuk menyimpan hasil token
-5. Hasil disimpan ke file `test/milestone-1/[nama].txt`
+1. Program meminta nama file input
+2. Lexer melakukan tokenisasi source code
+3. Parser membangun parse tree dari token hasil lexer
+4. Semantic analyzer melakukan traversal AST dan validasi semantik
+5. Jika terdapat semantic error, seluruh error ditampilkan sekaligus
+6. Jika berhasil, program mencetak:
+   - Parse Tree / Decorated AST
+   - Symbol Table
+   - Hasil semantic analysis
+7. Hasil output disimpan ke file pada folder milestone terkait
 
 ### 5. Contoh Penggunaan
 **Input:** File bernama `input-1.txt`
@@ -194,6 +215,8 @@ make help    # Menampilkan informasi bantuan
 - Mengerjakan implementasi program lexer
 - Membuat implementasi program bagian statement dan control flow 
 - Mengerjakan laporan tugas bagian implementasi program milestone 2
+- Mengerjakan implementasi type checker dan visitor declaration
+- Mengerjakan laporan bagian hasil implementasi program milestone 
 
 
 13524073 Keisha Rizka Syofyani 
@@ -203,6 +226,8 @@ make help    # Menampilkan informasi bantuan
 - Membuat implementasi core program parser dan program utama
 - Refactor dan menyesuaikan struktur file dan program Milestone 1 serta revisi program pada Milestone 1
 - Membuat inisialisasi laporan, quality controlling isi laporan, mengerjakan bagian kesimpulan dan saran, serta finishing readme dan submission milestone 2
+- Mengerjakan implementasi visitor expression
+- Mengerjakan laporan bagian landasan teori, kesimpulan, saran, dan finishing milestone 3
 
 
 13524087 Muhammad Fakhry Zaki 
@@ -212,7 +237,9 @@ make help    # Menampilkan informasi bantuan
 - Membuat implementasi program bagian expression parser dan operator
 - Membuat implementasi parser tree builder
 - Melakukan testing dan bug fixing
-- Mengerjakan laporan bagian testing program
+- Mengerjakan laporan bagian testing program pada milestone 2
+- Mengerjakan implementasi visitor statement, control flow, dan output program semantic analysis
+- Mengerjakan laporan bagian testing program pada milestone 3
 
 
 13524109 Helena Kristela Sarhawa 
@@ -220,6 +247,8 @@ make help    # Menampilkan informasi bantuan
 - Mengerjakan implementasi program lexer
 - Membuat implementasi program bagian declaration parser dan menangani edge case parsing declaration
 - Mengerjakan laporan tugas bagian landasan teori milestone 2
+- Mengerjakan implementasi prgram symbol table dan node
+- Mengerjakan laporan bagian perancangan program
 
 
 
