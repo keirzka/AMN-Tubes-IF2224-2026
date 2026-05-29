@@ -22,7 +22,7 @@ void SAVE_TOKEN_LIST ()
     string fileName;
     getline(cin, fileName);
 
-    ofstream outputStream("test/milestone-3/" + fileName + ".txt");
+    ofstream outputStream("test/milestone-4/" + fileName + ".txt");
     if (!outputStream.is_open()) {
         cerr << "Error: Tidak dapat membuka file untuk penulisan" << endl;
         return;
@@ -48,7 +48,7 @@ void SAVE_PARSE_TREE (Node* akar, int depth) {
     string fileName;
     getline(cin, fileName);
 
-    ofstream outputStream("test/milestone-3/" + fileName + ".txt");
+    ofstream outputStream("test/milestone-4/" + fileName + ".txt");
     if (!outputStream.is_open()) {
         cerr << "Error: Tidak dapat membuka file untuk penulisan" << endl;
         return;
@@ -139,7 +139,7 @@ void SAVE_SYMBOL_TABLE(const SymbolTable& st) {
     string fileName;
     getline(cin, fileName);
 
-    ofstream outputStream("test/milestone-3/" + fileName + ".txt");
+    ofstream outputStream("test/milestone-4/" + fileName + ".txt");
     if (!outputStream.is_open()) {
         cerr << "Error: Tidak dapat membuka file untuk penulisan" << endl;
         return;
@@ -349,7 +349,7 @@ void SAVE_AST_NEW() {
     string fileName;
     getline(cin, fileName);
 
-    ofstream outputStream("test/milestone-3/" + fileName + ".txt");
+    ofstream outputStream("test/milestone-4/" + fileName + ".txt");
     if (!outputStream.is_open()) {
         cerr << "Error: Tidak dapat membuka file untuk penulisan" << endl;
         return;

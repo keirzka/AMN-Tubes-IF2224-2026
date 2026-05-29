@@ -1,0 +1,12 @@
+program Test5;
+var x : integer;
+
+procedure cetak(n : integer);
+begin
+  writeln(n);
+end;
+
+begin
+  x := 42;
+  cetak(x);
+end.

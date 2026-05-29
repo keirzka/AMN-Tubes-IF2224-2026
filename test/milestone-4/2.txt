@@ -1,0 +1,34 @@
+programsy
+ident (Test2)
+semicolon
+varsy
+ident (i)
+colon
+ident (integer)
+semicolon
+beginsy
+ident (i)
+becomes
+intcon (1)
+semicolon
+whilesy
+ident (i)
+leq
+intcon (5)
+dosy
+beginsy
+ident (writeln)
+lparent
+ident (i)
+rparent
+semicolon
+ident (i)
+becomes
+ident (i)
+plus
+intcon (1)
+semicolon
+endsy
+semicolon
+endsy
+period

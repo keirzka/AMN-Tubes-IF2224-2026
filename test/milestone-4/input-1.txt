@@ -1,0 +1,10 @@
+program Test1;
+var x, y : integer;
+begin
+  x := 10;
+  if x > 5 then
+    y := x * 2
+  else
+    y := x div 2;
+  writeln(y);
+end.

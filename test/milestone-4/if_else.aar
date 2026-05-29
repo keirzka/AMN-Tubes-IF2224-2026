@@ -1,0 +1,15 @@
+program test;
+var x : integer;
+
+begin
+    x := 1;
+
+    if x > 3 then
+    begin
+        writeln(100);
+    end
+    else
+    begin
+        writeln(200);
+    end;
+end.

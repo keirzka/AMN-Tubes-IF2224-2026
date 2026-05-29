@@ -1,0 +1,10 @@
+program test;
+
+procedure hello;
+begin
+    writeln(123);
+end;
+
+begin
+    hello();
+end.

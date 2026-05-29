@@ -296,36 +296,257 @@ void CodeGenerator::genProcCall(const std::shared_ptr<ASTNode>& node){
 }
 
 void CodeGenerator::genIf(const std::shared_ptr<ASTNode>& node){
-    if(!node) return;
-    // stub
+    if (!node) return;
+
+    // Cari child: Condition, Then, Else
+    auto condNode = findChild(node, "Condition");
+    auto thenNode = findChild(node, "Then");
+    auto elseNode = findChild(node, "Else");
+
+    // 1. Generate kondisi
+    if (condNode && !condNode->children.empty())
+        genExpression(condNode->children[0]);
+
+    // 2. Emit JPC (lompat ke else/end jika kondisi false)
+    int jpcIdx = emit(Mnemonic::JPC, 0, 0); // operand di-patch nanti
+
+    // 3. Generate body THEN
+    if (thenNode)
+        for (auto& s : thenNode->children) genStatement(s);
+
+    if (elseNode) {
+        // 4. Emit JMP ke end (lewati else)
+        int jmpIdx = emit(Mnemonic::JMP, 0, 0);
+
+        // 5. Patch JPC ke awal else
+        patch(jpcIdx, currentPc());
+
+        // 6. Generate body ELSE
+        for (auto& s : elseNode->children) genStatement(s);
+
+        // 7. Patch JMP ke setelah else
+        patch(jmpIdx, currentPc());
+    } else {
+        // Tidak ada else: patch JPC ke instruksi setelah then
+        patch(jpcIdx, currentPc());
+    }
 }
 
 void CodeGenerator::genWhile(const std::shared_ptr<ASTNode>& node){
-    if(!node) return;
-    // stub
+    if (!node) return;
+
+    auto condNode = findChild(node, "Condition");
+    auto bodyNode = findChild(node, "Body");
+
+    // 1. Catat posisi awal kondisi
+    int startPc = currentPc();
+
+    // 2. Generate kondisi
+    if (condNode && !condNode->children.empty())
+        genExpression(condNode->children[0]);
+
+    // 3. JPC ke end (keluar jika false)
+    int jpcIdx = emit(Mnemonic::JPC, 0, 0);
+
+    // 4. Generate body
+    if (bodyNode)
+        for (auto& s : bodyNode->children) genStatement(s);
+
+    // 5. JMP kembali ke kondisi
+    emit(Mnemonic::JMP, 0, startPc);
+
+    // 6. Patch JPC ke instruksi setelah JMP
+    patch(jpcIdx, currentPc());
 }
 
 void CodeGenerator::genRepeat(const std::shared_ptr<ASTNode>& node){
-    if(!node) return;
-    // stub
+    if (!node) return;
+
+    auto bodyNode = findChild(node, "Body");
+    auto condNode = findChild(node, "Condition");
+
+    // 1. Catat awal body
+    int startPc = currentPc();
+
+    // 2. Generate body
+    if (bodyNode)
+        for (auto& s : bodyNode->children) genStatement(s);
+
+    // 3. Evaluasi kondisi UNTIL
+    if (condNode && !condNode->children.empty())
+        genExpression(condNode->children[0]);
+
+    // 4. JPC kembali ke start jika kondisi false (belum terpenuhi)
+    emit(Mnemonic::JPC, 0, startPc);
 }
 
 void CodeGenerator::genProcedureDecl(const std::shared_ptr<ASTNode>& node){
-    if(!node) return;
-    // stub
+    if (!node) return;
+
+    int tabIdx = node->tab_index;
+
+    // Catat address prosedur (PC sekarang = entry point)
+    if (tabIdx >= 0 && tabIdx < (int)st_.tab.size()) {
+        // patch address di symbol table — biasanya dilakukan via const_cast
+        // karena st_ adalah const ref; koordinasikan dengan tim jika perlu
+    }
+
+    int procStart = currentPc();
+
+    // Simpan level sebelumnya
+    int savedLevel = currentLevel_;
+    currentLevel_++;
+
+    // Cari block_index untuk frame size
+    int blkIdx = node->block_index >= 0 ? node->block_index : 0;
+    int intIdx = emit(Mnemonic::INT, 0, 0);
+    int frameSize = resolveFrameSize(st_, blkIdx);
+    patch(intIdx, frameSize);
+
+    // Generate declarations lokal (prosedur/fungsi bersarang)
+    auto declNode = findChild(node, "Declarations");
+    if (declNode) genDeclarations(declNode, blkIdx);
+
+    // Generate body
+    auto blockNode = findChild(node, "Block");
+    if (blockNode) genBlock(blockNode);
+
+    // RET di akhir
+    emit(Mnemonic::RET, 0, 0);
+
+    currentLevel_ = savedLevel;
 }
 
 void CodeGenerator::genFunctionDecl(const std::shared_ptr<ASTNode>& node){
-    if(!node) return;
-    // stub
+    if (!node) return;
+
+    int savedLevel = currentLevel_;
+    currentLevel_++;
+
+    int blkIdx = node->block_index >= 0 ? node->block_index : 0;
+    int intIdx = emit(Mnemonic::INT, 0, 0);
+    patch(intIdx, resolveFrameSize(st_, blkIdx));
+
+    auto declNode = findChild(node, "Declarations");
+    if (declNode) genDeclarations(declNode, blkIdx);
+
+    auto blockNode = findChild(node, "Block");
+    if (blockNode) genBlock(blockNode);
+
+    // Return value sudah di stack (di-push oleh genAssign ke var fungsi)
+    emit(Mnemonic::RET, 0, 0);
+
+    currentLevel_ = savedLevel;
 }
 
 void CodeGenerator::genFor(const std::shared_ptr<ASTNode>& node){
-    if(!node) return;
-    // stub
+    if (!node) return;
+
+    // Struktur node For: [Var, From, To/Downto, Body]
+    // Cari child berdasarkan kind
+    auto varNode  = findChild(node, "Var");
+    auto fromNode = findChild(node, "From");
+    auto toNode   = findChild(node, "To");      // to
+    auto downNode = findChild(node, "Downto");  // downto (jika ada)
+    auto bodyNode = findChild(node, "Body");
+
+    bool isDownto = (downNode != nullptr);
+    auto limitNode = isDownto ? downNode : toNode;
+
+    // 1. Init: assign nilai awal ke loop var
+    if (fromNode && varNode) {
+        genExpression(fromNode->children.empty() ? fromNode : fromNode->children[0]);
+        int tabIdx = varNode->tab_index;
+        int varLevel = st_.tab[tabIdx].lev;
+        int levelDiff = resolveLevel(currentLevel_, varLevel);
+        int offset = resolveVarAddress(st_, tabIdx);
+        emit(Mnemonic::STO, levelDiff, offset);
+    }
+
+    // 2. Label start kondisi
+    int startPc = currentPc();
+
+    // 3. Evaluasi kondisi: loopVar <= limit (to) atau loopVar >= limit (downto)
+    if (varNode) genVar(varNode);
+    if (limitNode) {
+        if (!limitNode->children.empty())
+            genExpression(limitNode->children[0]);
+        else
+            genExpression(limitNode);
+    }
+    // to: var <= limit → LEQ; downto: var >= limit → GEQ
+    emit(Mnemonic::OPR, 0, static_cast<int>(isDownto ? OprCode::GEQ : OprCode::LEQ));
+
+    // 4. JPC keluar jika kondisi false
+    int jpcIdx = emit(Mnemonic::JPC, 0, 0);
+
+    // 5. Generate body
+    if (bodyNode)
+        for (auto& s : bodyNode->children) genStatement(s);
+
+    // 6. Increment/decrement loop var
+    if (varNode) {
+        genVar(varNode);
+        emit(Mnemonic::LIT, 0, 1);
+        emit(Mnemonic::OPR, 0, static_cast<int>(isDownto ? OprCode::SUB : OprCode::ADD));
+        int tabIdx = varNode->tab_index;
+        int varLevel = st_.tab[tabIdx].lev;
+        int levelDiff = resolveLevel(currentLevel_, varLevel);
+        int offset = resolveVarAddress(st_, tabIdx);
+        emit(Mnemonic::STO, levelDiff, offset);
+    }
+
+    // 7. JMP kembali ke kondisi
+    emit(Mnemonic::JMP, 0, startPc);
+
+    // 8. Patch JPC
+    patch(jpcIdx, currentPc());
 }
 
 void CodeGenerator::genCase(const std::shared_ptr<ASTNode>& node){
-    if(!node) return;
-    // stub
+    if (!node) return;
+
+    // Simpan ekspresi case ke variabel sementara via assign ke slot stack
+    // Atau evaluasi ulang tiap branch (lebih sederhana)
+    auto exprNode = findChild(node, "Expression");
+
+    std::vector<int> jmpToEndIndices;
+
+    for (auto& child : node->children) {
+        if (!child || child->kind != "CaseBranch") continue;
+
+        auto labelNode = findChild(child, "Label");  // nilai konstanta
+        auto bodyNode2 = findChild(child, "Body");
+
+        // Evaluasi ekspresi case
+        if (exprNode && !exprNode->children.empty())
+            genExpression(exprNode->children[0]);
+        else if (exprNode)
+            genExpression(exprNode);
+
+        // Load konstanta label
+        if (labelNode) genExpression(labelNode);
+
+        // EQL
+        emit(Mnemonic::OPR, 0, static_cast<int>(OprCode::EQL));
+
+        // JPC ke branch berikutnya jika tidak cocok
+        int jpcIdx = emit(Mnemonic::JPC, 0, 0);
+
+        // Body branch
+        if (bodyNode2)
+            for (auto& s : bodyNode2->children) genStatement(s);
+
+        // JMP ke end
+        int jmpIdx = emit(Mnemonic::JMP, 0, 0);
+        jmpToEndIndices.push_back(jmpIdx);
+
+        // Patch JPC ke instruksi setelah JMP (= branch berikutnya)
+        patch(jpcIdx, currentPc());
+    }
+
+    // Patch semua JMP ke end
+    int endPc = currentPc();
+    for (int idx : jmpToEndIndices)
+        patch(idx, endPc);
 }

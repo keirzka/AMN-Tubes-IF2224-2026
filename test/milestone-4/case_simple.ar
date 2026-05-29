@@ -1,0 +1,12 @@
+program test;
+var x : integer;
+
+begin
+    x := 2;
+
+    case x of
+        1: writeln(100);
+        2: writeln(200);
+        3: writeln(300);
+    end;
+end.

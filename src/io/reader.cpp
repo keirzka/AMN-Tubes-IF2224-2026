@@ -11,14 +11,14 @@ void INPUT_FILE ()
         string fileName;
         getline(cin, fileName);
 
-        ifstream fInput("test/milestone-3/" + fileName);
+        ifstream fInput("test/milestone-4/" + fileName);
 
         if (!fInput.is_open()) {
             cout << "File dengan nama: " << fileName << " tidak ditemukan!" << endl;
         }
         else {
             fInput.close();
-            fileStream.open("test/milestone-3/" + fileName);
+            fileStream.open("test/milestone-4/" + fileName);
             break;
         }
     }

@@ -1,0 +1,16 @@
+program test;
+var x : integer;
+
+begin
+    x := 0;
+
+    while x < 5 do
+    begin
+        if x mod 2 = 0 then
+        begin
+            writeln(x);
+        end;
+
+        x := x + 1;
+    end;
+end.

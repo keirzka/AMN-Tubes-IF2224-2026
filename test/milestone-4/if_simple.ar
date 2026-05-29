@@ -1,0 +1,11 @@
+program test;
+var x : integer;
+
+begin
+    x := 5;
+
+    if x > 3 then
+    begin
+        writeln(x);
+    end;
+end.
